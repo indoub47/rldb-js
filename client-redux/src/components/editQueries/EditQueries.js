@@ -1,12 +1,12 @@
-import React, {Component} from 'react';
-import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
-import EditQueryForm from './components/EditQueryForm';
-import QueryList from './components/QueryList';
-import ErrorAlert from '../common/ErrorAlert';
-import IsLoading from '../common/IsLoading';
-import {updateQueries} from "../../actions/queriesActions";
-import getId from '../../utils/getId';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import EditQueryForm from "./components/EditQueryForm";
+import QueryList from "./components/QueryList";
+import ErrorAlert from "../common/ErrorAlert";
+import IsLoading from "../common/IsLoading";
+import { updateQueries } from "../../actions/queriesActions";
+import getId from "../../utils/getId";
 
 class EditQueries extends Component {
   constructor(props) {
@@ -15,9 +15,8 @@ class EditQueries extends Component {
       queries: [],
       currentQuery: null,
       isBusy: false,
-      queryNameErrorMsg: '',
-      queriesUpdateError: null
-    }
+      queryNameErrorMsg: ""
+    };
 
     this.submitQueries = this.submitQueries.bind(this);
     this.submitQuery = this.submitQuery.bind(this);
@@ -28,17 +27,18 @@ class EditQueries extends Component {
   }
 
   componentDidMount() {
-    let query = this.props.queries.find(q => 
-      q.filter === this.props.filterSort.filterText && 
-      q.sort === this.props.filterSort.sortText
+    let query = this.props.queries.find(
+      q =>
+        q.filter === this.props.filterSort.filterText &&
+        q.sort === this.props.filterSort.sortText
     );
 
     if (!query) {
       query = {
-        filter: this.props.filterSort.filterText, 
+        filter: this.props.filterSort.filterText,
         sort: this.props.filterSort.sortText
       };
-    }  
+    }
 
     this.setState({
       queries: this.props.queries,
@@ -95,7 +95,7 @@ class EditQueries extends Component {
     const id = e.target.dataset.id;
     const query = this.state.queries.find(q => q.id === id);
     if (query) {
-      this.setState({currentQuery: query});
+      this.setState({ currentQuery: query });
     }
   }
 
@@ -104,15 +104,21 @@ class EditQueries extends Component {
     console.log("draft", draft);
     // validate query
     // name must be not empty
-    if (draft.name.trim() === '') {
-      this.setState({queryNameErrorMsg: "Name must be not empty"});
+    if (draft.name.trim() === "") {
+      this.setState({ queryNameErrorMsg: "Name must be not empty" });
       return;
     }
 
     // ...and must be unique
-    const sameNameQuery = this.state.queries.find(q => q.name.trim() === draft.name.trim());
+    const sameNameQuery = this.state.queries.find(
+      q => q.name.trim() === draft.name.trim()
+    );
     if (sameNameQuery) {
-      this.setState({queryNameErrorMsg: `Same name as ${sameNameQuery.id}; The name must be unique`});
+      this.setState({
+        queryNameErrorMsg: `Same name as ${
+          sameNameQuery.id
+        }; The name must be unique`
+      });
       return;
     }
 
@@ -127,15 +133,12 @@ class EditQueries extends Component {
       ];
     } else {
       draft.id = getId();
-      modifiedQueries = [
-        ...this.state.queries,
-        draft
-      ];
+      modifiedQueries = [...this.state.queries, draft];
     }
 
     this.setState({
-      queryNameErrorMsg: '', 
-      queries: modifiedQueries, 
+      queryNameErrorMsg: "",
+      queries: modifiedQueries,
       currentQuery: draft
     });
   }
@@ -150,11 +153,14 @@ class EditQueries extends Component {
 
   render() {
     if (this.state.isBusy) {
-      return <IsLoading />
+      return <IsLoading />;
     }
 
-    return (      
+    return (
       <div className="container thing-edit">
+        {this.props.queriesUpdateError ? (
+          <ErrorAlert errorObj={this.props.queriesUpdateError} />
+        ) : null}
         <QueryList
           queries={this.state.queries}
           remove={this.remove}
@@ -168,15 +174,12 @@ class EditQueries extends Component {
           nameErrorMsg={this.state.queryNameErrorMsg}
         />
         {this.state.error && <ErrorAlert errorObj={this.state.error} />}
-        <button 
-          className="btn btn-primary btn-lg"
-          onClick={this.submitQueries}>
+        <button className="btn btn-primary btn-lg" onClick={this.submitQueries}>
           Submit Changes
         </button>
       </div>
     );
   }
-
 }
 
 EditQueries.propTypes = {
@@ -184,13 +187,16 @@ EditQueries.propTypes = {
   queries: PropTypes.arrayOf(PropTypes.object),
   currentQuery: PropTypes.object,
   filterSort: PropTypes.object,
-  queryNameError: PropTypes.object,
-  queriesUpdateError: PropTypes.object,
-}
+  queriesUpdateError: PropTypes.object
+};
 
 const mapStateToProps = (state, ownProps) => ({
   queries: state.queries.data[ownProps.match.params.thingType],
-  filterSort: state.filterSort 
+  filterSort: state.filterSort,
+  queriesUpdateError: state.queries.error
 });
 
-export default connect(mapStateToProps, {updateQueries})(EditQueries);
+export default connect(
+  mapStateToProps,
+  { updateQueries }
+)(EditQueries);
