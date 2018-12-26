@@ -76,7 +76,7 @@ const DefectHeadRow = () => {
       <th className="km">km</th>
       <th className="pk">pk</th>
       <th className="m">m</th>
-      <th className="sl">sl</th>
+      <th className="siule">siule</th>
       <th className="oper">oper</th>
       <th className="apar">apar</th>
       <th className="data">data</th>

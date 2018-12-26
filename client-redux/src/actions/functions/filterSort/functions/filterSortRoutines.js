@@ -1,12 +1,13 @@
+import parseAndReplaceVk from "./parseAndReplaceVk";
 /**
  * Returns filter function.
  * Takes a raw filter string and an object with field name replacement rules,
  * and returns a filter function which can be used for filtering object list.
  * @param {string} filterString - raw filter field string, may be trimmed.
- * @param {object} fnReplacements - object which keys are field names of 
+ * @param {object} fnReplacements - object which keys are field names of
  * the object in the list to be filtered, and values are strings which should
  * be put instead of field names into the filterString.
- * @return {function} a function which takes an object as a parameter and 
+ * @return {function} a function which takes an object as a parameter and
  * returns a boolean value indicating if the object passes the filter.
  */
 export function getFilterFunction(filterString, fnReplacements) {
@@ -14,19 +15,12 @@ export function getFilterFunction(filterString, fnReplacements) {
     return x => true;
   }
 
-  const filterFuncString = "return " + replaceFieldNames(filterString, fnReplacements);
+  const filterFuncString =
+    "return " + replaceFieldNames(filterString, fnReplacements);
 
-  // tikrina, kad nebutu pliko "="
-  // != == !== === >= <=
-  let regex = new RegExp(/[^!<>=]=[^=]/);
-  if (regex.test(filterFuncString)) {
-    throw new Error("assignment instead of comparison");
-  }
-  
   // eslint-disable-next-line
   return new Function("x", filterFuncString);
 }
-
 
 /**
  * Replaces field names with corresponding object key names in filter string.
@@ -35,30 +29,40 @@ export function getFilterFunction(filterString, fnReplacements) {
  * the object ('id === 5' in filter text should be replaced by 'obj["id"] === 5' in filter
  * function text; additionaly, object may be not flat).
  * @param {string} filterString - raw filter field string, may be trimmed.
- * @param {object} fnReplacements - object which keys are field names of 
+ * @param {object} fnReplacements - object which keys are field names of
  * the object in the list to be filtered, and values are strings which should
  * be put instead of field names into the filterString.
  * @return {string} a filter string where field names are replaced by real paths inside the object
  */
 function replaceFieldNames(filterString, fnReplacements) {
-
-  // replaces _vt_ with:
-  // km != null && km > 0 && pk != null && pk > 0 && (km * 1000 + (pk - 1) * 100 + m)
-  const vt = "km && pk  && (km * 1000 + (pk - 1) * 100 + m)";
-  let filterText = filterString.replace(/_vt_/g, vt);
+  // replaces a.b.c with a*1000 + (b-1)*100 + z
+  let filterText = parseAndReplaceVk(filterString);
+  const metres = "km && pk && (km * 1000 + (pk - 1) * 100 + m)";
+  // replaces consecutive spaces, tabs, etc with one space
+  // replaces all consecutive "=" with "==="
+  // replaces "!===" with "!=", "<===" with "<=" and ">===" with ">="
+  // replaces "_m_" with metres
+  // replaces "_k_" with metres
+  // replaces "some (" and "some(" with "x.history.some(hi => "
+  filterText = filterText
+    .replace(/\s+/g, " ")
+    .replace(/=+/g, "===")
+    .replace("<===", "<=")
+    .replace(">===", ">=")
+    .replace("!===", "!=")
+    .replace(/_m_/g, metres)
+    .replace(/_k_/g, metres)
+    .replace(/((some \()|(some\())/g, "x.history.some(hi => ");
 
   // replaces field names with paths:
   // "fieldName" -> obj["inner_prop"]["fieldName"]
-  Object.keys(fnReplacements).forEach(key => { 
+  Object.keys(fnReplacements).forEach(key => {
     const regex = new RegExp("(\\b[\\W]*)(" + key + ")([\\W]*\\b)", "g");
     filterText = filterText.replace(regex, "$1" + fnReplacements[key] + "$3");
   });
-
+  console.log("filterText", filterText);
   return filterText;
 }
-
-
-
 
 // SORTING
 
@@ -69,21 +73,19 @@ function replaceFieldNames(filterString, fnReplacements) {
  * object list.
  * @param {string} sortString - raw sort field string, may be trimmed.
  * @param {function} getSortingReplacement - function which takes a field key
- * as a string parameter and returns a function which supplied with object 
+ * as a string parameter and returns a function which supplied with object
  * returns a value of corresponding field of that object.
- * @return {function} a sorter function which takes two objects of the same 
+ * @return {function} a sorter function which takes two objects of the same
  * type as a parameters and returns an integer indicating which of those
  * objects goes first in the sort.
  */
 export function getSortFunction(sortString, getSortingReplacement) {
-
   if (!sortString || !sortString.trim()) {
     return (a, b) => 0;
   }
 
   return fieldSorter(splitString(sortString), getSortingReplacement);
 }
-
 
 /**
  * Splits a string on commas, semicolons or spaces.
@@ -103,9 +105,9 @@ function splitString(rawString) {
  * which can be used for sorting object list.
  * @param {array<string>} fields - array of object field names.
  * @param {function} fnToValue - function which takes a field key
- * as a string parameter and returns a function which supplied with object 
+ * as a string parameter and returns a function which supplied with object
  * returns a value of corresponding field of that object.
- * @return {function} a sorter function which takes two objects of the same 
+ * @return {function} a sorter function which takes two objects of the same
  * type as a parameters and returns an integer indicating which of those
  * objects goes first in the sort.
  */
@@ -126,7 +128,5 @@ function fieldSorter(fields, fnToValue) {
       .reduce((p, n) => {
         return p ? p : n;
       }, 0);
-  };  
+  };
 }
-
-

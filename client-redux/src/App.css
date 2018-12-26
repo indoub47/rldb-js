@@ -56,3 +56,32 @@ li.page-item button.current {
 li.ellipsis {
   margin: 0 .5em;
 }
+
+.manual {
+  font-size: .8em;
+  text-align: justify;
+}
+
+.manual span.fn {
+  color: blue;
+  font-family: monospace;
+  font-size: 1.25em;
+  font-weight: bold;
+  background: #f4f4f4;
+}
+
+.manual span.fv {
+  color: blue;
+  font-family: monospace;
+  font-size: 1.25em;
+  font-weight: normal;
+  background: #f4f4f4;
+}
+
+.manual span.cd {
+  color: blue;
+  font-family: monospace;
+  font-size: 1.25em;
+  font-weight: normal;
+  background: #f4f4f4;
+}

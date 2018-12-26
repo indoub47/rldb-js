@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import Filter from "./components/Filter";
 import Sort from "./components/Sort";
 import QuerySelect from "./components/QuerySelect";
+import Manual from "./components/Manual";
 import ErrorAlert from "../ErrorAlert";
 import { filterSortDefects } from "../../../actions/defectsActions";
 import {createOptions} from '../../createOptions';
@@ -102,7 +103,7 @@ class FilterSort extends Component {
                 clearText={this.clearSort}
                 valid={isValidFs}
               />
-            </div>          
+            </div>
             <div className="col-12">
               <ErrorAlert errorObj={this.props.filterSortError} />
             </div>
@@ -116,14 +117,9 @@ class FilterSort extends Component {
                 Apply Filter-Sort
               </button>
             </div>
-            {/*<div className="col-3">
-              <button
-                className="btn btn-block btn-warning"
-                onClick={this.saveAsFsQuery}
-              >
-                Save as Query
-              </button>
-            </div>*/}
+            <div className="col-12">
+              <Manual />    
+            </div>
           </div>
         </div>
         <div className="col-3">
@@ -134,16 +130,16 @@ class FilterSort extends Component {
                   className="btn btn-sm btn-warning"
                   onClick={this.editQueries}
                 >Edit</button>
+              <button 
+                className="btn btn-sm btn-info" 
+                onClick={this.useSelectedQuery}
+              >Use</button>
               </h5>
               <QuerySelect
                 options={this.querySelectOptions}
                 onChange={this.onSelectedQueryChange}
                 value={this.state.currentQueryId}
               /> 
-              <button 
-                className="btn btn-sm btn-info" 
-                onClick={this.useSelectedQuery}
-              >Use</button>
             </div>
           </div>
         </div>

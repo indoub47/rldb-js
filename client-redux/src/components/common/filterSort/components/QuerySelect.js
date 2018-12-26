@@ -10,7 +10,7 @@ const QuerySelect = ({options, onChange, value}) => {
             value={value || ''}
             placeholder='Queries'
             onChange={onChange}
-            size="3"
+            size="6"
             style={{ fontSize: ".95rem" }}
           /> 
       );

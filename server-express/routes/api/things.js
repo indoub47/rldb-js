@@ -118,7 +118,7 @@ router.get(
           if (err) return res.status(500).send(err); 
           found.toArray((err, result) => {
             if (err) return res.status(500).send(err);            
-            return res.status(200).json(JSON.parse(result[0].queries));
+            return res.status(200).json(result[0].queries);
           });
         }); 
       });
