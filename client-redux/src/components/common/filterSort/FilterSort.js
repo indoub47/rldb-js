@@ -7,17 +7,17 @@ import QuerySelect from "./components/QuerySelect";
 import Manual from "./components/Manual";
 import ErrorAlert from "../ErrorAlert";
 import { filterSortDefects } from "../../../actions/defectsActions";
-import {createOptions} from '../../createOptions';
+import { createOptions } from "../../createOptions";
 
 class FilterSort extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
-      currentQueryId: '',
-      filterText: '',
-      sortText: ''
-    }
+      currentQueryId: "",
+      filterText: "",
+      sortText: "",
+      showManual: true
+    };
     this.clearFilter = this.clearFilter.bind(this);
     this.clearSort = this.clearSort.bind(this);
     this.changeFilter = this.changeFilter.bind(this);
@@ -26,25 +26,26 @@ class FilterSort extends Component {
     this.useSelectedQuery = this.useSelectedQuery.bind(this);
     this.onSelectedQueryChange = this.onSelectedQueryChange.bind(this);
     this.editQueries = this.editQueries.bind(this);
-    
+    this.toggleManual = this.toggleManual.bind(this);
+
     // in order to avoid recreating options each time new query is selected
     this.querySelectOptions = createOptions(this.props.queries);
   }
 
   clearFilter() {
-    this.setState({filterText: '', id: ''});
+    this.setState({ filterText: "", id: "" });
   }
 
   clearSort() {
-    this.setState({sortText: '', id: ''});
+    this.setState({ sortText: "", id: "" });
   }
 
   changeFilter(e) {
-    this.setState({filterText: e.target.value, id: ''});
+    this.setState({ filterText: e.target.value, id: "" });
   }
 
   changeSort(e) {
-    this.setState({sortText: e.target.value, id: ''});
+    this.setState({ sortText: e.target.value, id: "" });
   }
 
   applyFS() {
@@ -53,15 +54,21 @@ class FilterSort extends Component {
 
   onSelectedQueryChange(e) {
     const id = e.target.value;
-    this.setState({currentQueryId: id});
+    this.setState({ currentQueryId: id });
+  }
+
+  toggleManual() {
+    this.setState({ showManual: !this.state.showManual });
   }
 
   useSelectedQuery() {
     //console.log("queries, state.id", this.props.queries, this.state.currentQueryId);
-    const query = this.props.queries.find(q => q.id === this.state.currentQueryId);
+    const query = this.props.queries.find(
+      q => q.id === this.state.currentQueryId
+    );
     //console.log("found query", query);
     this.setState({
-      filterText: query.filter, 
+      filterText: query.filter,
       sortText: query.sort
     });
   }
@@ -82,10 +89,9 @@ class FilterSort extends Component {
     // } else {
     //   isValidFs = null;
     // }
-    
 
     return (
-      <div className="row fs-view mb-2">        
+      <div className="row fs-view mb-2">
         <div className="col-7" id="fscontent">
           <div className="row">
             <div className="col-7">
@@ -110,36 +116,43 @@ class FilterSort extends Component {
           </div>
           <div className="row">
             <div className="col-12">
-              <button
-                className="btn btn-block btn-info"
-                onClick={this.applyFS}
-              >
+              <button type="button" className="btn btn-sm btn-secondary col-1" onClick={this.toggleManual}>
+                Manual
+              </button>
+              <button type="button" className="btn btn-sm btn-info col-11" onClick={this.applyFS}>
                 Apply Filter-Sort
               </button>
             </div>
+            {this.state.showManual ? (
             <div className="col-12">
-              <Manual />    
+              <Manual />
             </div>
+            ) : null}
           </div>
         </div>
         <div className="col-3">
           <div className="row">
-            <div className="col-12">              
+            <div className="col-12">
               <h5>
-                Filter-Sort Queries <button 
+                Filter-Sort Queries{" "}
+                <button
                   className="btn btn-sm btn-warning"
                   onClick={this.editQueries}
-                >Edit</button>
-              <button 
-                className="btn btn-sm btn-info" 
-                onClick={this.useSelectedQuery}
-              >Use</button>
+                >
+                  Edit
+                </button>
+                <button
+                  className="btn btn-sm btn-info"
+                  onClick={this.useSelectedQuery}
+                >
+                  Use
+                </button>
               </h5>
               <QuerySelect
                 options={this.querySelectOptions}
                 onChange={this.onSelectedQueryChange}
                 value={this.state.currentQueryId}
-              /> 
+              />
             </div>
           </div>
         </div>
@@ -163,7 +176,7 @@ const mapStateToProps = (state, ownProps) => ({
 
 FilterSort.defaultProps = {
   queries: []
-}
+};
 
 export default connect(
   mapStateToProps,

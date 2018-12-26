@@ -31,7 +31,7 @@ class HistoryForm extends Component {
   componentDidUpdate(prevProps) {
     // atnaujina state tik tada, kai EditHistory siunčia
     // naują item. Tas vyksta po submit, po empty arba po setForEditing
-    console.log("HistoryForm.componentDidUpdate props.actions, props.item", this.props.actions, this.props.item);
+    // console.log("HistoryForm.componentDidUpdate props.actions, props.item", this.props.actions, this.props.item);
 
     // po submit, empty arba setForEditing pareina naujas historyItem.
     // jis turi action arba neturi. Nustatoma doneByNB reikšmė. Default yra true
@@ -42,7 +42,7 @@ class HistoryForm extends Component {
       : 
       true;  
 
-      console.log("HistoryForm.componentDidUpdate doneByNB", doneByNB);
+      //console.log("HistoryForm.componentDidUpdate doneByNB", doneByNB);
 
 
     if (this.props.item !== prevProps.item) {

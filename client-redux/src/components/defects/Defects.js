@@ -71,10 +71,10 @@ class Defects extends Component {
 
   render() {
 
-    console.log("defectsIsLoading, queriesIsLoading:",this.props.defectsIsLoading, this.props.queriesIsLoading);
+    //console.log("defectsIsLoading, queriesIsLoading:",this.props.defectsIsLoading, this.props.queriesIsLoading);
 
     if (this.props.queryCount < 1) {
-      console.log("initial render");
+      //console.log("initial render");
       return <h3>the innitial render</h3>
     }
 
@@ -125,17 +125,11 @@ class Defects extends Component {
       <div className="container-fluid">
         <div className="row">
           <div className="col-xl-12 fs-header">
-            <h4>
-              Filter - Sort <button
-                className="btn btn-sm btn-light"
-                onClick={this.toggleFilterSort}
-              >
-                <i className="far fa-eye-slash" />
-              </button>
-            </h4>
+            <button className="btn btn-sm btn-secondary" onClick={this.toggleFilterSort}>
+              Filter-Sort
+            </button>
           </div>
           <div className="col-lg-12">
-
             {this.state.showFilterSort ? 
               <FilterSort 
                 history={this.props.history}
@@ -143,7 +137,6 @@ class Defects extends Component {
               /> 
               : null
             }
-
             <div className="row">
               <div className="col-2 mb-2">
                 <button

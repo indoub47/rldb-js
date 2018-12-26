@@ -6,7 +6,7 @@ export const createOptions =
     displayfunc = x => x.name, 
     keyfunc = x => x.id, 
     valuefunc = x => x.id) => {
-      console.log("TESTING: recreating options " + placeholder, arr);
+      //console.log("TESTING: recreating options " + placeholder, arr);
       let options = arr.map(x => 
         <option
           key={keyfunc(x)} 

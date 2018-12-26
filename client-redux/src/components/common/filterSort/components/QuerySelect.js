@@ -2,7 +2,7 @@ import React from 'react';
 import SelectInputGroup from "../../SelectInputGroup";
 
 const QuerySelect = ({options, onChange, value}) => {
-      console.log(value);
+      // console.log(value);
       return (
           <SelectInputGroup
             options={options}
