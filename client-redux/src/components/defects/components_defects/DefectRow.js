@@ -47,6 +47,8 @@ const DefectRow = ({defect, editDefect, deleteDefect}) => {
           </button>
           <button
             className="btn btn-xs btn-danger"
+           // data-toggle="modal" 
+            //data-target="#confirmation"
             data-id={defect.id}
             onClick={deleteDefect}
           >

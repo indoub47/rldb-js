@@ -7,6 +7,7 @@ import IsLoading from "../common/IsLoading";
 import ErrorAlert from "../common/ErrorAlert";
 import ItemsCount from "../common/ItemsCount";
 import Pager from "../common/pager/Pager";
+import Confirmation from "../common/Confirmation";
 //import ExportItems from "../common/exportItems/ExportItems";
 import FilterSort from "../common/filterSort/FilterSort";
 import { pageChange, itemsPerPageChange } from "../../actions/pagerActions";
@@ -17,15 +18,20 @@ class Defects extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      showFilterSort: true
+      showFilterSort: true,
+      showConfirmationDialog: false,
+      idToDelete: ""
     };
     this.thingType = "defect";
     this.toggleFilterSort = this.toggleFilterSort.bind(this);
     this.editDefect = this.editDefect.bind(this);
-    this.deleteDefect = this.deleteDefect.bind(this);
+    //this.deleteDefect = this.deleteDefect.bind(this);
     this.createDefect = this.createDefect.bind(this);
     this.pageChange = this.pageChange.bind(this);
     this.itemsPerPageChange = this.itemsPerPageChange.bind(this);
+    this.showDeleteConfirmation = this.showDeleteConfirmation.bind(this);
+    this.confirmDelete = this.confirmDelete.bind(this);
+    this.unconfirmDelete = this.unconfirmDelete.bind(this);
   }
 
   componentDidMount() {
@@ -47,8 +53,7 @@ class Defects extends Component {
 
   itemsPerPageChange(e) {
     const selectedValue = parseInt(e.target.value, 10);
-    this.props.itemsPerPageChange(
-      selectedValue, this.props.fsedDefects.length);
+    this.props.itemsPerPageChange(selectedValue, this.props.fsedDefects.length);
   }
 
   toggleFilterSort() {
@@ -64,18 +69,39 @@ class Defects extends Component {
     this.props.history.push(`defects/edit/${id}`);
   }
 
-  deleteDefect(e) {
-    const id = e.target.dataset.id;
-    this.props.deleteDefect(id);
+  // deleteDefect(e) {
+  //   const id = e.target.dataset.id;
+  //   this.props.deleteDefect(id);
+  // }
+
+  showDeleteConfirmation(e) {
+    this.setState({
+        showConfirmationDialog: true, 
+        idToDelete: e.target.dataset.id 
+      });
+  }
+
+  confirmDelete() {    
+    this.props.deleteDefect(this.state.idToDelete);
+    this.setState({
+      showConfirmationDialog: false,
+      idToDelete: ""
+    });
+  }
+
+  unconfirmDelete() {
+    this.setState({ 
+      showConfirmationDialog: false,
+      defectId: ""
+    });
   }
 
   render() {
-
     //console.log("defectsIsLoading, queriesIsLoading:",this.props.defectsIsLoading, this.props.queriesIsLoading);
 
     if (this.props.queryCount < 1) {
       //console.log("initial render");
-      return <h3>the innitial render</h3>
+      return <h3>the innitial render</h3>;
     }
 
     if (this.props.defectsIsLoading || this.props.queriesIsLoading) {
@@ -83,11 +109,11 @@ class Defects extends Component {
     }
 
     if (this.props.defectsError) {
-      return <ErrorAlert errorObj={this.props.defectsError} />
+      return <ErrorAlert errorObj={this.props.defectsError} />;
     }
 
     if (this.props.queriesFetchError) {
-      return <ErrorAlert errorObj={this.props.queriesFetchError} />
+      return <ErrorAlert errorObj={this.props.queriesFetchError} />;
     }
 
     // let errorMsg = '';
@@ -123,20 +149,29 @@ class Defects extends Component {
 
     return (
       <div className="container-fluid">
+        <Confirmation
+          title="Delete Confirmation"
+          body="Please confirm that you really want to delete this defect from database."
+          confirmHandler={this.confirmDelete}
+          rejectHandler={this.unconfirmDelete}
+          show={this.state.showConfirmationDialog}
+        />
         <div className="row">
           <div className="col-xl-12 fs-header">
-            <button className="btn btn-sm btn-secondary" onClick={this.toggleFilterSort}>
+            <button
+              className="btn btn-sm btn-secondary"
+              onClick={this.toggleFilterSort}
+            >
               Filter-Sort
             </button>
           </div>
           <div className="col-lg-12">
-            {this.state.showFilterSort ? 
-              <FilterSort 
+            {this.state.showFilterSort ? (
+              <FilterSort
                 history={this.props.history}
                 thingType={this.thingType}
-              /> 
-              : null
-            }
+              />
+            ) : null}
             <div className="row">
               <div className="col-2 mb-2">
                 <button
@@ -155,7 +190,7 @@ class Defects extends Component {
                     firstItemIndex + itemsPerPage
                   )}
                   editDefect={this.editDefect}
-                  deleteDefect={this.deleteDefect}
+                  deleteDefect={this.showDeleteConfirmation}
                 />
               </div>
             </div>
@@ -212,7 +247,7 @@ const mapStateToProps = state => ({
 Defects.defaultProps = {
   fsedDefects: [],
   allDefectCount: 0
-}
+};
 
 export default connect(
   mapStateToProps,
