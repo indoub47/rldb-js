@@ -25,7 +25,6 @@ class Defects extends Component {
     this.thingType = "defect";
     this.toggleFilterSort = this.toggleFilterSort.bind(this);
     this.editDefect = this.editDefect.bind(this);
-    //this.deleteDefect = this.deleteDefect.bind(this);
     this.createDefect = this.createDefect.bind(this);
     this.pageChange = this.pageChange.bind(this);
     this.itemsPerPageChange = this.itemsPerPageChange.bind(this);

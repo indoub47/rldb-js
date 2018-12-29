@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import HistoryForm from './editHistoryComponents/HistoryForm';
 import HistoryRecordsView from './editHistoryComponents/HistoryRecordsView';
-// import updateDefect from '../../../actions/defectsActions';
 import IsLoading from '../../common/IsLoading';
 import ErrorAlert from '../../common/ErrorAlert/ErrorAlert';
 import {emptyHistoryItem} from './editHistoryComponents/emptyHistoryItem';
@@ -82,8 +81,7 @@ EditHistory.defaultProps = {
 
 const mapStateToProps = state => ({
   isBusy: state.defectsStatus.isBusy,
-  error: state.defectsError.updateError,
-  //defect: state.defectIntent.currentDefect,
+  error: state.defectsError.updateError
 });
 
 export default connect(
