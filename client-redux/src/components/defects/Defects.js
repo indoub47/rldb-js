@@ -4,7 +4,7 @@ import { PropTypes } from "prop-types";
 import { connect } from "react-redux";
 import DefectTable from "./components_defects/DefectTable";
 import IsLoading from "../common/IsLoading";
-import ErrorAlert from "../common/ErrorAlert";
+import ErrorAlertPacket from "../common/ErrorAlert/ErrorAlertPacket";
 import ItemsCount from "../common/ItemsCount";
 import Pager from "../common/pager/Pager";
 import Confirmation from "../common/Confirmation";
@@ -13,12 +13,12 @@ import FilterSort from "../common/filterSort/FilterSort";
 import { pageChange, itemsPerPageChange } from "../../actions/pagerActions";
 import { fetchDefects, deleteDefect } from "../../actions/defectsActions";
 import { fetchQueries } from "../../actions/queriesActions";
+import {toggleFS} from "../../actions/showActions";
 
 class Defects extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      showFilterSort: true,
       showConfirmationDialog: false,
       idToDelete: ""
     };
@@ -57,7 +57,7 @@ class Defects extends Component {
   }
 
   toggleFilterSort() {
-    this.setState({ showFilterSort: !this.state.showFilterSort });
+    this.props.toggleFS("defect");
   }
 
   createDefect() {
@@ -68,11 +68,6 @@ class Defects extends Component {
     const id = e.target.dataset.id;
     this.props.history.push(`defects/edit/${id}`);
   }
-
-  // deleteDefect(e) {
-  //   const id = e.target.dataset.id;
-  //   this.props.deleteDefect(id);
-  // }
 
   showDeleteConfirmation(e) {
     this.setState({
@@ -97,43 +92,16 @@ class Defects extends Component {
   }
 
   render() {
-    //console.log("defectsIsLoading, queriesIsLoading:",this.props.defectsIsLoading, this.props.queriesIsLoading);
 
     if (this.props.queryCount < 1) {
-      //console.log("initial render");
-      return <h3>the innitial render</h3>;
+      return <h3>queryCount &lt; 0, kažkokia chujnia</h3>;
     }
 
     if (this.props.defectsIsLoading || this.props.queriesIsLoading) {
       return <IsLoading />;
     }
 
-    if (this.props.defectsError) {
-      return <ErrorAlert errorObj={this.props.defectsError} />;
-    }
-
-    if (this.props.queriesFetchError) {
-      return <ErrorAlert errorObj={this.props.queriesFetchError} />;
-    }
-
-    // let errorMsg = '';
-    // if (this.props.defectsError) {
-    //   errorMsg = errorMsg + this.props.defectsError.msg;
-    // }
-    // if (this.props.queriesFetchError) {
-    //   errorMsg = errorMsg + '\n' + this.props.queriesFetchError.msg
-    // }
-    // errorMsg = errorMsg.trim();
-    // if (errorMsg !== '') {
-    //   return <ErrorAlert error={errorMsg} />;
-    // }
-
     const { firstItemIndex, itemsPerPage, buttons } = this.props.pager;
-    //console.log("Defects.render firstItemIndex, itemsPerPage, buttons",
-    //   firstItemIndex,
-    //   itemsPerPage,
-    //   buttons
-    // );
 
     const pagerComponent =
       buttons.length > 0 ? (
@@ -156,8 +124,18 @@ class Defects extends Component {
           rejectHandler={this.unconfirmDelete}
           show={this.state.showConfirmationDialog}
         />
+        {
+          this.props.defectsError || this.props.queriesFetchError ?
+          (<div className="row">
+            <div className="col-12">
+              <ErrorAlertPacket
+                errorObjArray={[this.props.defectsError, this.props.queriesFetchError]}
+              />
+            </div>
+          </div>)  : null
+        }
         <div className="row">
-          <div className="col-xl-12 fs-header">
+          <div className="col-12 fs-header">
             <button
               className="btn btn-sm btn-secondary"
               onClick={this.toggleFilterSort}
@@ -165,8 +143,8 @@ class Defects extends Component {
               Filter-Sort
             </button>
           </div>
-          <div className="col-lg-12">
-            {this.state.showFilterSort ? (
+          <div className="col-12">
+            {this.props.showFs ? (
               <FilterSort
                 history={this.props.history}
                 thingType={this.thingType}
@@ -183,7 +161,7 @@ class Defects extends Component {
               </div>
             </div>
             <div className="row">
-              <div className="col-xl-12">
+              <div className="col-12">
                 <DefectTable
                   items={this.props.fsedDefects.slice(
                     firstItemIndex,
@@ -196,7 +174,7 @@ class Defects extends Component {
             </div>
 
             <div className="row">
-              <div className="col-xl-3">
+              <div className="col-3">
                 <ItemsCount
                   inView={this.props.fsedDefects.length}
                   total={this.props.allDefectCount}
@@ -230,7 +208,9 @@ Defects.propTypes = {
   queriesIsLoading: PropTypes.bool,
   queriesFetchError: PropTypes.object,
   pageChange: PropTypes.func.isRequired,
-  itemsPerPageChange: PropTypes.func.isRequired
+  itemsPerPageChange: PropTypes.func.isRequired,
+  toggleFS: PropTypes.func.isRequired,
+  showFs: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -241,7 +221,8 @@ const mapStateToProps = state => ({
   allDefectCount: state.allDefects.length,
   defectsIsLoading: state.defectsStatus.isBusy,
   defectsError: state.defectsError.error,
-  pager: state.pager
+  pager: state.pager,
+  showFs: state.show.fsOn.defect,
 });
 
 Defects.defaultProps = {
@@ -251,5 +232,5 @@ Defects.defaultProps = {
 
 export default connect(
   mapStateToProps,
-  { deleteDefect, fetchDefects, fetchQueries, pageChange, itemsPerPageChange }
+  { deleteDefect, fetchDefects, fetchQueries, pageChange, itemsPerPageChange, toggleFS }
 )(Defects);

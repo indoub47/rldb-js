@@ -8,6 +8,7 @@ import SelectInputGroup from '../common/SelectInputGroup';
 import {fetchRegisterThings} from '../../actions/thingsActions';
 import isEmpty from '../../validation/is-empty';
 import {createOptions} from '../createOptions';
+import IsLoading from '../common/IsLoading';
 
 
 class Register extends Component {
@@ -54,10 +55,6 @@ class Register extends Component {
     const inputErrors = this.props.register.error || {};
     const thingsIsLoading = isEmpty(this.props.things.data) || this.props.things.isLoading;
 
-    if (this.props.register.isBusy) {
-      return (<div><h1>Wait a moment...</h1></div>);
-    }
-
     // things load error
     if (!isEmpty(this.props.things.error)) {
       return (
@@ -69,8 +66,9 @@ class Register extends Component {
     }
 
     // things data is not empty
-    return (
+    return (      
       <div className='register'>
+        {this.props.register.isBusy ? <IsLoading /> : null}
         <div className='container'>
           <div className='row'>
             <div className='col-md-8 m-auto'>

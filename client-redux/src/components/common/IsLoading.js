@@ -1,8 +1,8 @@
 import React from 'react';
 
-const IsLoading = ({text}) => {
+const IsLoading = () => {
   return (
-    <h1>{text}....</h1>
+    <div className="spinner"></div>
   )
 }
 

@@ -5,9 +5,10 @@ import Filter from "./components/Filter";
 import Sort from "./components/Sort";
 import QuerySelect from "./components/QuerySelect";
 import Manual from "./components/Manual";
-import ErrorAlert from "../ErrorAlert";
+import ErrorAlert from "../ErrorAlert/ErrorAlert";
 import { filterSortDefects } from "../../../actions/defectsActions";
 import { createOptions } from "../../createOptions";
+import {toggleFSManual} from "../../../actions/showActions";
 
 class FilterSort extends Component {
   constructor(props) {
@@ -15,8 +16,7 @@ class FilterSort extends Component {
     this.state = {
       currentQueryId: "",
       filterText: "",
-      sortText: "",
-      showManual: true
+      sortText: ""
     };
     this.clearFilter = this.clearFilter.bind(this);
     this.clearSort = this.clearSort.bind(this);
@@ -29,7 +29,7 @@ class FilterSort extends Component {
     this.toggleManual = this.toggleManual.bind(this);
 
     // in order to avoid recreating options each time new query is selected
-    this.querySelectOptions = createOptions(this.props.queries);
+    this.querySelectOptions = createOptions(this.props.queries, "Filter-Sort Queries");
   }
 
   clearFilter() {
@@ -54,18 +54,29 @@ class FilterSort extends Component {
 
   onSelectedQueryChange(e) {
     const id = e.target.value;
+    console.log("current query id set to ", id);
     this.setState({ currentQueryId: id });
+
   }
 
   toggleManual() {
-    this.setState({ showManual: !this.state.showManual });
+    this.props.toggleFSManual(this.props.thingType);
   }
 
   useSelectedQuery() {
     //console.log("queries, state.id", this.props.queries, this.state.currentQueryId);
+    if (!this.state.currentQueryId) return;
+
     const query = this.props.queries.find(
       q => q.id === this.state.currentQueryId
     );
+
+    if (!query) {
+      // this must not happen
+      console.log('didn\'t found a selected query by its id', this.state.currentQueryId);
+      return;
+    }
+
     //console.log("found query", query);
     this.setState({
       filterText: query.filter,
@@ -123,7 +134,7 @@ class FilterSort extends Component {
                 Apply Filter-Sort
               </button>
             </div>
-            {this.state.showManual ? (
+            {this.props.showFsManual ? (
             <div className="col-12">
               <Manual />
             </div>
@@ -166,12 +177,15 @@ FilterSort.propTypes = {
   thingType: PropTypes.string.isRequired,
   filterSortError: PropTypes.object,
   filterSortDefects: PropTypes.func.isRequired,
-  queries: PropTypes.arrayOf(PropTypes.object).isRequired
+  queries: PropTypes.arrayOf(PropTypes.object).isRequired,
+  toggleFSManual: PropTypes.func.isRequired,
+  showFsManual: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = (state, ownProps) => ({
   queries: state.queries.data[ownProps.thingType],
-  filterSortError: state.filterSort.error
+  filterSortError: state.filterSort.error,
+  showFsManual: state.show.fsManualOn[ownProps.thingType]
 });
 
 FilterSort.defaultProps = {
@@ -180,5 +194,5 @@ FilterSort.defaultProps = {
 
 export default connect(
   mapStateToProps,
-  { filterSortDefects }
+  { filterSortDefects, toggleFSManual }
 )(FilterSort);

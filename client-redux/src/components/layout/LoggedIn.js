@@ -3,8 +3,9 @@ import {PropTypes} from 'prop-types';
 import {connect} from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import {fetchAllThings} from '../../actions/thingsActions';
-import ErrorAlert from '../common/ErrorAlert';
+import ErrorAlert from '../common/ErrorAlert/ErrorAlert';
 import isEmpty from '../../validation/is-empty';
+import IsLoading from '../common/IsLoading';
 
 
 
@@ -26,7 +27,7 @@ class LoggedIn extends Component {
     const thingsIsLoading = this.props.things.isLoading;
 
     if (thingsIsLoading) {
-      return (<div><h1>Wait a moment...</h1></div>);
+      return (<IsLoading />);
     }
 
     // things load error

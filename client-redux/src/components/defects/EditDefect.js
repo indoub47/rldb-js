@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 
 import MainDataForm from './components_edit/MainDataForm';
 import EditHistory from './components_edit/EditHistory';
-import ErrorAlert from '../common/ErrorAlert';
+import ErrorAlert from '../common/ErrorAlert/ErrorAlert';
 import IsLoading from '../common/IsLoading';
 import { updateDefect, insertDefect } from '../../actions/defectsActions';
 import getId from '../../utils/getId';
@@ -166,10 +166,7 @@ class EditDefect extends Component {
     const defect = this.state.defect;
     if (defect === null || defect === undefined) return;
     // validate defect here
-    if (
-      defect.hasOwnProperty('id') &&
-      defect.id
-    ) {
+    if (defect.id) {
       this.props.updateDefect(defect, this.props.history);
     } else {
       defect.id = getId();
@@ -198,6 +195,7 @@ class EditDefect extends Component {
           defectHistory={this.state.defect.history}
           submitItem={this.onSubmitHi}
           deleteItem={this.onDeleteHi}
+          //defect={this.state.defect}
         />
 
         <button className='btn btn-info' onClick={this.onSubmitDefect}>

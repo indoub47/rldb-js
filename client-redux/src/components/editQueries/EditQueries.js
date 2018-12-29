@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import EditQueryForm from "./components/EditQueryForm";
 import QueryList from "./components/QueryList";
-import ErrorAlert from "../common/ErrorAlert";
+import ErrorAlert from "../common/ErrorAlert/ErrorAlert";
 import IsLoading from "../common/IsLoading";
 import { updateQueries } from "../../actions/queriesActions";
 import getId from "../../utils/getId";

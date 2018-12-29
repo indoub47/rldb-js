@@ -2,28 +2,26 @@ import axios from "axios";
 import {
   FETCH_DEFECTS_BEGIN,
   FETCH_DEFECTS_SUCCESS,
-  FETCH_DEFECTS_FAILURE,
+  FETCH_DEFECTS_FAILURE, 
 
-  CREATE_DEFECT,
   DEFECT_INSERT_BEGIN,
   DEFECT_INSERT_SUCCESS,
-  DEFECT_INSERT_FAILURE,
+  DEFECT_INSERT_FAILURE, 
 
-  EDIT_DEFECT,
   DEFECT_UPDATE_BEGIN,
   DEFECT_UPDATE_SUCCESS,
-  DEFECT_UPDATE_FAILURE,
-
-  REMOVE_DEFECT,
+  DEFECT_UPDATE_FAILURE, 
+  
   DEFECT_DELETE_BEGIN,
   DEFECT_DELETE_SUCCESS,
   DEFECT_DELETE_NOT_FOUND,
   DEFECT_DELETE_FAILURE,
 
-  DEFECT_SHOW_HISTORY
+  //DEFECT_SHOW_HISTORY
 } from "./types";
 import {applyFilterSort} from './filterSortActions'
 
+// fetch defects
 const fetchDefectsBegin = () => ({
   type: FETCH_DEFECTS_BEGIN
 });
@@ -38,7 +36,6 @@ const fetchDefectsFailure = error => ({
   payload: {error}
 });
 
-// Fetch all defects for current region
 export const fetchDefects = () => (dispatch, getState) => {
   dispatch(fetchDefectsBegin());
   axios
@@ -54,15 +51,8 @@ export const fetchDefects = () => (dispatch, getState) => {
     .catch(err => dispatch(fetchDefectsFailure(err)));
 };
 
-//  show defect history
-export const showHistory = defectId => ({ 
-  type: DEFECT_SHOW_HISTORY, 
-  payload: {defectId} 
-});
 
-// create defect
-export const defectCreate = () => ({type: CREATE_DEFECT});
-
+// insert defect
 const defectInsertBegin = () => ({
   type: DEFECT_INSERT_BEGIN
 })
@@ -93,11 +83,6 @@ export const insertDefect = defectDraft => (dispatch, getState) => {
 
 
 // edit defect
-export const editDefect = defectId => ({
-  type: EDIT_DEFECT, 
-  payload: {defectId}
-});
-
 const defectUpdateBegin = () => ({
   type: DEFECT_UPDATE_BEGIN
 });
@@ -129,10 +114,6 @@ export const updateDefect = (defectDraft, history) => (dispatch, getState) => {
 
 
 // delete defect
-export const removeDefect = defectId => ({
-  type: REMOVE_DEFECT, 
-  payload: {defectId}
-});
 
 const defectDeleteBegin = () => ({
   type: DEFECT_DELETE_BEGIN
@@ -172,6 +153,7 @@ export const deleteDefect = defectId => (dispatch, getState) => {
 
 
 // just filtersort defects
+
 export const filterSortDefects = (filterText, sortText) => (dispatch, getState) => {
   dispatch(applyFilterSort(getState().allDefects, filterText, sortText));
 };

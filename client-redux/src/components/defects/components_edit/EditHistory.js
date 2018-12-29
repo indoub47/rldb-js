@@ -5,7 +5,7 @@ import HistoryForm from './editHistoryComponents/HistoryForm';
 import HistoryRecordsView from './editHistoryComponents/HistoryRecordsView';
 // import updateDefect from '../../../actions/defectsActions';
 import IsLoading from '../../common/IsLoading';
-import ErrorAlert from '../../common/ErrorAlert';
+import ErrorAlert from '../../common/ErrorAlert/ErrorAlert';
 import {emptyHistoryItem} from './editHistoryComponents/emptyHistoryItem';
 
 class EditHistory extends Component {
@@ -70,18 +70,20 @@ EditHistory.propTypes = {
   submitItem: PropTypes.func.isRequired,
   deleteItem: PropTypes.func.isRequired,
   error: PropTypes.object,
-  isBusy: PropTypes.bool
+  isBusy: PropTypes.bool,
+  //defect: PropTypes.object
 }
 
 EditHistory.defaultProps = {
   error: null,
   isBusy: false,
+  //defect: null
 };
 
 const mapStateToProps = state => ({
   isBusy: state.defectsStatus.isBusy,
   error: state.defectsError.updateError,
-  defect: state.defectIntent.currentDefect,
+  //defect: state.defectIntent.currentDefect,
 });
 
 export default connect(

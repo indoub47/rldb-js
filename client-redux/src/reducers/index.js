@@ -6,10 +6,11 @@ import pagerReducer from './pagerReducer';
 import filterSortReducer from './filterSortReducer';
 import queriesReducer from './queriesReducer';
 import allDefectsReducer from './defects/allDefectsReducer';
-import defectIntentReducer from './defects/defectIntentReducer';
+//import defectIntentReducer from './defects/defectIntentReducer';
 import defectsErrorReducer from './defects/defectsErrorReducer';
 import fsedDefectsReducer from './defects/fsedDefectsReducer';
 import defectsStatusReducer from './defects/defectsStatusReducer';
+import showReducer from './showReducer';
 
 export default combineReducers({
   login: loginReducer, 
@@ -17,10 +18,11 @@ export default combineReducers({
   register: registerReducer,
   filterSort: filterSortReducer,
   allDefects: allDefectsReducer,
-  defectIntent: defectIntentReducer,
+  //defectIntent: defectIntentReducer,
   defectsError: defectsErrorReducer,
   fsedDefects: fsedDefectsReducer,
   defectsStatus: defectsStatusReducer,
   queries: queriesReducer,
-  pager: pagerReducer
+  pager: pagerReducer,
+  show: showReducer
 });
