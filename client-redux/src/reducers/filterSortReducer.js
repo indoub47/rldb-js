@@ -27,7 +27,7 @@ export default function filterSortReducer(state = initialState, action) {
       };
 
     case LOGOUT:
-      return {...initialState};
+      return initialState;
 
     default:
       return state;

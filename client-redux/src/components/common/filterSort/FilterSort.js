@@ -183,7 +183,7 @@ FilterSort.propTypes = {
 };
 
 const mapStateToProps = (state, ownProps) => ({
-  queries: state.queries.data[ownProps.thingType],
+  queries: state.queries[ownProps.thingType].data,
   filterSortError: state.filterSort.error,
   showFsManual: state.show.fsManualOn[ownProps.thingType]
 });

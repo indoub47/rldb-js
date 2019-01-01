@@ -13,7 +13,7 @@ import FilterSort from "../common/filterSort/FilterSort";
 import { pageChange, itemsPerPageChange } from "../../actions/pagerActions";
 import { fetchDefects, deleteDefect } from "../../actions/defectsActions";
 import { fetchQueries } from "../../actions/queriesActions";
-import {toggleFS} from "../../actions/showActions";
+import { toggleFS } from "../../actions/showActions";
 
 class Defects extends Component {
   constructor(props) {
@@ -34,14 +34,11 @@ class Defects extends Component {
   }
 
   componentDidMount() {
-    //console.log("component did mount");
-    if (this.props.fsedDefects.length < 1) {
-      //console.log("fetchDefects called");
+    if (!this.props.fsedDefectsAreValid) {
       this.props.fetchDefects();
     }
 
-    if (this.props.queryCount < 1) {
-      //console.log("fetch queries called");
+    if (!this.props.queriesAreValid) {
       this.props.fetchQueries(this.thingType);
     }
   }
@@ -70,12 +67,12 @@ class Defects extends Component {
 
   showDeleteConfirmation(e) {
     this.setState({
-        showConfirmationDialog: true, 
-        idToDelete: e.target.dataset.id 
-      });
+      showConfirmationDialog: true,
+      idToDelete: e.target.dataset.id
+    });
   }
 
-  confirmDelete() {    
+  confirmDelete() {
     this.props.deleteDefect(this.state.idToDelete);
     this.setState({
       showConfirmationDialog: false,
@@ -84,19 +81,34 @@ class Defects extends Component {
   }
 
   unconfirmDelete() {
-    this.setState({ 
+    this.setState({
       showConfirmationDialog: false,
       defectId: ""
     });
   }
 
   render() {
-
-    if (this.props.queryCount < 1) {
-      return <h3>queryCount &lt; 0, kažkokia chujnia</h3>;
+    if (this.props.defectsError || this.props.queriesFetchError) {
+      return (
+        <div className="row">
+          <div className="col-12">
+            <ErrorAlertPacket
+              errorObjArray={[
+                this.props.defectsError,
+                this.props.queriesFetchError
+              ]}
+            />
+          </div>
+        </div>
+      );
     }
 
-    if (this.props.defectsIsLoading || this.props.queriesIsLoading) {
+    if (
+      !this.props.queriesAreValid ||
+      this.props.queriesIsLoading ||
+      !this.props.fsedDefectsAreValid ||
+      this.props.defectsIsLoading
+    ) {
       return <IsLoading />;
     }
 
@@ -123,16 +135,6 @@ class Defects extends Component {
           rejectHandler={this.unconfirmDelete}
           show={this.state.showConfirmationDialog}
         />
-        {
-          this.props.defectsError || this.props.queriesFetchError ?
-          (<div className="row">
-            <div className="col-12">
-              <ErrorAlertPacket
-                errorObjArray={[this.props.defectsError, this.props.queriesFetchError]}
-              />
-            </div>
-          </div>)  : null
-        }
         <div className="row">
           <div className="col-12 fs-header">
             <button
@@ -202,7 +204,6 @@ Defects.propTypes = {
   defectsIsLoading: PropTypes.bool,
   defectsError: PropTypes.object,
   pager: PropTypes.object.isRequired,
-  queryCount: PropTypes.number.isRequired,
   fetchQueries: PropTypes.func.isRequired,
   queriesIsLoading: PropTypes.bool,
   queriesFetchError: PropTypes.object,
@@ -213,15 +214,17 @@ Defects.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  fsedDefects: state.fsedDefects,
-  queryCount: state.queries.data.defect.length,
-  queriesIsLoading: state.queries.isLoading,
-  queriesFetchError: state.queries.error,
+  fsedDefects: state.fsedDefects.data,
+  fsedDefectsAreValid: state.fsedDefects.valid,
+  queriesIsLoading: state.queries.defect.isLoading,
+  queriesFetchError: state.queries.defect.error,
+  queriesAreValid: state.queries.defect.valid,
+
   allDefectCount: state.allDefects.length,
   defectsIsLoading: state.defectsStatus.isBusy,
   defectsError: state.defectsError.error,
   pager: state.pager,
-  showFs: state.show.fsOn.defect,
+  showFs: state.show.fsOn.defect
 });
 
 Defects.defaultProps = {
@@ -231,5 +234,12 @@ Defects.defaultProps = {
 
 export default connect(
   mapStateToProps,
-  { deleteDefect, fetchDefects, fetchQueries, pageChange, itemsPerPageChange, toggleFS }
+  {
+    deleteDefect,
+    fetchDefects,
+    fetchQueries,
+    pageChange,
+    itemsPerPageChange,
+    toggleFS
+  }
 )(Defects);

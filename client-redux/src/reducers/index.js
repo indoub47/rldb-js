@@ -10,6 +10,7 @@ import defectsErrorReducer from './defects/defectsErrorReducer';
 import fsedDefectsReducer from './defects/fsedDefectsReducer';
 import defectsStatusReducer from './defects/defectsStatusReducer';
 import showReducer from './showReducer';
+import loadingReducer from './loadingReducer';
 
 export default combineReducers({
   login: loginReducer, 
@@ -22,5 +23,6 @@ export default combineReducers({
   defectsStatus: defectsStatusReducer,
   queries: queriesReducer,
   pager: pagerReducer,
-  show: showReducer
+  show: showReducer,
+  loading: loadingReducer
 });

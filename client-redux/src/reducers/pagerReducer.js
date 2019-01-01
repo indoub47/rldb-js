@@ -62,7 +62,7 @@ export default function pagerReducer(state = initialState, action) {
       return pagerObj;
 
     case LOGOUT: 
-      return {...initialState};
+      return initialState;
 
     default:
       return state;

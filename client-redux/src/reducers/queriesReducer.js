@@ -9,65 +9,59 @@ import {
 } from "../actions/types";
 
 const initialState = {
-  data: {defect:[], weld: []},
-  isLoading: false,
-  error: null
+  defect: {
+    data: [],
+    valid: false,
+    isLoading: false,
+    error: null
+  },
+  weld: {
+    data: [],
+    valid: false,
+    isLoading: false,
+    error: null
+  }
 };
 
 export default function queriesReducer(state = initialState, action) {
+  //const tt = action.payload.thingType;
   switch (action.type) {
     case QUERIES_FETCH_BEGIN:
+    case QUERIES_UPDATE_BEGIN:
       return {
         ...state,
-        isLoading: true,
-        error: null
+        [action.payload.thingType]: {
+          ...state[action.payload.thingType],
+          isLoading: true
+        }
       };
 
     case QUERIES_FETCH_SUCCESS:
+    case QUERIES_UPDATE_SUCCESS:
       return {
         ...state,
-        isLoading: false,
-        error: null,
-        data: {
-          ...state.data,
-          [action.payload.thingType]: action.payload.queries
+        [action.payload.thingType]: {
+          ...state[action.payload.thingType],
+          data: action.payload.queries,
+          isLoading: false,
+          error: null,
+          valid: true
         }
       };
 
     case QUERIES_FETCH_FAILURE:
-      return {
-        ...state,
-        isLoading: false,
-        error: action.payload.error
-      };
-
-    case QUERIES_UPDATE_BEGIN:
-      return {
-        ...state,
-        isLoading: true,
-        error: null
-      };
-
-    case QUERIES_UPDATE_SUCCESS:
-      return {
-        ...state,
-        isLoading: false,
-        error: null,
-        data: {
-          ...state.data,
-          [action.payload.thingType]: action.payload.queries
-        }
-      };
-
     case QUERIES_UPDATE_FAILURE:
       return {
         ...state,
-        isLoading: false,
-        error: action.payload.error
+        [action.payload.thingType]: {
+          ...state[action.payload.thingType],
+          isLoading: false,
+          error: action.payload.error
+        }
       };
 
     case LOGOUT:
-      return {...initialState};
+      return initialState;
 
     default:
       return state;

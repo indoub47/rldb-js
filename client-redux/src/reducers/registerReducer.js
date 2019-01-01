@@ -1,5 +1,5 @@
 import {
-  REGISTER_BEGIN, REGISTER_SUCCESS, REGISTER_ERROR
+  REGISTER_BEGIN, REGISTER_SUCCESS, REGISTER_ERROR, LOGOUT
 } from "../actions/types";
 
 const initialState = {
@@ -29,6 +29,10 @@ export default function(state = initialState, action) {
         isBusy: false,
         error: action.payload
       };
+    
+    case LOGOUT:
+      return initialState;
+
     default:
       return state;
   }

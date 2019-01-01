@@ -1,39 +1,39 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 //import {Link} from 'react-router-dom';
-import { PropTypes } from 'prop-types';
-import { connect } from 'react-redux';
+import { PropTypes } from "prop-types";
+import { connect } from "react-redux";
 
-import MainDataForm from './components_edit/MainDataForm';
-import EditHistory from './components_edit/EditHistory';
-import ErrorAlert from '../common/ErrorAlert/ErrorAlert';
-import IsLoading from '../common/IsLoading';
-import { updateDefect, insertDefect } from '../../actions/defectsActions';
-import getId from '../../utils/getId';
+import MainDataForm from "./components_edit/MainDataForm";
+import EditHistory from "./components_edit/EditHistory";
+import ErrorAlert from "../common/ErrorAlert/ErrorAlert";
+import IsLoading from "../common/IsLoading";
+import { updateDefect, insertDefect } from "../../actions/defectsActions";
+import getId from "../../utils/getId";
 
 class EditDefect extends Component {
   constructor(props) {
     super(props);
     this.state = {
       defect: {
-            id: '',
-            kkateg: '',
-            vieta: {
-              meistrij: '',
-              linst: '',
-              kelias: '',
-              iesmas: '',
-              km: '',
-              pk: '',
-              m: '',
-              siule: ''
-            },
-            history: [],
-            begis: {
-              tipas: '',
-              gamykla: '',
-              metai: ''
-            }
-          },
+        id: "",
+        kkateg: "",
+        vieta: {
+          meistrij: "",
+          linst: "",
+          kelias: "",
+          iesmas: "",
+          km: "",
+          pk: "",
+          m: "",
+          siule: ""
+        },
+        history: [],
+        begis: {
+          tipas: "",
+          gamykla: "",
+          metai: ""
+        }
+      },
       isBusy: false,
       error: null
     };
@@ -47,10 +47,12 @@ class EditDefect extends Component {
 
   componentDidMount() {
     if (this.props.match.params.id) {
-      const defect = this.props.defects.find(d => d.id === this.props.match.params.id);
+      const defect = this.props.defects.find(
+        d => d.id === this.props.match.params.id
+      );
       if (defect) {
         //console.log('defect', defect);
-        this.setState({defect});
+        this.setState({ defect });
       }
     }
   }
@@ -103,8 +105,8 @@ class EditDefect extends Component {
       if (a.action.end && !b.action.end) return 1;
       if (!a.action.end && b.action.end) return -1;
       return 0;
-    }
-    
+    };
+
     newHistory.sort(sort);
     const newDefect = {
       ...this.state.defect,
@@ -175,14 +177,10 @@ class EditDefect extends Component {
   }
 
   render() {
-    if (this.props.isBusy) {
-      return <IsLoading />;
-    }
-
     return (
       <React.Fragment>
-        {this.props.error && <ErrorAlert errorObj={this.props.error.msg} />}
-
+        {this.props.error && <ErrorAlert errorObj={this.props.error} />}
+        <IsLoading when={this.props.isBusy} />
         <MainDataForm
           defect={this.state.defect}
           onChangeMain={this.onChangeMain}
@@ -195,10 +193,9 @@ class EditDefect extends Component {
           defectHistory={this.state.defect.history}
           submitItem={this.onSubmitHi}
           deleteItem={this.onDeleteHi}
-          //defect={this.state.defect}
         />
 
-        <button className='btn btn-info' onClick={this.onSubmitDefect}>
+        <button className="btn btn-info" onClick={this.onSubmitDefect}>
           Submit Defect
         </button>
       </React.Fragment>
@@ -216,8 +213,8 @@ EditDefect.propTypes = {
 const mapStateToProps = state => ({
   isBusy: state.defectsStatus.isBusy,
   error: state.defectsError.error,
-  things: state.things.data, 
-  defects: state.fsedDefects
+  things: state.things.data,
+  defects: state.fsedDefects.data
 });
 
 export default connect(

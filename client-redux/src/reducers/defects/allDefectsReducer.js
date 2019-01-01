@@ -31,7 +31,7 @@ export default function allDefectsReducer(state = initialState, action) {
 
     // delete defect success
     case DEFECT_DELETE_SUCCESS:
-      console.log("DEFECT_DELETE_SUCCESS: payload, defect count before removing from local all defects", action.payload, state.length);
+      //console.log("DEFECT_DELETE_SUCCESS: payload, defect count before removing from local all defects", action.payload, state.length);
       ind = state.findIndex(x => x.id === action.payload.defectId);
       if (ind < 0) return state; // jeigu kartais nerastų tokio id...
       return [
@@ -44,7 +44,7 @@ export default function allDefectsReducer(state = initialState, action) {
       return state;
 
     case LOGOUT:
-      return {...initialState};
+      return initialState;
     
     default:
       return state;

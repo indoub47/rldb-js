@@ -14,7 +14,6 @@ class EditQueries extends Component {
     this.state = {
       queries: [],
       currentQuery: null,
-      isBusy: false,
       queryNameErrorMsg: ""
     };
 
@@ -100,8 +99,6 @@ class EditQueries extends Component {
   }
 
   submitQuery(draft) {
-    console.log("queries", this.state.queries);
-    console.log("draft", draft);
     // validate query
     // name must be not empty
     if (draft.name.trim() === "") {
@@ -144,7 +141,6 @@ class EditQueries extends Component {
   }
 
   submitQueries() {
-    console.log("props.match", this.props.match);
     this.props.updateQueries(
       this.state.queries,
       this.props.match.params.thingType
@@ -152,15 +148,12 @@ class EditQueries extends Component {
   }
 
   render() {
-    if (this.state.isBusy) {
-      return <IsLoading />;
-    }
-
     return (
       <div className="container thing-edit">
         {this.props.queriesUpdateError ? (
           <ErrorAlert errorObj={this.props.queriesUpdateError} />
         ) : null}
+        <IsLoading when={this.props.queriesIsLoading} />
         <QueryList
           queries={this.state.queries}
           remove={this.remove}
@@ -183,18 +176,23 @@ class EditQueries extends Component {
 }
 
 EditQueries.propTypes = {
-  updateQueries: PropTypes.func.isRequired,
   queries: PropTypes.arrayOf(PropTypes.object),
+  queriesUpdateError: PropTypes.object,
+  queriesIsLoading: PropTypes.bool,
   currentQuery: PropTypes.object,
   filterSort: PropTypes.object,
-  queriesUpdateError: PropTypes.object
+  updateQueries: PropTypes.func.isRequired
 };
 
-const mapStateToProps = (state, ownProps) => ({
-  queries: state.queries.data[ownProps.match.params.thingType],
-  filterSort: state.filterSort,
-  queriesUpdateError: state.queries.error
-});
+const mapStateToProps = (state, ownProps) => {
+  const stateQueries = state.queries[ownProps.match.params.thingType];
+  return {
+    queries: stateQueries.data,
+    queriesIsLoading: stateQueries.isLoading,
+    queriesUpdateError: stateQueries.error,
+    filterSort: state.filterSort
+  };
+};
 
 export default connect(
   mapStateToProps,

@@ -50,7 +50,7 @@ export default function defectsErrorReducer(state = initialState, action) {
       };
 
     case LOGOUT:
-      return {...initialState};
+      return initialState;
 
     default: 
       return state;

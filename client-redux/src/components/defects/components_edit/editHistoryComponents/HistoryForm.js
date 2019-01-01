@@ -7,6 +7,7 @@ import TextAreaGroup from '../../../common/TextAreaGroup';
 import validateDefectHistory from '../../../../validation/defectHistory';
 import {createOptions} from '../../../createOptions';
 import {emptyHistoryItem} from './emptyHistoryItem';
+import ErrorAlert from '../../../common/ErrorAlert/ErrorAlert';
 
 class HistoryForm extends Component {
   constructor(props) {    
@@ -223,6 +224,12 @@ class HistoryForm extends Component {
                 error={this.state.errors && this.state.errors.pastaba}
                 info="Neilgas tekstukas, iki 300 simbolių"
               />
+              {this.props.hiSubmitError ? 
+                <div className="form-group row">
+                  <ErrorAlert errorObj={this.props.hiSubmitError} />
+                </div> 
+                : null
+              }
               <div className="form-group row">
                 <button type="button" className="btn btn-light" onClick={this.props.empty}>
                   Clear
@@ -247,6 +254,7 @@ HistoryForm.propTypes = {
   operats: PropTypes.arrayOf(PropTypes.object).isRequired,
   defskops: PropTypes.arrayOf(PropTypes.object).isRequired,
   pavojs: PropTypes.arrayOf(PropTypes.object).isRequired,
+  hiSubmitError: PropTypes.object
 }
 
 const mapStateToProps = state => ({

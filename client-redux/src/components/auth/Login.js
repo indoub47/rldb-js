@@ -1,15 +1,16 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { loginUser } from '../../actions/loginActions';
-import TextFieldGroup from '../common/TextFieldGroup';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { loginUser } from "../../actions/loginActions";
+import TextFieldGroup from "../common/TextFieldGroup";
+import IsLoading from "../common/IsLoading";
 
 class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
       errors: {}
     };
 
@@ -19,13 +20,13 @@ class Login extends Component {
 
   componentDidMount() {
     if (this.props.login.isAuthenticated) {
-      this.props.history.push('/logged-in');
+      this.props.history.push("/logged-in");
     }
   }
 
   componentDidUpdate(prevProps) {
     if (!prevProps.login.isAuthenticated && this.props.login.isAuthenticated) {
-      this.props.history.push('/logged-in');
+      this.props.history.push("/logged-in");
     }
   }
 
@@ -45,39 +46,35 @@ class Login extends Component {
   render() {
     const inputErrors = this.props.login.error || {};
 
-    if (this.props.login.isBusy) {
-      return <div><h1>Wait a moment...</h1></div>
-    }
-
     return (
-      <div className='login'>
-        <div className='container'>
-          <div className='row'>
-            <div className='col-md-8 m-auto'>
-              <h1 className='display-4 text-center'>Log In</h1>
-              <p className='lead text-center'>Sign in to your RLDB account</p>
+      <div className="login">
+        <IsLoading when={this.props.login.isBusy} />
+        <div className="container">
+          <div className="row">
+            <div className="col-md-8 m-auto">
+              <h1 className="display-4 text-center">Log In</h1>
+              <p className="lead text-center">Sign in to your RLDB account</p>
               <form noValidate onSubmit={this.onSubmit}>
-                <TextFieldGroup 
-                  type='email'
-                  name='email'
-                  
-                  placeholder='Email Address'
+                <TextFieldGroup
+                  type="email"
+                  name="email"
+                  placeholder="Email Address"
                   value={this.state.email}
                   onChange={this.onChange}
-                  error={inputErrors.email}                  
+                  error={inputErrors.email}
                 />
-                <TextFieldGroup 
-                  type='password'
-                  name='password'
-                  placeholder='Password'
+                <TextFieldGroup
+                  type="password"
+                  name="password"
+                  placeholder="Password"
                   value={this.state.password}
                   onChange={this.onChange}
-                  error={inputErrors.password}                  
+                  error={inputErrors.password}
                 />
                 {inputErrors.msg && (
-                  <div className='invalid-fidback'>{inputErrors.msg}</div>
+                  <div className="invalid-fidback">{inputErrors.msg}</div>
                 )}
-                <input type='submit' className='btn btn-info btn-block mt-4' />
+                <input type="submit" className="btn btn-info btn-block mt-4" />
               </form>
             </div>
           </div>

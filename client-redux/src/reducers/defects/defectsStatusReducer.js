@@ -42,7 +42,7 @@ export default function defectsStatusReducer(state = initialState, action) {
       };
 
     case LOGOUT:
-      return {...initialState};
+      return initialState;
 
     default:
       return state;

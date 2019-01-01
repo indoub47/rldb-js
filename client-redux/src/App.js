@@ -54,13 +54,6 @@ class App extends Component {
             <div className="container">
               <Route exact path="/login" component={Login} />
               <Route exact path="/register" component={Register} />
-
-              {/*<Switch>
-                <PrivateRoute 
-                  exact path='/edit-fs-query' 
-                  component={EditFsQuery} 
-                />
-              </Switch>*/}
             </div>
             <Switch>
               <PrivateRoute exact path='/defects' component={Defects} />
