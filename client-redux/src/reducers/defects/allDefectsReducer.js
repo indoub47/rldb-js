@@ -18,12 +18,12 @@ export default function allDefectsReducer(state = initialState, action) {
 
     // create defect
     case DEFECT_INSERT_SUCCESS:
-      return [...state, action.payload.result];
+      return [...state, action.payload];
 
     // edit defect
     case DEFECT_UPDATE_SUCCESS:
-      const updatedDefect = action.payload.result;
-      let ind = state.findIndex(x => x.id === updatedDefect.id);
+      const updatedDefect = action.payload;
+      let ind = state.findIndex(x => x._id === updatedDefect._id);
       return [
         ...state.slice(0, ind),
         updatedDefect,
@@ -32,8 +32,8 @@ export default function allDefectsReducer(state = initialState, action) {
 
     // delete defect success
     case DEFECT_DELETE_SUCCESS:
-      //console.log("DEFECT_DELETE_SUCCESS: payload, defect count before removing from local all defects", action.payload, state.length);
-      ind = state.findIndex(x => x.id === action.payload.result);
+      if (!action.payload) return state;
+      ind = state.findIndex(x => x._id === action.payload);
       if (ind < 0) return state; // jeigu kartais nerastų tokio id...
       return [
         ...state.slice(0, ind),

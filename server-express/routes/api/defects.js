@@ -1,54 +1,22 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
-//const DefectModel = require('../../models/Defect');
 const areEqual = require('../../utilities/are-equal');
-
-const settings = require("../../config/settings");
-const collections = settings.COLLECTIONS;
-const dbName = settings.DB_NAME;
-const dbUri = settings.DB_URI;
-
-const MongoClient = require("mongodb").MongoClient;
+const connectDb = require("../middleware/connectDb");
 const ObjectId = require("mongodb").ObjectID;
 
+// const DefectModel = require('../../models/Defect');
+// const settings = require("../../config/settings");
+// const dbName = settings.DB_NAME;
+// const dbUri = settings.DB_URI;
+// const collections = settings.COLLECTIONS;
+// const MongoClient = require("mongodb").MongoClient;
 
+// force to authenticate
 router.use(passport.authenticate('jwt', { session: false }),);
 
-
 // connect database middleware
-router.use((req, res, next) => {
-  MongoClient.connect(
-    dbUri,
-    {useNewUrlParser: true},
-    (err, client) => {
-      if (err) return res.status(500).send(err); 
-      req.bnbldb = {};
-      req.bnbldb.db = client.db(dbName);
-      next();
-    }
-  );
-});
-
-// @route GET api/defects/version
-// @desc Get defects version for particular region
-// @access Public
-router.get(
-  '/version',  
-  (req, res) => {
-    const region = req.user.region;
-    const collection = 'defects';
-    const versionCollName = 'version';
-    req.bnbldb.db.collection(versionCollName).findOne(
-      {}, 
-      (err, found) => {
-        if (err) return res.status(500).send(err);
-        if (!found) return res.status(500).send({
-          status: "500 Internal Server Error",
-          message: `Server returned no version and without any reason`});
-        return res.status(200).send({version: found[collection][region]});
-    });
-  });
+router.use(connectDb);
 
 // @route GET api/defects
 // @desc Get defects
@@ -68,17 +36,13 @@ router.get(
 // @access Public
 router.post(
   '/update',
-  (req, res, next) => {
+  (req, res) => {
     //console.log("update req.body.draft", req.body.draft);
     let draft = JSON.parse(req.body.draft);
     // validate draft here
     const valid = true
     if (!valid) {
-      return res.status(400).send({
-        status: "400 Bad Request",
-        message: `Defect draft is invalid`,
-        errors: {errormsg: "lots of errors"}
-      });
+      return res.redirect('http://www.google.com');
     }
 
     const collDefects = req.bnbldb.db.collection("defects");
@@ -95,27 +59,17 @@ router.post(
           return res.status(500).send(findError);
         }
         if (!found) {
-          return res.status(410).send({
-            status: "410 Gone",
-            message: `Defect id ${defId} has been deleted`
-          });
+          return res.status(410).send(Error(`Defect with id ${defId} has been deleted by someone else`));
         }
 
         // check if draft version doesn't equal db version
         if (defV !== found.v) {
-          return res.status(409).send({
-            status: "409 Conflict",
-            message: `Defect id ${defId} has not been updated because it has been just modified by someone other`,
-            found: found
-          });
+          return res.status(409).send(Error(`Defect with id ${defId} has not been updated because it has been just modified by someone else`));
         }
 
         // check if both are Equal
         if (areEqual(draft, found)) {
-          return res.status(304).send({
-            status: "304 Not Modified",
-            message: `There's no need to update - both objects are equal`
-          });
+          return res.status(304).send(Error("There is no need to update - object has not been changed"));
         }
 
         // check if id is unique among its region defects
@@ -126,10 +80,7 @@ router.post(
               return res.status(500).send(checkUniqueError);
             }
             if (nonUniqueFound) {
-              return res.status(400).send({
-                status: "400 Bad Request",
-                message: `id ${defId} is not unique`
-              });
+              return res.status(400).send(Error(`id ${draft.id} is not unique`));
             }
 
             // update defect            
@@ -150,16 +101,10 @@ router.post(
                   return res.status(500).send(updateError);
                 }
                 if (!updateResult) {
-                  return res.status(500).send({
-                    status: "500 Internal Server Error",
-                    message: `Defect with id ${defId} hasn not been updated without any reason`
-                  });
+                  return res.status(500).send(Error(`Defect with id ${defId} has not been updated without any reason`));
                 }
 
-                req.bnbldb.opResult = updateResult.value;
-                req.bnbldb.userRegion = userRegion;
-                req.bnbldb.collName = "defects";
-                next();
+                return res.status(200).send(updateResult.value);
             }); 
         });
     });      
@@ -170,7 +115,7 @@ router.post(
 // @access Public
 router.put(
   '/insert',
-  (req, res, next) => { 
+  (req, res) => { 
     let draft = JSON.parse(req.body.draft);
     // validate draft here
     const userRegion = req.user.region;
@@ -188,10 +133,7 @@ router.put(
         }
 
         if (idFound) {
-          return res.status(400).send({
-            status: "400 Bad Request",
-            message: `id ${draft.id} is not unique`
-            });
+          return res.status(400).send(Error(`id ${draft.id} is not unique`));
         }
         
         // attempt to insert
@@ -199,15 +141,9 @@ router.put(
           draft, 
           (insertErr, insertResult) => {
             if (insertErr) return res.status(500).send(insertErr);              
-            if (!insertResult) return res.status(500).send({
-                status: "500 Internal Server Error",
-                message: `Defect hasn not been created for unknown reason`
-              });
-            
-            req.bnbldb.opResult = insertResult.ops[0];
-            req.bnbldb.userRegion = userRegion;
-            req.bnbldb.collName = "defects";
-            next();
+            if (!insertResult) return res.status(500).send(Error("Defect hasn not been created for unknown reason"));
+
+            return res.status(200).send(insertResult.ops[0]);
         });
     });
 });
@@ -234,74 +170,30 @@ router.delete(
         }
 
         if (!found) {
-          return res.status(410).send({
-            status: "410 Gone",
-            message: `Defect id ${defId} has been deleted`
-          });
+            return res.status(410).send(Error(`Defect _id ${_id} just has been deleted by someone else`));  
         }
 
         // check version
         if (found.v && found.v != v) {
-          return res.status(409).send({
-            status: "409 Conflict",
-            message: `Defect id ${defId} has not been deleted because it has been just modified by someone other`,
-            found
-          });
+          return res.status(410).send(Error(`Defect _id ${_id} has not been deleted since it has been just modified by someone else`)); 
         }
 
         // delete attempt
         collDefects.findOneAndDelete(
           {_id},
+          {projection: {_id: true}},
           (deleteError, deleteResult) => {
             if (deleteError) {
               return res.status(500).send(deleteError);
             }
 
             if (!deleteResult) {
-              if (!insertResult) return res.status(500).send({
-                status: "500 Internal Server Error",
-                message: `Defect hasn not been deleted for unknown reason`
-              });
+              return res.status(500).send(Error("Defect has not been deleted for unknown reason"));
             }
-            req.bnbldb.opResult = deleteResult.ok; // MAKE ID!
-            req.bnbldb.userRegion = req.user.region;
-            req.bnbldb.collName = "defects";
-            next();
+
+            return res.status(200).send(deleteResult.value._id);
         });
     });
-});
-
-
-// increment collection version middleware
-router.use((req, res) => {
-  const {db, collName, opResult, userRegion} = req.bnbldb;
-  // create increment operation dot notation object
-  let incrementOp = {};
-  incrementOp[collName + "." + userRegion] = 1;
-  
-  db.collection("versions").findOneAndUpdate(
-    {}, // filter
-    {$inc: incrementOp}, // update query
-    {
-      returnNewDocument: true,
-      new: true,
-      returnOriginal: false
-    }, // options
-    (error, result) => {
-      if (error) {
-        return res.status(200).send({
-          result: opResult, 
-          versionError: error, 
-          version: null
-        });
-      }
-
-      return res.status(200).send({
-          result: opResult, 
-          versionError: null, 
-          version: result.value[collName][userRegion]
-      });
-  }); 
 });
 
 module.exports = router;

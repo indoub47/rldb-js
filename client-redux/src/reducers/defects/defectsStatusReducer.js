@@ -16,8 +16,6 @@ import {
 
 const initialState = {
   error: null,
-  version: 0,
-  versionError: null,
   isBusy: false,
 };
 
@@ -40,8 +38,6 @@ export default function defectsStatusReducer(state = initialState, action) {
       return {
         ...state,
         error: null,
-        versionError: action.payload.versionError,
-        version: action.payload.version,
         isBusy: false
       };
 
