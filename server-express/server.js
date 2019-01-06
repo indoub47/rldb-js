@@ -14,7 +14,7 @@ const app = express();
 require("./config/passport")(passport);
 
 app.use((req, res, next) => {
-  const delay = 3000;
+  const delay = 0;
   const start = Date.now();
   while (Date.now() - start < delay) {}
   next();

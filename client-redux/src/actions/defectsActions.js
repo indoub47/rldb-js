@@ -57,9 +57,9 @@ const defectInsertBegin = () => ({
   type: DEFECT_INSERT_BEGIN
 })
 
-const defectInsertSuccess = defect => ({
+const defectInsertSuccess = data => ({
   type: DEFECT_INSERT_SUCCESS,
-  payload: {defect}
+  payload: data // {result, versionError, version}
 });
 
 const defectInsertFailure = error => ({
@@ -72,7 +72,7 @@ export const insertDefect = defectDraft => (dispatch, getState) => {
   axios
     .put("/api/defects/insert", {draft: defectDraft})
     .then(res => {
-      dispatch(defectInsertSuccess(res.data));
+      dispatch(defectInsertSuccess(res.data)); // {result, versionError, version}
       const fetchedDefects = getState().allDefects;
       const filterText = getState().filterSort.filterText;
       const sortText = getState().filterSort.sortText;
@@ -87,9 +87,9 @@ const defectUpdateBegin = () => ({
   type: DEFECT_UPDATE_BEGIN
 });
 
-const defectUpdateSuccess = defect => ({
+const defectUpdateSuccess = data => ({
   type: DEFECT_UPDATE_SUCCESS,
-  payload: {defect}
+  payload: data // {result, versionError, version}
 });
 
 const defectUpdateFailure = error => ({
@@ -102,7 +102,7 @@ export const updateDefect = (defectDraft, history) => (dispatch, getState) => {
   axios
     .post("/api/defects/update", {draft: defectDraft})
     .then(res => {
-      dispatch(defectUpdateSuccess(res.data));
+      dispatch(defectUpdateSuccess(res.data)); // {result, versionError, version}
       const fetchedDefects = getState().allDefects;
       const filterText = getState().filterSort.filterText;
       const sortText = getState().filterSort.sortText;
@@ -119,13 +119,9 @@ const defectDeleteBegin = () => ({
   type: DEFECT_DELETE_BEGIN
 });
 
-const defectDeleteNotFound = responseData => ({
-  type: DEFECT_DELETE_NOT_FOUND
-});
-
-const defectDeleteSuccess = responseData => ({
+const defectDeleteSuccess = data => ({
   type: DEFECT_DELETE_SUCCESS,
-  payload: responseData
+  payload: data // {result(defectId), versionError, version}
 });
 
 const defectDeleteFailure = error => ({
@@ -138,15 +134,11 @@ export const deleteDefect = defectId => (dispatch, getState) => {
   axios
     .delete("/api/defects/delete", {params: {id: defectId}})
     .then(res => {
-      if (!res.data.success) {
-        dispatch(defectDeleteNotFound());
-      } else {
-        dispatch(defectDeleteSuccess(res.data));
-        const fetchedDefects = getState().allDefects;
-        const filterText = getState().filterSort.filterText;
-        const sortText = getState().filterSort.sortText;
-        dispatch(applyFilterSort(fetchedDefects, filterText, sortText));
-      }
+      dispatch(defectDeleteSuccess(res.data)); // {result(defectId), versionError, version}
+      const fetchedDefects = getState().allDefects;
+      const filterText = getState().filterSort.filterText;
+      const sortText = getState().filterSort.sortText;
+      dispatch(applyFilterSort(fetchedDefects, filterText, sortText));
     })
     .catch(err => dispatch(defectDeleteFailure(err)));
 };

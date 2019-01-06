@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 const ErrorAlert = ({errorObj}) => {
   if (!errorObj) return null;
   let messageText = "some error has occured";
-  const msgProp = ['message', 'msg', 'info', 'error', 'text'].find(k => errorObj.hasOwnProperty(k));
+  const msgProp = ['message', 'msg', 'info', 'error', 'text', 'errormsg'].find(k => errorObj.hasOwnProperty(k));
   if (msgProp) {
     messageText = errorObj[msgProp];
   }
