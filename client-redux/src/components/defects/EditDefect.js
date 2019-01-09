@@ -212,7 +212,7 @@ EditDefect.propTypes = {
 
 const mapStateToProps = state => ({
   isBusy: state.defectsStatus.isBusy,
-  error: state.defectsError.error,
+  error: state.defectsStatus.error,
   things: state.things.data,
   defects: state.fsedDefects.data
 });

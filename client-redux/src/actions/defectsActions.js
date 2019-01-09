@@ -11,9 +11,8 @@ import {
   DEFECT_UPDATE_FAILURE,
   DEFECT_DELETE_BEGIN,
   DEFECT_DELETE_SUCCESS,
-  DEFECT_DELETE_NOT_FOUND,
-  DEFECT_DELETE_FAILURE
-
+  DEFECT_DELETE_FAILURE,
+  INVALIDATE_DEFECTS
   //DEFECT_SHOW_HISTORY
 } from "./types";
 import { applyFilterSort } from "./filterSortActions";
@@ -47,6 +46,10 @@ export const fetchDefects = () => (dispatch, getState) => {
     })
     .catch(err => dispatch(fetchDefectsFailure(err)));
 };
+
+export const invalidateDefects = () => (dispatch) => {
+  dispatch({type: INVALIDATE_DEFECTS});
+}
 
 // insert defect
 const defectInsertBegin = () => ({

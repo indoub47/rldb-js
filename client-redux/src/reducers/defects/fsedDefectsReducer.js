@@ -1,5 +1,8 @@
-import { FILTERSORT_APPLIED,
-  LOGOUT } from "../../actions/types";
+import { 
+  FILTERSORT_APPLIED,
+  INVALIDATE_DEFECTS,
+  LOGOUT 
+  } from "../../actions/types";
 
 const initialState = {data: [], valid: false};
 
@@ -8,6 +11,9 @@ export default function fsedDefectsReducer(state = initialState, action) {
     
     case FILTERSORT_APPLIED:
       return {data: action.payload.items, valid: true};
+    
+    case INVALIDATE_DEFECTS:
+      return {...state, valid: false};
 
     case LOGOUT:
       return initialState;

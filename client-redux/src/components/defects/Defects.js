@@ -11,7 +11,7 @@ import Confirmation from "../common/Confirmation";
 //import ExportItems from "../common/exportItems/ExportItems";
 import FilterSort from "../common/filterSort/FilterSort";
 import { pageChange, itemsPerPageChange } from "../../actions/pagerActions";
-import { fetchDefects, deleteDefect } from "../../actions/defectsActions";
+import { fetchDefects, deleteDefect, invalidateDefects } from "../../actions/defectsActions";
 import { fetchQueries } from "../../actions/queriesActions";
 import { toggleFS } from "../../actions/showActions";
 
@@ -31,6 +31,7 @@ class Defects extends Component {
     this.showDeleteConfirmation = this.showDeleteConfirmation.bind(this);
     this.confirmDelete = this.confirmDelete.bind(this);
     this.unconfirmDelete = this.unconfirmDelete.bind(this);
+    this.refreshDefects = this.refreshDefects.bind(this);
   }
 
   componentDidMount() {
@@ -40,6 +41,12 @@ class Defects extends Component {
 
     if (!this.props.queriesAreValid) {
       this.props.fetchQueries(this.thingType);
+    }
+  }
+
+  componentDidUpdate() {
+    if (!this.props.fsedDefectsAreValid) {
+      this.props.fetchDefects();
     }
   }
 
@@ -85,6 +92,10 @@ class Defects extends Component {
       showConfirmationDialog: false,
       defectId: ""
     });
+  }
+
+  refreshDefects() {
+    this.props.invalidateDefects();
   }
 
   render() {
@@ -152,12 +163,18 @@ class Defects extends Component {
               />
             ) : null}
             <div className="row">
-              <div className="col-2 mb-2">
+              <div className="button-group mb-2">
                 <button
                   className="btn btn-sm btn-primary"
                   onClick={this.createDefect}
                 >
                   New Defect
+                </button>
+                <button
+                  className="btn btn-sm btn-warning"
+                  onClick={this.refreshDefects}
+                >
+                  Refresh Defects
                 </button>
               </div>
             </div>
@@ -196,11 +213,13 @@ class Defects extends Component {
 }
 
 Defects.propTypes = {
-  fsedDefects: PropTypes.arrayOf(PropTypes.object).isRequired,
+  fsedDefects: PropTypes.array,
+  fsedDefectsAreValid: PropTypes.bool.isRequired,
   allDefectCount: PropTypes.number,
   filterSort: PropTypes.object,
   fetchDefects: PropTypes.func.isRequired,
   deleteDefect: PropTypes.func.isRequired,
+  invalidateDefects: PropTypes.func.isRequired,
   defectsIsLoading: PropTypes.bool,
   defectsError: PropTypes.object,
   pager: PropTypes.object.isRequired,
@@ -222,7 +241,7 @@ const mapStateToProps = state => ({
 
   allDefectCount: state.allDefects.length,
   defectsIsLoading: state.defectsStatus.isBusy,
-  defectsError: state.defectsError.error,
+  defectsError: state.defectsStatus.error,
   pager: state.pager,
   showFs: state.show.fsOn.defect
 });
@@ -238,6 +257,7 @@ export default connect(
     deleteDefect,
     fetchDefects,
     fetchQueries,
+    invalidateDefects,
     pageChange,
     itemsPerPageChange,
     toggleFS

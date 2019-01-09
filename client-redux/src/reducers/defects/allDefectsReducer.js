@@ -3,7 +3,6 @@ import {
   DEFECT_INSERT_SUCCESS,
   DEFECT_UPDATE_SUCCESS,
   DEFECT_DELETE_SUCCESS,
-  DEFECT_DELETE_NOT_FOUND,
   LOGOUT
 } from "../../actions/types";
 
