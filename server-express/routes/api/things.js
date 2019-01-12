@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const settings = require("../../config/settings");
+const secret = require("../../config/secret");
 const collections = settings.COLLECTIONS;
-const dbName = settings.DB_NAME;
-const dbUri = settings.DB_URI;
+const dbName = secret.DB_NAME;
+const dbUri = secret.DB_URI;
 
 const MongoClient = require("mongodb").MongoClient;
 

@@ -4,11 +4,15 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const passport = require("passport");
-const settings = require("./config/settings");
+//const settings = require("./config/settings");
+const secret = require("./config/secret");
 
 const users = require("./routes/api/users");
-const defects = require("./routes/api/defects");
+//const defects = require("./routes/api/defects");
+const items = require("./routes/api/items");
 const things = require("./routes/api/things");
+
+
 
 const app = express();
 require("./config/passport")(passport);
@@ -23,10 +27,9 @@ app.use((req, res, next) => {
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-const DB = "mongodb://evaldas:evaldas0@ds159121.mlab.com:59121/bnbldb";
 mongoose
   .connect(
-    DB,
+    secret.DB_URI,
     { useNewUrlParser: true }
   )
   .then(() => console.log("MongoDB Connected"))
@@ -35,7 +38,7 @@ mongoose
 app.use(passport.initialize());
 
 app.use("/api/users", users);
-app.use("/api/defects", defects);
+app.use(["/api/defects", "/api/weldings"], items);
 app.use("/api/things", things);
 app.use("/", express.static("../client-redux/"));
 

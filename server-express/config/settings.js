@@ -1,5 +1,6 @@
 exports.COLLECTIONS = [
-  {name: "defect", actions: []},
+  {name: "defects", actions: []},
+  {name: "weldings", actions: []},
   {name: "bgamykl", actions: ["defects", "all"]},
   {name: "btipas", actions: ["defects", "all"]},
   {name: "defskop", actions: ["defects", "all"]},
@@ -19,11 +20,10 @@ exports.COLLECTIONS = [
   {name: "user", actions: []}
 ];
 
-exports.SECRET_KEY = "|a%crVew5$$,-#5ssf82@$";
-
-exports.PORT = 3000;
-exports.DB_URI = "mongodb://evaldas:evaldas0@ds159121.mlab.com:59121/bnbldb";
-exports.DB_NAME = "bnbldb";
+exports.URL_COLLECTION_MAP = [
+  {url: "/api/defects", collection: "defects", item: "defect", items: "defects"},
+  {url: "/api/weldings", collection: "weldings", item: "welding", items: "weldings"}
+];
 
 // developement
 exports.ERROR_PCT = 25.0;

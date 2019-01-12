@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const settings = require("../../config/settings.js");
+const secret = require("../../config/secret.js");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
@@ -107,7 +107,7 @@ router.post("/login", (req, res) => {
         // sign the jwt
         jwt.sign(
           payload,
-          settings.SECRET_KEY,
+          secret.SECRET_KEY,
           { expiresIn: 36000 },
           (err, token) => {
             if (!err) {

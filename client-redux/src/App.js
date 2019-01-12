@@ -7,6 +7,8 @@ import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
 import Defects from "./components/defects/Defects";
 import EditDefect from './components/defects/EditDefect';
+import Weldings from "./components/weldings/Weldings";
+import EditWelding from './components/weldings/EditWelding';
 import EditQueries from "./components/editQueries/EditQueries";
 import LoggedIn from "./components/layout/LoggedIn";
 
@@ -59,6 +61,9 @@ class App extends Component {
               <PrivateRoute exact path='/defects' component={Defects} />
               <PrivateRoute path='/defects/edit/:id' component={EditDefect} />
               <PrivateRoute exact path='/defects/new' component={EditDefect} />
+              <PrivateRoute exact path='/weldings' component={Weldings} />
+              <PrivateRoute path='/weldings/edit/:id' component={EditWelding} />
+              <PrivateRoute exact path='/weldings/new' component={EditWelding} />
               <PrivateRoute exact path='/queries/edit/:thingType' component={EditQueries} />
             </Switch>
             <Footer />
