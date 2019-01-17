@@ -8,6 +8,9 @@ import queriesReducer from "./queriesReducer";
 import allDefectsReducer from "./defects/allDefectsReducer";
 import fsedDefectsReducer from "./defects/fsedDefectsReducer";
 import defectsStatusReducer from "./defects/defectsStatusReducer";
+import allWeldingsReducer from "./weldings/allWeldingsReducer";
+import fsedWeldingsReducer from "./weldings/fsedWeldingsReducer";
+import weldingsStatusReducer from "./weldings/weldingStatusReducer";
 import showReducer from "./showReducer";
 
 export default combineReducers({
@@ -18,6 +21,9 @@ export default combineReducers({
   allDefects: allDefectsReducer,
   fsedDefects: fsedDefectsReducer,
   defectsStatus: defectsStatusReducer,
+  allWeldings: allWeldingsReducer,
+  fsedWeldings: fsedWeldingsReducer,
+  weldingsStatus: weldingsStatusReducer,
   queries: queriesReducer,
   pager: pagerReducer,
   show: showReducer

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import TextFieldGroup from '../../common/TextFieldGroup';
 import SelectInputGroup from '../../common/SelectInputGroup';
 import {createOptions} from '../../createOptions';
+import absent from '../../../utils/absent-props';
 
 const MainDataForm = ({defect, onChangeMain, onChangeVieta, onChangeBegis, things}) => {
   
@@ -26,7 +27,7 @@ const MainDataForm = ({defect, onChangeMain, onChangeVieta, onChangeBegis, thing
           name="id"
           placeholder="Defekto ID"
           readonly={true}
-          value={defect.id || ''}
+          value={absent(defect.id)}
           onChange={onChangeMain}
         />
 
@@ -35,7 +36,7 @@ const MainDataForm = ({defect, onChangeMain, onChangeVieta, onChangeBegis, thing
           name="meistrij"
           label="Meistrija"
           divClassname="form-group col-4"
-          value={defect.vieta.meistrij || ''}
+          value={absent(defect.vieta.meistrij)}
           options={meistrijOptions}
           onChange={onChangeVieta}
         />
@@ -45,7 +46,7 @@ const MainDataForm = ({defect, onChangeMain, onChangeVieta, onChangeBegis, thing
           name="kkateg"
           label="Kelio kategorija"
           divClassname="form-group col-4"
-          value={defect.kkateg || ''}
+          value={absent(defect.kkateg)}
           options={kkategOptions}
           onChange={onChangeMain}
         />
@@ -57,7 +58,7 @@ const MainDataForm = ({defect, onChangeMain, onChangeVieta, onChangeBegis, thing
           name="tipas"
           label="Bėgio tipas"
           divClassname="form-group col-4"
-          value={defect.begis.tipas || ''}
+          value={absent(defect.begis.tipas)}
           options={btipasOptions}
           onChange={onChangeBegis}
         />
@@ -67,7 +68,7 @@ const MainDataForm = ({defect, onChangeMain, onChangeVieta, onChangeBegis, thing
           name="gamykla"
           label="Bėgio gamykla"
           divClassname="form-group col-4"
-          value={defect.begis.gamykla || ''}
+          value={absent(defect.begis.gamykla)}
           options={bgamyklOptions}
           onChange={onChangeBegis}
         />
@@ -78,7 +79,7 @@ const MainDataForm = ({defect, onChangeMain, onChangeVieta, onChangeBegis, thing
           id="defect-bmetai"
           name="metai"
           placeholder="Bėgio gam. metai"
-          value={(defect.begis.metai && defect.begis.metai + '') || ''}
+          value={absent(defect.begis.metai) + ""}
           onChange={onChangeBegis}
         />
       </div>
@@ -89,7 +90,7 @@ const MainDataForm = ({defect, onChangeMain, onChangeVieta, onChangeBegis, thing
           name="linst"
           label="Linija/stotis"
           divClassname="form-group col-4"
-          value={defect.vieta.linst || ''}
+          value={absent(defect.vieta.linst)}
           options={linstOptions}
           onChange={onChangeVieta}
         />
@@ -100,7 +101,7 @@ const MainDataForm = ({defect, onChangeMain, onChangeVieta, onChangeBegis, thing
           id="defect-kelias"
           name="kelias"
           placeholder="Kelio Nr."
-          value={defect.vieta.kelias || ''}
+          value={absent(defect.vieta.kelias)}
           onChange={onChangeVieta}
         />
         
@@ -110,7 +111,7 @@ const MainDataForm = ({defect, onChangeMain, onChangeVieta, onChangeBegis, thing
           name="iesmas"
           id="defect-iesmas"
           placeholder="Iešmo Nr."
-          value={defect.vieta.iesmas || ''}
+          value={absent(defect.vieta.iesmas)}
           onChange={onChangeVieta}
         />
         
@@ -120,7 +121,7 @@ const MainDataForm = ({defect, onChangeMain, onChangeVieta, onChangeBegis, thing
           id="defect-km"
           name="km"
           placeholder="km"
-          value={(defect.vieta.km && defect.vieta.km + '') || ''}
+          value={absent(defect.vieta.km) + ''}
           onChange={onChangeVieta}
         />
         
@@ -130,7 +131,7 @@ const MainDataForm = ({defect, onChangeMain, onChangeVieta, onChangeBegis, thing
           id="defect-pk"
           name="pk"
           placeholder="pk"
-          value={(defect.vieta.pk && defect.vieta.pk + '') || ''}
+          value={absent(defect.vieta.pk) + ''}
           onChange={onChangeVieta}
         />
         
@@ -140,7 +141,7 @@ const MainDataForm = ({defect, onChangeMain, onChangeVieta, onChangeBegis, thing
           id="defect-m"
           name="m"
           placeholder="m"
-          value={(defect.vieta.m && defect.vieta.m + '') || ''}
+          value={absent(defect.vieta.m) + ''}
           onChange={onChangeVieta}
         />
 
@@ -149,7 +150,7 @@ const MainDataForm = ({defect, onChangeMain, onChangeVieta, onChangeBegis, thing
           name="siule"
           label="Siūlė"
           divClassname="form-group col-1"
-          value={defect.vieta.siule || ''}
+          value={absent(defect.vieta.siule)}
           options={siuleOptions}
           onChange={onChangeVieta}
         />

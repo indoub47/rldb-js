@@ -41,7 +41,7 @@ const areEqual = (a, b) => {
   // Otherwise they're Objects, Functions or Arrays or some kind of host object
   if (typeof a == 'object' || typeof a == 'function') {
 
-    // For functions, check stringigied values are the same
+    // For functions, check stringified values are the same
     // Almost certainly false if a and b aren't trivial
     // and are different functions
     if (aClass == '[object Function]' && a.toString() != b.toString()) return false;

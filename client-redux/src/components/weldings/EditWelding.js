@@ -7,172 +7,48 @@ import MainDataForm from "./components_edit/MainDataForm";
 import EditHistory from "./components_edit/EditHistory";
 import ErrorAlert from "../common/ErrorAlert/ErrorAlert";
 import IsLoading from "../common/IsLoading";
-import { updateDefect, insertDefect } from "../../actions/defectsActions";
+import { updateWelding, insertWelding } from "../../actions/weldingsActions";
 import getId from "../../utils/getId";
 
 class EditWelding extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      defect: {
-        id: "",
-        kkateg: "",
-        vieta: {
-          meistrij: "",
-          linst: "",
-          kelias: "",
-          iesmas: "",
-          km: "",
-          pk: "",
-          m: "",
-          siule: ""
-        },
-        history: [],
-        begis: {
-          tipas: "",
-          gamykla: "",
-          metai: ""
-        }
-      },
-      isBusy: false,
-      error: null
+      welding: {}
     };
-    this.onChangeMain = this.onChangeMain.bind(this);
-    this.onChangeVieta = this.onChangeVieta.bind(this);
-    this.onChangeBegis = this.onChangeBegis.bind(this);
-    this.onSubmitHi = this.onSubmitHi.bind(this);
-    this.onDeleteHi = this.onDeleteHi.bind(this);
-    this.onSubmitDefect = this.onSubmitDefect.bind(this);
+    this.onChange = this.onChange.bind(this);
+    this.onSubmitWelding = this.onSubmitWelding.bind(this);
   }
 
   componentDidMount() {
     if (this.props.match.params.id) {
-      const defect = this.props.defects.find(
+      const welding = this.props.weldings.find(
         d => d.id === this.props.match.params.id
       );
-      if (defect) {
-        //console.log('defect', defect);
-        this.setState({ defect });
+      if (welding) {
+        this.setState({ welding });
       }
     }
   }
 
-  // onMoveHiUp(e) {
-  //   const id = e.target.dataset.id;
-  //   const ind = this.state.defect.history.findIndex(hi => hi.id === id);
-  //   if (ind < 0) return;
-  //   const currHistory = this.state.defect.history;
-  //   let newHistory;
-  //   if (ind === 0) {
-  //     newHistory = [...currHistory.slice(1), currHistory[0]];
-  //   } else {
-  //     newHistory = [
-  //       ...currHistory.slice(0, ind - 1),
-  //       currHistory[ind],
-  //       currHistory[ind - 1],
-  //       ...currHistory.slice(ind + 1)
-  //     ];
-  //   }
-  //   const defect = { ...this.state.defect, history: newHistory };
-  //   this.setState({ defect });
-  // }
-
-  // replace history record
-  replaceItem(draft, arr) {
-    const ind = arr.findIndex(h => h.id === draft.id);
-    if (ind < 0) return;
-    return [...arr.slice(0, ind), draft, ...arr.slice(ind + 1)];
-  }
-
-  // insert new record
-  insertItem(draft, arr) {
-    draft.id = getId();
-    return [...arr, draft];
-  }
-
-  // submit historyItem
-  onSubmitHi(draft) {
-    let newHistory;
-    if (draft.id) {
-      newHistory = this.replaceItem(draft, this.state.defect.history);
-    } else {
-      newHistory = this.insertItem(draft, this.state.defect.history);
-    }
-
-    const sort = (a, b) => {
-      if (a.date < b.date) return -1;
-      if (a.date > b.date) return 1;
-      if (a.action.end && !b.action.end) return 1;
-      if (!a.action.end && b.action.end) return -1;
-      return 0;
-    };
-
-    newHistory.sort(sort);
-    const newDefect = {
-      ...this.state.defect,
-      history: newHistory
-    };
-    this.setState({ defect: newDefect });
-  }
-
-  onChangeMain(e) {
-    const defect = {
-      ...this.state.defect,
+  onChange(e) {
+    const welding = {
+      ...this.state.welding,
       [e.target.name]: e.target.value
     };
-    this.setState({ defect });
+    this.setState({ welding });
   }
 
-  onChangeVieta(e) {
-    const vieta = {
-      ...this.state.defect.vieta,
-      [e.target.name]: e.target.value
-    };
-    const defect = {
-      ...this.state.defect,
-      vieta
-    };
-    this.setState({ defect });
-  }
-
-  onChangeBegis(e) {
-    const begis = {
-      ...this.state.defect.begis,
-      [e.target.name]: e.target.value
-    };
-    const defect = {
-      ...this.state.defect,
-      begis
-    };
-    this.setState({ defect });
-  }
-
-  onDeleteHi(e) {
-    const id = e.target.dataset.id;
-    const currHistory = this.state.defect.history;
-    const ind = currHistory.findIndex(hi => hi.id === id);
-    if (ind < 0) return;
-    let newHistory = [
-      ...currHistory.slice(0, ind),
-      ...currHistory.slice(ind + 1)
-    ];
-    const defect = {
-      ...this.state.defect,
-      history: newHistory
-    };
-    this.setState({ defect });
-  }
-
-  onSubmitDefect(e) {
+  onSubmitWelding(e) {
     e.preventDefault();
-    const defect = this.state.defect;
-    if (defect === null || defect === undefined) return;
-    // validate defect here
-    if (defect.id) {
-      this.props.updateDefect(defect, this.props.history);
+    const welding = this.state.welding;
+    if (welding == null) return;
+    // validate welding here
+    if (welding.id) {
+      this.props.updateWelding(welding, this.props.history);
     } else {
-      defect.id = getId();
-      this.props.insertDefect(defect);
+      welding.id = getId();
+      this.props.insertWelding(welding);
     }
   }
 
@@ -182,21 +58,13 @@ class EditWelding extends Component {
         {this.props.error && <ErrorAlert errorObj={this.props.error} />}
         <IsLoading when={this.props.isBusy} />
         <MainDataForm
-          defect={this.state.defect}
-          onChangeMain={this.onChangeMain}
-          onChangeVieta={this.onChangeVieta}
-          onChangeBegis={this.onChangeBegis}
+          welding={this.state.welding}
+          onChange={this.onChange}
           things={this.props.things}
         />
-
-        <EditHistory
-          defectHistory={this.state.defect.history}
-          submitItem={this.onSubmitHi}
-          deleteItem={this.onDeleteHi}
-        />
-
-        <button className="btn btn-info" onClick={this.onSubmitDefect}>
-          Submit Defect
+        
+        <button className="btn btn-info" onClick={this.onSubmitWelding}>
+          Submit Welding
         </button>
       </React.Fragment>
     );
@@ -204,20 +72,20 @@ class EditWelding extends Component {
 }
 
 EditWelding.propTypes = {
-  updateDefect: PropTypes.func.isRequired,
-  insertDefect: PropTypes.func.isRequired,
+  updateWelding: PropTypes.func.isRequired,
+  insertWelding: PropTypes.func.isRequired,
   isBusy: PropTypes.bool,
   error: PropTypes.object
 };
 
 const mapStateToProps = state => ({
-  isBusy: state.defectsStatus.isBusy,
-  error: state.defectsStatus.error,
+  isBusy: state.weldingsStatus.isBusy,
+  error: state.weldingsStatus.error,
   things: state.things.data,
-  defects: state.fsedDefects.data
+  weldings: state.fsedWeldings.data
 });
 
 export default connect(
   mapStateToProps,
-  { updateDefect, insertDefect }
+  { updateWelding, insertWelding }
 )(EditWelding);

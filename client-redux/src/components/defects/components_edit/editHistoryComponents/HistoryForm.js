@@ -8,6 +8,7 @@ import validateDefectHistory from '../../../../validation/defectHistory';
 import {createOptions} from '../../../createOptions';
 import {emptyHistoryItem} from './emptyHistoryItem';
 import ErrorAlert from '../../../common/ErrorAlert/ErrorAlert';
+import absent from '../../../../utils/absent-props';
 
 class HistoryForm extends Component {
   constructor(props) {    
@@ -113,7 +114,7 @@ class HistoryForm extends Component {
                     name="id" id="id" 
                     placeholder="ID" 
                     readOnly="readOnly"
-                    value={this.state.item.id} 
+                    value={absent(this.state.item.id)} 
                   />
                 </div>
               </div>
@@ -122,7 +123,7 @@ class HistoryForm extends Component {
                   divClassname="form-group col-4"
                   type="date"
                   name="data"
-                  value={this.state.item.data}
+                  value={absent(this.state.item.data)}
                   onChange={this.onChange}
                   error={this.state.errors && this.state.errors.data}
                 />
@@ -130,7 +131,7 @@ class HistoryForm extends Component {
                   name="action"
                   size="1"
                   divClassname="form-group col-4"
-                  value={this.state.item.action}
+                  value={absent(this.state.item.action)}
                   onChange={this.onChange}
                   error={this.state.errors && this.state.errors.action}
                   options={this.state.doneByNB ? this.nbActionOptions : this.nonNbActionOptions}
@@ -143,7 +144,7 @@ class HistoryForm extends Component {
                       name="oper"
                       size="1"
                       divClassname="form-group col-6"
-                      value={this.state.item.oper}
+                      value={absent(this.state.item.oper)}
                       onChange={this.onChange}
                       error={this.state.errors && this.state.errors.oper}
                       options={this.operatOptions}
@@ -153,7 +154,7 @@ class HistoryForm extends Component {
                       name="apar"
                       size="1"
                       divClassname="form-group col-6"
-                      value={this.state.item.apar}
+                      value={absent(this.state.item.apar)}
                       onChange={this.onChange}
                       error={this.state.errors && this.state.errors.apar}
                       options={this.defskopOptions}
@@ -166,7 +167,7 @@ class HistoryForm extends Component {
                       name="dl" 
                       placeholder="L"
                       info="Sąlyginis ilgis L"
-                      value={(this.state.item.dl && this.state.item.dl + '') || ''}
+                      value={absent(this.state.item.dl) + ''}
                       onChange={this.onChange}
                       disabled={this.state.doneByNB ? null : "disabled"}
                       error={this.state.errors && this.state.errors.dl}
@@ -176,7 +177,7 @@ class HistoryForm extends Component {
                       name="dh" 
                       placeholder="H"
                       info="Sąlyginis aukštis H"
-                      value={(this.state.item.dh && this.state.item.dh + '') || ''}
+                      value={absent(this.state.item.dh) + ''}
                       onChange={this.onChange}
                       disabled={this.state.doneByNB ? null : "disabled"}
                       error={this.state.errors && this.state.errors.dh}
@@ -186,7 +187,7 @@ class HistoryForm extends Component {
                       name="kodas" 
                       placeholder="Kodas"
                       info="Defekto kodas"
-                      value={this.state.item.kodas}
+                      value={absent(this.state.item.kodas)}
                       onChange={this.onChange}
                       disabled={this.state.doneByNB ? null : "disabled"}
                       error={this.state.errors && this.state.errors.kodas}
@@ -195,7 +196,7 @@ class HistoryForm extends Component {
                       name="pavoj"
                       size="1"
                       divClassname="form-group col-2"
-                      value={this.state.item.pavoj}
+                      value={absent(this.state.item.pavoj)}
                       onChange={this.onChange}
                       error={this.state.errors && this.state.errors.pavoj}
                       options={this.pavojOptions}
@@ -206,7 +207,7 @@ class HistoryForm extends Component {
                       type="date"
                       name="termin"
                       info="Pašalinti iki datos"
-                      value={this.state.item.termin || ''}
+                      value={absent(this.state.item.termin)}
                       onChange={this.onChange}
                       error={this.state.errors && this.state.errors.termin}
                       disabled={this.state.doneByNB ? null : "disabled"}
@@ -219,7 +220,7 @@ class HistoryForm extends Component {
                 name="pastaba"
                 rows="2" 
                 placeholder="Pastaba"
-                value={this.state.item.pastaba}
+                value={absent(this.state.item.pastaba)}
                 onChange={this.onChange}
                 error={this.state.errors && this.state.errors.pastaba}
                 info="Neilgas tekstukas, iki 300 simbolių"

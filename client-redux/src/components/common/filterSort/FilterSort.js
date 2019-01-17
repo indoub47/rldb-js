@@ -6,7 +6,7 @@ import Sort from "./components/Sort";
 import QuerySelect from "./components/QuerySelect";
 import Manual from "./components/Manual";
 import ErrorAlert from "../ErrorAlert/ErrorAlert";
-import { filterSortDefects } from "../../../actions/defectsActions";
+//import { filterSortDefects } from "../../../actions/defectsActions";
 import { createOptions } from "../../createOptions";
 import {toggleFSManual} from "../../../actions/showActions";
 
@@ -49,7 +49,7 @@ class FilterSort extends Component {
   }
 
   applyFS() {
-    this.props.filterSortDefects(this.state.filterText, this.state.sortText);
+    this.props.fsAction(this.state.filterText, this.state.sortText);
   }
 
   onSelectedQueryChange(e) {
@@ -176,7 +176,7 @@ FilterSort.propTypes = {
   history: PropTypes.object.isRequired,
   thingType: PropTypes.string.isRequired,
   filterSortError: PropTypes.object,
-  filterSortDefects: PropTypes.func.isRequired,
+  fsAction: PropTypes.func.isRequired,
   queries: PropTypes.arrayOf(PropTypes.object).isRequired,
   toggleFSManual: PropTypes.func.isRequired,
   showFsManual: PropTypes.bool.isRequired
@@ -194,5 +194,5 @@ FilterSort.defaultProps = {
 
 export default connect(
   mapStateToProps,
-  { filterSortDefects, toggleFSManual }
+  { toggleFSManual }
 )(FilterSort);

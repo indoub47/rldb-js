@@ -40,6 +40,15 @@ export const fetchDefectThings = () => dispatch => {
     .catch(err => dispatch(fetchThingsFailure(err)));
 };
 
+// Get all things for weldings
+export const fetchWeldingThings = () => dispatch => {
+  dispatch(fetchThingsBegin());
+  axios
+    .get("/api/things/weldings")
+    .then(res => dispatch(fetchThingsSuccess(res.data)))
+    .catch(err => dispatch(fetchThingsFailure(err)));
+};
+
 // Get all things for all apps
 export const fetchAllThings = () => dispatch => {
   dispatch(fetchThingsBegin());

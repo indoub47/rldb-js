@@ -11,7 +11,7 @@ import Confirmation from "../common/Confirmation";
 //import ExportItems from "../common/exportItems/ExportItems";
 import FilterSort from "../common/filterSort/FilterSort";
 import { pageChange, itemsPerPageChange } from "../../actions/pagerActions";
-import { fetchDefects, deleteDefect, invalidateDefects } from "../../actions/defectsActions";
+import { fetchDefects, deleteDefect, invalidateDefects, filterSortDefects } from "../../actions/defectsActions";
 import { fetchQueries } from "../../actions/queriesActions";
 import { toggleFS } from "../../actions/showActions";
 
@@ -160,6 +160,7 @@ class Defects extends Component {
               <FilterSort
                 history={this.props.history}
                 thingType={this.thingType}
+                fsAction={this.props.filterSortDefects} 
               />
             ) : null}
             <div className="row">
@@ -258,6 +259,7 @@ export default connect(
     fetchDefects,
     fetchQueries,
     invalidateDefects,
+    filterSortDefects,
     pageChange,
     itemsPerPageChange,
     toggleFS

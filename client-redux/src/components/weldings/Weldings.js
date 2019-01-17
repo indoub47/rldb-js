@@ -2,7 +2,7 @@ import React, { Component } from "react";
 //import {Link} from 'react-router-dom';
 import { PropTypes } from "prop-types";
 import { connect } from "react-redux";
-import DefectTable from "./components_defects/DefectTable";
+import WeldingTable from "./components_weldings/WeldingTable";
 import IsLoading from "../common/IsLoading";
 import ErrorAlertPacket from "../common/ErrorAlert/ErrorAlertPacket";
 import ItemsCount from "../common/ItemsCount";
@@ -11,7 +11,12 @@ import Confirmation from "../common/Confirmation";
 //import ExportItems from "../common/exportItems/ExportItems";
 import FilterSort from "../common/filterSort/FilterSort";
 import { pageChange, itemsPerPageChange } from "../../actions/pagerActions";
-import { fetchDefects, deleteDefect, invalidateDefects } from "../../actions/defectsActions";
+import {
+  fetchWeldings,
+  deleteWelding,
+  invalidateWeldings, 
+  filterSortWeldings
+} from "../../actions/weldingsActions";
 import { fetchQueries } from "../../actions/queriesActions";
 import { toggleFS } from "../../actions/showActions";
 
@@ -22,21 +27,21 @@ class Weldings extends Component {
       showConfirmationDialog: false,
       idToDelete: ""
     };
-    this.thingType = "defect";
+    this.thingType = "welding";
     this.toggleFilterSort = this.toggleFilterSort.bind(this);
-    this.editDefect = this.editDefect.bind(this);
-    this.createDefect = this.createDefect.bind(this);
+    this.editWelding = this.editWelding.bind(this);
+    this.createWelding = this.createWelding.bind(this);
     this.pageChange = this.pageChange.bind(this);
     this.itemsPerPageChange = this.itemsPerPageChange.bind(this);
     this.showDeleteConfirmation = this.showDeleteConfirmation.bind(this);
     this.confirmDelete = this.confirmDelete.bind(this);
     this.unconfirmDelete = this.unconfirmDelete.bind(this);
-    this.refreshDefects = this.refreshDefects.bind(this);
+    this.refreshWeldings = this.refreshWeldings.bind(this);
   }
 
   componentDidMount() {
-    if (!this.props.fsedDefectsAreValid) {
-      this.props.fetchDefects();
+    if (!this.props.fsedWeldingsAreValid) {
+      this.props.fetchWeldings();
     }
 
     if (!this.props.queriesAreValid) {
@@ -45,31 +50,34 @@ class Weldings extends Component {
   }
 
   componentDidUpdate() {
-    if (!this.props.fsedDefectsAreValid) {
-      this.props.fetchDefects();
+    if (!this.props.fsedWeldingsAreValid) {
+      this.props.fetchWeldings();
     }
   }
 
   pageChange(pageIndex) {
-    this.props.pageChange(pageIndex, this.props.fsedDefects.length);
+    this.props.pageChange(pageIndex, this.props.fsedWeldings.length);
   }
 
   itemsPerPageChange(e) {
     const selectedValue = parseInt(e.target.value, 10);
-    this.props.itemsPerPageChange(selectedValue, this.props.fsedDefects.length);
+    this.props.itemsPerPageChange(
+      selectedValue,
+      this.props.fsedWeldings.length
+    );
   }
 
   toggleFilterSort() {
-    this.props.toggleFS("defect");
+    this.props.toggleFS("welding");
   }
 
-  createDefect() {
-    this.props.history.push("/defects/new");
+  createWelding() {
+    this.props.history.push("/weldings/new");
   }
 
-  editDefect(e) {
+  editWelding(e) {
     const id = e.target.dataset.id;
-    this.props.history.push(`defects/edit/${id}`);
+    this.props.history.push(`weldings/edit/${id}`);
   }
 
   showDeleteConfirmation(e) {
@@ -80,7 +88,7 @@ class Weldings extends Component {
   }
 
   confirmDelete() {
-    this.props.deleteDefect(this.state.idToDelete);
+    this.props.deleteWelding(this.state.idToDelete);
     this.setState({
       showConfirmationDialog: false,
       idToDelete: ""
@@ -90,22 +98,22 @@ class Weldings extends Component {
   unconfirmDelete() {
     this.setState({
       showConfirmationDialog: false,
-      defectId: ""
+      weldingId: ""
     });
   }
 
-  refreshDefects() {
-    this.props.invalidateDefects();
+  refreshWeldings() {
+    this.props.invalidateWeldings();
   }
 
   render() {
-    if (this.props.defectsError || this.props.queriesFetchError) {
+    if (this.props.weldingsError || this.props.queriesFetchError) {
       return (
         <div className="row">
           <div className="col-12">
             <ErrorAlertPacket
               errorObjArray={[
-                this.props.defectsError,
+                this.props.weldingsError,
                 this.props.queriesFetchError
               ]}
             />
@@ -117,8 +125,8 @@ class Weldings extends Component {
     if (
       !this.props.queriesAreValid ||
       this.props.queriesIsLoading ||
-      !this.props.fsedDefectsAreValid ||
-      this.props.defectsIsLoading
+      !this.props.fsedWeldingsAreValid ||
+      this.props.weldingsIsLoading
     ) {
       return <IsLoading />;
     }
@@ -133,7 +141,7 @@ class Weldings extends Component {
           itemsPerPage={itemsPerPage}
           onPageChanged={this.pageChange}
           onItemsPerPageChanged={this.itemsPerPageChange}
-          itemCount={this.props.fsedDefects.length}
+          itemCount={this.props.fsedWeldings.length}
         />
       ) : null;
 
@@ -141,7 +149,7 @@ class Weldings extends Component {
       <div className="container-fluid">
         <Confirmation
           title="Delete Confirmation"
-          body="Please confirm that you really want to delete this defect from database."
+          body="Please confirm that you really want to delete this welding from database."
           confirmHandler={this.confirmDelete}
           rejectHandler={this.unconfirmDelete}
           show={this.state.showConfirmationDialog}
@@ -160,33 +168,34 @@ class Weldings extends Component {
               <FilterSort
                 history={this.props.history}
                 thingType={this.thingType}
+                fsAction={this.props.filterSortWeldings} 
               />
             ) : null}
             <div className="row">
               <div className="button-group mb-2">
                 <button
                   className="btn btn-sm btn-primary"
-                  onClick={this.createDefect}
+                  onClick={this.createWelding}
                 >
-                  New Defect
+                  New Welding
                 </button>
                 <button
                   className="btn btn-sm btn-warning"
-                  onClick={this.refreshDefects}
+                  onClick={this.refreshWeldings}
                 >
-                  Refresh Defects
+                  Refresh Weldings
                 </button>
               </div>
             </div>
             <div className="row">
               <div className="col-12">
-                <DefectTable
-                  items={this.props.fsedDefects.slice(
+                <WeldingTable
+                  items={this.props.fsedWeldings.slice(
                     firstItemIndex,
                     firstItemIndex + itemsPerPage
                   )}
-                  editDefect={this.editDefect}
-                  deleteDefect={this.showDeleteConfirmation}
+                  editWelding={this.editWelding}
+                  deleteWelding={this.showDeleteConfirmation}
                 />
               </div>
             </div>
@@ -194,8 +203,8 @@ class Weldings extends Component {
             <div className="row">
               <div className="col-3">
                 <ItemsCount
-                  inView={this.props.fsedDefects.length}
-                  total={this.props.allDefectCount}
+                  inView={this.props.fsedWeldings.length}
+                  total={this.props.allWeldingCount}
                 />
               </div>
 
@@ -213,15 +222,15 @@ class Weldings extends Component {
 }
 
 Weldings.propTypes = {
-  fsedDefects: PropTypes.array,
-  fsedDefectsAreValid: PropTypes.bool.isRequired,
-  allDefectCount: PropTypes.number,
+  fsedWeldings: PropTypes.array,
+  fsedWeldingsAreValid: PropTypes.bool.isRequired,
+  allWeldingCount: PropTypes.number,
   filterSort: PropTypes.object,
-  fetchDefects: PropTypes.func.isRequired,
-  deleteDefect: PropTypes.func.isRequired,
-  invalidateDefects: PropTypes.func.isRequired,
-  defectsIsLoading: PropTypes.bool,
-  defectsError: PropTypes.object,
+  fetchWeldings: PropTypes.func.isRequired,
+  deleteWelding: PropTypes.func.isRequired,
+  invalidateWeldings: PropTypes.func.isRequired,
+  weldingsIsLoading: PropTypes.bool,
+  weldingsError: PropTypes.object,
   pager: PropTypes.object.isRequired,
   fetchQueries: PropTypes.func.isRequired,
   queriesIsLoading: PropTypes.bool,
@@ -233,31 +242,32 @@ Weldings.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  fsedDefects: state.fsedDefects.data,
-  fsedDefectsAreValid: state.fsedDefects.valid,
-  queriesIsLoading: state.queries.defect.isLoading,
-  queriesFetchError: state.queries.defect.error,
-  queriesAreValid: state.queries.defect.valid,
+  fsedWeldings: state.fsedWeldings.data,
+  fsedWeldingsAreValid: state.fsedWeldings.valid,
+  queriesIsLoading: state.queries.welding.isLoading,
+  queriesFetchError: state.queries.welding.error,
+  queriesAreValid: state.queries.welding.valid,
 
-  allDefectCount: state.allDefects.length,
-  defectsIsLoading: state.defectsStatus.isBusy,
-  defectsError: state.defectsStatus.error,
+  allWeldingCount: state.allWeldings.length,
+  weldingsIsLoading: state.weldingsStatus.isBusy,
+  weldingsError: state.weldingsStatus.error,
   pager: state.pager,
-  showFs: state.show.fsOn.defect
+  showFs: state.show.fsOn.welding
 });
 
 Weldings.defaultProps = {
-  fsedDefects: [],
-  allDefectCount: 0
+  fsedWeldings: [],
+  allWeldingCount: 0
 };
 
 export default connect(
   mapStateToProps,
   {
-    deleteDefect,
-    fetchDefects,
+    deleteWelding,
+    fetchWeldings,
     fetchQueries,
-    invalidateDefects,
+    invalidateWeldings,
+    filterSortWeldings,
     pageChange,
     itemsPerPageChange,
     toggleFS
