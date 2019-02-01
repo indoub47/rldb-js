@@ -1,24 +1,25 @@
 import React, { Component } from "react";
-//import {Link} from 'react-router-dom';
 import { PropTypes } from "prop-types";
 import { connect } from "react-redux";
-import WeldingTable from "./components_weldings/WeldingTable";
+import ItemTable from "./components_of_weldings/ItemTable";
 import IsLoading from "../common/IsLoading";
-import ErrorAlertPacket from "../common/ErrorAlert/ErrorAlertPacket";
+import ErrorAlert from "../common/Alerts/ErrorAlert";
+//import WarningAlert from "../common/Alerts/WarningAlert";
 import ItemsCount from "../common/ItemsCount";
 import Pager from "../common/pager/Pager";
 import Confirmation from "../common/Confirmation";
-//import ExportItems from "../common/exportItems/ExportItems";
 import FilterSort from "../common/filterSort/FilterSort";
-import { pageChange, itemsPerPageChange } from "../../actions/pagerActions";
 import {
   fetchWeldings,
   deleteWelding,
-  invalidateWeldings, 
-  filterSortWeldings
+  invalidateWeldings,
+  filterSortWeldings,
+  pageChange,
+  itemsPerPageChange,
+  toggleFS,
+  toggleFSManual
 } from "../../actions/weldingsActions";
 import { fetchQueries } from "../../actions/queriesActions";
-import { toggleFS } from "../../actions/showActions";
 
 class Weldings extends Component {
   constructor(props) {
@@ -37,6 +38,7 @@ class Weldings extends Component {
     this.confirmDelete = this.confirmDelete.bind(this);
     this.unconfirmDelete = this.unconfirmDelete.bind(this);
     this.refreshWeldings = this.refreshWeldings.bind(this);
+    this.refreshWeldingsAll = this.refreshWeldingsAll.bind(this);
   }
 
   componentDidMount() {
@@ -68,7 +70,7 @@ class Weldings extends Component {
   }
 
   toggleFilterSort() {
-    this.props.toggleFS("welding");
+    this.props.toggleFS();
   }
 
   createWelding() {
@@ -103,7 +105,11 @@ class Weldings extends Component {
   }
 
   refreshWeldings() {
-    this.props.invalidateWeldings();
+    this.props.invalidateWeldings(false);
+  }
+
+  refreshWeldingsAll() {
+    this.props.invalidateWeldings(true);
   }
 
   render() {
@@ -111,11 +117,11 @@ class Weldings extends Component {
       return (
         <div className="row">
           <div className="col-12">
-            <ErrorAlertPacket
-              errorObjArray={[
-                this.props.weldingsError,
-                this.props.queriesFetchError
-              ]}
+            <ErrorAlert
+              message={
+                this.props.weldingsError.message ||
+                this.props.queriesFetchError.message
+              }
             />
           </div>
         </div>
@@ -155,47 +161,52 @@ class Weldings extends Component {
           show={this.state.showConfirmationDialog}
         />
         <div className="row">
-          <div className="col-12 fs-header">
+          <div className="col-12 commands button-group mb-2">
             <button
               className="btn btn-sm btn-secondary"
               onClick={this.toggleFilterSort}
             >
               Filter-Sort
             </button>
+            <button
+              className="btn btn-sm btn-primary"
+              onClick={this.createWelding}
+            >
+              New
+            </button>
+            <button
+              className="btn btn-sm btn-warning"
+              onClick={this.refreshWeldings}
+            >
+              Refresh
+            </button>
+            <button
+              className="btn btn-sm btn-warning"
+              onClick={this.refreshWeldingsAll}
+            >
+              Refresh All
+            </button>
           </div>
           <div className="col-12">
-            {this.props.showFs ? (
+            {this.props.showFS ? (
               <FilterSort
                 history={this.props.history}
                 thingType={this.thingType}
-                fsAction={this.props.filterSortWeldings} 
+                fsAction={this.props.filterSortWeldings}
+                toggleFSManual={this.props.toggleFSManual}
+                filterSortError={this.props.filterSortError}
+                showFSManual={this.props.showFSManual}
               />
             ) : null}
             <div className="row">
-              <div className="button-group mb-2">
-                <button
-                  className="btn btn-sm btn-primary"
-                  onClick={this.createWelding}
-                >
-                  New Welding
-                </button>
-                <button
-                  className="btn btn-sm btn-warning"
-                  onClick={this.refreshWeldings}
-                >
-                  Refresh Weldings
-                </button>
-              </div>
-            </div>
-            <div className="row">
               <div className="col-12">
-                <WeldingTable
+                <ItemTable
                   items={this.props.fsedWeldings.slice(
                     firstItemIndex,
                     firstItemIndex + itemsPerPage
                   )}
-                  editWelding={this.editWelding}
-                  deleteWelding={this.showDeleteConfirmation}
+                  editItem={this.editWelding}
+                  deleteItem={this.showDeleteConfirmation}
                 />
               </div>
             </div>
@@ -238,7 +249,7 @@ Weldings.propTypes = {
   pageChange: PropTypes.func.isRequired,
   itemsPerPageChange: PropTypes.func.isRequired,
   toggleFS: PropTypes.func.isRequired,
-  showFs: PropTypes.bool.isRequired
+  showFS: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -251,8 +262,10 @@ const mapStateToProps = state => ({
   allWeldingCount: state.allWeldings.length,
   weldingsIsLoading: state.weldingsStatus.isBusy,
   weldingsError: state.weldingsStatus.error,
-  pager: state.pager,
-  showFs: state.show.fsOn.welding
+  pager: state.weldingsPager,
+  showFS: state.weldingsShow.fsOn,
+  filterSortError: state.weldingsFS.error,
+  showFSManual: state.weldingsShow.fsManualOn
 });
 
 Weldings.defaultProps = {
@@ -270,6 +283,7 @@ export default connect(
     filterSortWeldings,
     pageChange,
     itemsPerPageChange,
-    toggleFS
+    toggleFS,
+    toggleFSManual
   }
 )(Weldings);

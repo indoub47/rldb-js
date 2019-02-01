@@ -15,7 +15,7 @@ const initialState = {
     isLoading: false,
     error: null
   },
-  weld: {
+  welding: {
     data: [],
     valid: false,
     isLoading: false,
@@ -38,6 +38,7 @@ export default function queriesReducer(state = initialState, action) {
 
     case QUERIES_FETCH_SUCCESS:
     case QUERIES_UPDATE_SUCCESS:
+      console.log("queries fetch/update success - payload", action.payload);
       return {
         ...state,
         [action.payload.thingType]: {

@@ -37,22 +37,19 @@ export function getFilterFunction(filterString, fnReplacements) {
 function replaceFieldNames(filterString, fnReplacements) {
   // replaces a.b.c with a*1000 + (b-1)*100 + z
   let filterText = parseAndReplaceVk(filterString);
-  const metres = "km && pk && (km * 1000 + (pk - 1) * 100 + m)";
   // replaces consecutive spaces, tabs, etc with one space
   // replaces all consecutive "=" with "==="
-  // replaces "!===" with "!=", "<===" with "<=" and ">===" with ">="
-  // replaces "_m_" with metres
-  // replaces "_k_" with metres
-  // replaces "some (" and "some(" with "x.history.some(hi => "
   filterText = filterText
-    .replace(/\s+/g, " ")
     .replace(/=+/g, "===")
-    .replace("<===", "<=")
-    .replace(">===", ">=")
-    .replace("!===", "!=")
-    .replace(/_m_/g, metres)
-    .replace(/_k_/g, metres)
-    .replace(/((some \()|(some\())/g, "x.history.some(hi => ");
+    .replace(/!=+/g, " !== ")
+    .replace(/>=+/g, " >= ")
+    .replace(/<=+/g, " <= ")
+    //.replace(/===/g, " === ")
+    .replace(/<>/g, " !== ")
+    .replace(/&+/g, " && ")
+    .replace(/\|+/g, " || ")
+    .replace(/\s+/g, " ");
+
 
   // replaces field names with paths:
   // "fieldName" -> obj["inner_prop"]["fieldName"]

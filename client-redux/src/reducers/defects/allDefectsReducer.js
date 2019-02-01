@@ -17,10 +17,12 @@ export default function allDefectsReducer(state = initialState, action) {
 
     // create defect
     case DEFECT_INSERT_SUCCESS:
+      if (!action.payload) return state;
       return [...state, action.payload];
 
     // edit defect
     case DEFECT_UPDATE_SUCCESS:
+      if (!action.payload) return state;
       const updatedDefect = action.payload;
       let ind = state.findIndex(x => x._id === updatedDefect._id);
       return [
@@ -31,6 +33,7 @@ export default function allDefectsReducer(state = initialState, action) {
 
     // delete defect success
     case DEFECT_DELETE_SUCCESS:
+      //console.log("action.payload", action.payload);
       if (!action.payload) return state;
       ind = state.findIndex(x => x._id === action.payload);
       if (ind < 0) return state; // jeigu kartais nerastų tokio id...
@@ -38,6 +41,7 @@ export default function allDefectsReducer(state = initialState, action) {
         ...state.slice(0, ind),
         ...state.slice(ind + 1)
       ];
+
 
     case LOGOUT:
       return initialState;

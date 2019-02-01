@@ -14,4 +14,5 @@ const parseAndReplaceVk = inputText => {
   return replaced;
 }
 
+
 export default parseAndReplaceVk;

@@ -59,10 +59,10 @@ class App extends Component {
             </div>
             <Switch>
               <PrivateRoute exact path='/defects' component={Defects} />
-              <PrivateRoute path='/defects/edit/:id' component={EditDefect} />
+              <PrivateRoute path='/defects/edit/:_id' component={EditDefect} />
               <PrivateRoute exact path='/defects/new' component={EditDefect} />
               <PrivateRoute exact path='/weldings' component={Weldings} />
-              <PrivateRoute path='/weldings/edit/:id' component={EditWelding} />
+              <PrivateRoute path='/weldings/edit/:_id' component={EditWelding} />
               <PrivateRoute exact path='/weldings/new' component={EditWelding} />
               <PrivateRoute exact path='/queries/edit/:thingType' component={EditQueries} />
             </Switch>

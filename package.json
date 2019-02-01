@@ -1,0 +1,20 @@
+{
+  "name": "rldb",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "server": "cd ./server-express && npm run start",
+    "client": "cd ./client-redux && npm run start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/indoub47/rldb-js.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/indoub47/rldb-js/issues"
+  },
+  "homepage": "https://github.com/indoub47/rldb-js#readme"
+}

@@ -9,7 +9,7 @@ import { fetchRegisterThings } from "../../actions/thingsActions";
 import isEmpty from "../../validation/is-empty";
 import { createOptions } from "../createOptions";
 import IsLoading from "../common/IsLoading";
-import ErrorAlert from "../common/ErrorAlert/ErrorAlert";
+import ErrorAlert from "../common/Alerts/ErrorAlert";
 
 class Register extends Component {
   constructor(props) {
@@ -54,7 +54,7 @@ class Register extends Component {
   render() {
     // things load error
     if (!isEmpty(this.props.things.error)) {
-      return <ErrorAlert errorObj={this.props.things.error} />;
+      return <ErrorAlert message={this.props.things.error.message} />;
     }
 
     const inputErrors = this.props.register.error || {};

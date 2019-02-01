@@ -3,7 +3,7 @@ import { PropTypes } from "prop-types";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import { fetchAllThings } from "../../actions/thingsActions";
-import ErrorAlert from "../common/ErrorAlert/ErrorAlert";
+import ErrorAlert from "../common/Alerts/ErrorAlert";
 import isEmpty from "../../validation/is-empty";
 import IsLoading from "../common/IsLoading";
 
@@ -25,7 +25,7 @@ class LoggedIn extends Component {
 
     // things load error
     if (!isEmpty(thingsLoadError)) {
-      return <ErrorAlert errorObj={thingsLoadError} />;
+      return <ErrorAlert message={thingsLoadError.message} />;
     }
 
     return (

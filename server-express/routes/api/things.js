@@ -103,7 +103,34 @@ router.get(
 // @desc Get filter-sort queries for defect for particular region
 // @access Public
 router.get(
-  "/fs/defect",
+  "/fs/:type",
+  (req, res) => {
+    var resultObject = {};
+    MongoClient.connect(
+      dbUri,
+      {useNewUrlParser: true},
+      (err, client) => {
+        if (err) return res.status(500).send(err); 
+        const db = client.db(dbName);       
+        const filter = {region: req.user.region};
+        const collName = 'fsqueries';
+        db.collection(collName).find(filter, (err, found) => {
+          if (err) return res.status(500).send(err); 
+          found.toArray((err, result) => {
+            if (err) return res.status(500).send(err); 
+            if (!result[0][req.params.type]) return res.status(404).send({msg: "Collection not found"});
+            return res.status(200).json(result[0][req.params.type]);
+          });
+        }); 
+      });
+  });
+
+
+// @route GET api/things/fs/welding
+// @desc Get filter-sort queries for welding for particular region
+// @access Public
+router.get(
+  "/fs/welding",
   (req, res) => {
     var resultObject = {};
     MongoClient.connect(
@@ -138,13 +165,18 @@ router.post(
       (err, client) => {
         if (err) return res.status(500).send(err);
         const filter = {region: req.user.region};
-        const setCommand = {$set: {queries: req.body.queries}};
-        const options = {returnOriginal: false};
-        const collectionName = 'querydefect';
+        const setCommand = {$set: {defect: req.body.queries}};
+        const options = {
+            returnNewDocument: true,
+            new: true,
+            returnOriginal: false
+          }; // options
+        const collectionName = 'fsqueries';
         client.db(dbName).collection(collectionName)
           .findOneAndUpdate(filter, setCommand, options, (err, result) => {
             if (err) return res.status(500).send(err);
-            return res.status(200).json(result.value.queries);
+            console.log("result", result);
+            return res.status(200).json(result.value.defect);
         });
     });
   });

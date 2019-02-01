@@ -1,11 +1,9 @@
 import React, { Component } from "react";
-//import {Link} from 'react-router-dom';
 import { PropTypes } from "prop-types";
 import { connect } from "react-redux";
 
-import MainDataForm from "./components_edit/MainDataForm";
-import EditHistory from "./components_edit/EditHistory";
-import ErrorAlert from "../common/ErrorAlert/ErrorAlert";
+import MainDataForm from "./components_of_edit/MainDataForm";
+import ErrorAlert from "../common/Alerts/ErrorAlert";
 import IsLoading from "../common/IsLoading";
 import { updateWelding, insertWelding } from "../../actions/weldingsActions";
 import getId from "../../utils/getId";
@@ -55,7 +53,7 @@ class EditWelding extends Component {
   render() {
     return (
       <React.Fragment>
-        {this.props.error && <ErrorAlert errorObj={this.props.error} />}
+        {this.props.error && <ErrorAlert message={this.props.error.message} />}
         <IsLoading when={this.props.isBusy} />
         <MainDataForm
           welding={this.state.welding}

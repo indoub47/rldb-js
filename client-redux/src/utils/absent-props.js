@@ -1,1 +1,2 @@
-export default absent = prop => prop == null ? "" : prop;
+const absent = prop => prop == null ? "" : prop; 
+export default absent;

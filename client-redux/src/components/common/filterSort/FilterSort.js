@@ -5,10 +5,8 @@ import Filter from "./components/Filter";
 import Sort from "./components/Sort";
 import QuerySelect from "./components/QuerySelect";
 import Manual from "./components/Manual";
-import ErrorAlert from "../ErrorAlert/ErrorAlert";
-//import { filterSortDefects } from "../../../actions/defectsActions";
+import ErrorAlert from "../Alerts/ErrorAlert";
 import { createOptions } from "../../createOptions";
-import {toggleFSManual} from "../../../actions/showActions";
 
 class FilterSort extends Component {
   constructor(props) {
@@ -29,7 +27,10 @@ class FilterSort extends Component {
     this.toggleManual = this.toggleManual.bind(this);
 
     // in order to avoid recreating options each time new query is selected
-    this.querySelectOptions = createOptions(this.props.queries, "Filter-Sort Queries");
+    this.querySelectOptions = createOptions(
+      this.props.queries,
+      "Filter-Sort Queries"
+    );
   }
 
   clearFilter() {
@@ -56,11 +57,10 @@ class FilterSort extends Component {
     const id = e.target.value;
     console.log("current query id set to ", id);
     this.setState({ currentQueryId: id });
-
   }
 
   toggleManual() {
-    this.props.toggleFSManual(this.props.thingType);
+    this.props.toggleFSManual();
   }
 
   useSelectedQuery() {
@@ -73,7 +73,10 @@ class FilterSort extends Component {
 
     if (!query) {
       // this must not happen
-      console.log('didn\'t found a selected query by its id', this.state.currentQueryId);
+      console.log(
+        "didn't found a selected query by its id",
+        this.state.currentQueryId
+      );
       return;
     }
 
@@ -88,17 +91,17 @@ class FilterSort extends Component {
     this.props.history.push(`/queries/edit/${this.props.thingType}`);
   }
 
-  // saveAsFsQuery() {
+  // saveAsFSQuery() {
   //   this.props.history.push(`/queries/edit/${this.props.thingType}`);
   // }
 
   render() {
-    const isValidFs = null;
-    // let isValidFs;
+    const isValidFS = null;
+    // let isValidFS;
     // if (this.props.filterSort.isCurrentValidated) {
-    //   isValidFs = this.props.filterSort.error !== true
+    //   isValidFS = this.props.filterSort.error !== true
     // } else {
-    //   isValidFs = null;
+    //   isValidFS = null;
     // }
 
     return (
@@ -110,7 +113,7 @@ class FilterSort extends Component {
                 filterText={this.state.filterText}
                 onChange={this.changeFilter}
                 clearText={this.clearFilter}
-                valid={isValidFs}
+                valid={isValidFS}
               />
             </div>
             <div className="col-5">
@@ -118,26 +121,37 @@ class FilterSort extends Component {
                 sortText={this.state.sortText}
                 onChange={this.changeSort}
                 clearText={this.clearSort}
-                valid={isValidFs}
+                valid={isValidFS}
               />
             </div>
-            <div className="col-12">
-              <ErrorAlert errorObj={this.props.filterSortError} />
-            </div>
+            {
+              this.props.filterSortError &&
+              <div className="col-12">
+                <ErrorAlert message={this.props.filterSortError.message} />
+              </div>
+            }
           </div>
           <div className="row">
             <div className="col-12">
-              <button type="button" className="btn btn-sm btn-secondary col-1" onClick={this.toggleManual}>
+              <button
+                type="button"
+                className="btn btn-sm btn-secondary col-1"
+                onClick={this.toggleManual}
+              >
                 Manual
               </button>
-              <button type="button" className="btn btn-sm btn-info col-11" onClick={this.applyFS}>
+              <button
+                type="button"
+                className="btn btn-sm btn-info col-11"
+                onClick={this.applyFS}
+              >
                 Apply Filter-Sort
               </button>
             </div>
-            {this.props.showFsManual ? (
-            <div className="col-12">
-              <Manual />
-            </div>
+            {this.props.showFSManual ? (
+              <div className="col-12">
+                <Manual />
+              </div>
             ) : null}
           </div>
         </div>
@@ -179,20 +193,15 @@ FilterSort.propTypes = {
   fsAction: PropTypes.func.isRequired,
   queries: PropTypes.arrayOf(PropTypes.object).isRequired,
   toggleFSManual: PropTypes.func.isRequired,
-  showFsManual: PropTypes.bool.isRequired
+  showFSManual: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = (state, ownProps) => ({
-  queries: state.queries[ownProps.thingType].data,
-  filterSortError: state.filterSort.error,
-  showFsManual: state.show.fsManualOn[ownProps.thingType]
+  queries: state.queries[ownProps.thingType].data
 });
 
 FilterSort.defaultProps = {
   queries: []
 };
 
-export default connect(
-  mapStateToProps,
-  { toggleFSManual }
-)(FilterSort);
+export default connect(mapStateToProps)(FilterSort);

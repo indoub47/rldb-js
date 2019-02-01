@@ -1,8 +1,8 @@
 //import validator from 'validator';
 //import isEmpty from './is-empty';
 
-function validateFsQuery(data) {
-  return {errors: {}, isValid: true};
+function validateFSQuery(data) {
+  return { errors: {}, isValid: true };
   /*
   let errors = {};
   let decimalOptions = {
@@ -21,7 +21,7 @@ function validateFsQuery(data) {
     pavoj,
     termin,
     pastaba,    
-  */ 
+  */
 
   // čia jovalas ir reikia sutvarkyti
   /*
@@ -57,4 +57,4 @@ function validateFsQuery(data) {
   */
 }
 
-export default validateFsQuery;
+export default validateFSQuery;

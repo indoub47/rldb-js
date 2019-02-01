@@ -11,12 +11,14 @@ import {
   FETCH_WELDINGS_BEGIN,
   FETCH_WELDINGS_FAILURE,
   FETCH_WELDINGS_SUCCESS,
+  INVALIDATE_WELDINGS,
   LOGOUT
 } from "../../actions/types";
 
 const initialState = {
   error: null,
-  isBusy: false
+  isBusy: false,
+  all: false
 };
 
 export default function weldingsStatusReducer(state = initialState, action) {
@@ -49,6 +51,12 @@ export default function weldingsStatusReducer(state = initialState, action) {
         error: action.payload.error,
         isBusy: false
       };
+    
+    case INVALIDATE_WELDINGS:
+      return {
+        ...state,
+        all: action.payload.all
+      }
 
     case LOGOUT:
       return initialState;

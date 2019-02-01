@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import EditQueryForm from "./components/EditQueryForm";
 import QueryList from "./components/QueryList";
-import ErrorAlert from "../common/ErrorAlert/ErrorAlert";
+import ErrorAlert from "../common/Alerts/ErrorAlert";
 import IsLoading from "../common/IsLoading";
 import { updateQueries } from "../../actions/queriesActions";
 import getId from "../../utils/getId";
@@ -151,7 +151,7 @@ class EditQueries extends Component {
     return (
       <div className="container thing-edit">
         {this.props.queriesUpdateError ? (
-          <ErrorAlert errorObj={this.props.queriesUpdateError} />
+          <ErrorAlert message={this.props.queriesUpdateError.message} />
         ) : null}
         <IsLoading when={this.props.queriesIsLoading} />
         <QueryList
@@ -166,7 +166,7 @@ class EditQueries extends Component {
           submitQuery={this.submitQuery}
           nameErrorMsg={this.state.queryNameErrorMsg}
         />
-        {this.state.error && <ErrorAlert errorObj={this.state.error} />}
+        {/*{this.props.error && <ErrorAlert message={this.props.error.message} />}*/}
         <button className="btn btn-primary btn-lg" onClick={this.submitQueries}>
           Submit Changes
         </button>
@@ -185,12 +185,23 @@ EditQueries.propTypes = {
 };
 
 const mapStateToProps = (state, ownProps) => {
-  const stateQueries = state.queries[ownProps.match.params.thingType];
+  const thingType = ownProps.match.params.thingType;
+  const stateQueries = state.queries[thingType];  
+  let stateFilterSort;
+  switch(thingType) {
+    case "defect":
+      stateFilterSort = state.defectsFS;
+      break;
+    case "welding":
+      stateFilterSort = state.weldingsFS;
+      break;
+    default: throw(Error(`bad thingType argument ${thingType} for EditQueries`));
+  }
   return {
     queries: stateQueries.data,
     queriesIsLoading: stateQueries.isLoading,
     queriesUpdateError: stateQueries.error,
-    filterSort: state.filterSort
+    filterSort: stateFilterSort
   };
 };
 

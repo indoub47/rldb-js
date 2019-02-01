@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 //import { connect } from "react-redux";
 import TextFieldGroup from "../../common/TextFieldGroup";
 import TextAreaGroup from "../../common/TextAreaGroup";
-import validateFsQuery from "../../../validation/fsQuery";
+import validateFSQuery from "../../../validation/fsQuery";
 
 class EditQueryForm extends Component {
   constructor(props) {
@@ -39,7 +39,7 @@ class EditQueryForm extends Component {
       sort: this.state.sort,
       name: this.state.name
     };
-    const validation = validateFsQuery(modifiedQuery);
+    const validation = validateFSQuery(modifiedQuery);
     if (validation.isValid) {
       this.props.submitQuery(modifiedQuery);
     } else {
@@ -119,7 +119,7 @@ class EditQueryForm extends Component {
 EditQueryForm.propTypes = {
   query: PropTypes.object,
   submitQuery: PropTypes.func.isRequired,
-  nameErrorMsg: PropTypes.string,
+  nameErrorMsg: PropTypes.string
 };
 
 //export default connect()(EditQueryForm);
