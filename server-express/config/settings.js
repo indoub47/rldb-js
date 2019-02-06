@@ -20,9 +20,21 @@ exports.COLLECTIONS = [
   {name: "user", actions: []}
 ];
 
-exports.URL_COLLECTION_MAP = [
-  {url: "/api/defects", collection: "defects", item: "defect", items: "defects"},
-  {url: "/api/weldings", collection: "weldings", item: "welding", items: "weldings"}
+exports.COLLECTION_MAP = [
+  {itype: "defect", 
+    name: "defects", 
+    itemNames: {
+      item: "defektas", 
+      Item: "Defektas"
+    }
+  },
+  {itype: "welding", 
+    name: "weldings", 
+    itemNames: {
+      item: "suvirinimas", 
+      Item: "Suvirinimas"
+    }
+  }
 ];
 
 // developement

@@ -99,31 +99,31 @@ router.get(
   });
 
 
-// @route GET api/things/fs/defect
-// @desc Get filter-sort queries for defect for particular region
+// @route GET api/things/fs/:itype
+// @desc Get filter-sort queries for itype for particular region
 // @access Public
 router.get(
-  "/fs/:type",
+  "/fs/:itype",
   (req, res) => {
-    var resultObject = {};
     MongoClient.connect(
       dbUri,
       {useNewUrlParser: true},
       (err, client) => {
         if (err) return res.status(500).send(err); 
-        const db = client.db(dbName);       
-        const filter = {region: req.user.region};
+        const db = client.db(dbName);
+        const filter = {
+          region: req.user.region, 
+          itype: req.params.itype
+        };
         const collName = 'fsqueries';
-        db.collection(collName).find(filter, (err, found) => {
-          if (err) return res.status(500).send(err); 
-          found.toArray((err, result) => {
-            if (err) return res.status(500).send(err); 
-            if (!result[0][req.params.type]) return res.status(404).send({msg: "Collection not found"});
-            return res.status(200).json(result[0][req.params.type]);
+        db.collection(collName)
+          .find(filter)
+          .toArray((err, result) => {
+            if (err) return res.status(500).send(err);
+            return res.status(200).send(result);
           });
-        }); 
-      });
-  });
+    }); 
+});
 
 
 // @route GET api/things/fs/welding

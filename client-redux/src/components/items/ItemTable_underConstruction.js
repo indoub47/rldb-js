@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {ItemRow, ItemHeadRow} from "./WeldingRow";
-const ItemTable = ({items, editItem, deleteItem}) => {
+
+const ItemTable = ({items, editItem, deleteItem, itemHeadRow, itemRow}) => {
 
   if (items.length < 1) {
     return (
@@ -12,7 +12,13 @@ const ItemTable = ({items, editItem, deleteItem}) => {
   }
   
   const itemRows = items.map(
-    item =>
+    item => 
+    // kaip daryti šitoje vietoje?
+    // ItemRow pareina kaip prop itemRow iš Weldings:
+    
+                // itemRow={<ItemRow />}
+                // itemHeadRow={<ItemHeadRow />}
+
       <ItemRow 
         item={item}
         editItem={editItem}
@@ -26,7 +32,7 @@ const ItemTable = ({items, editItem, deleteItem}) => {
       className="table table-sm table-striped table-bordered defects" style={{fontSize: ".95rem"}}
     >
       <thead>
-        <ItemHeadRow />
+        {itemHeadRow}
       </thead>
       <tbody>
         {itemRows}

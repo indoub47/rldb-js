@@ -1,2 +1,2 @@
-export const DEFECT = "DEFECT";
-export const WELDING = "WELDING";
+export const defect = "defect";
+export const welding = "welding";

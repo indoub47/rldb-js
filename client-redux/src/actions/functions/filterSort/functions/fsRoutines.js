@@ -10,7 +10,7 @@ import parseAndReplaceVk from "./parseAndReplaceVk";
  * @return {function} a function which takes an object as a parameter and
  * returns a boolean value indicating if the object passes the filter.
  */
-export function getFilterFunction(filterString, fnReplacements) {
+export function getFilterFunc(filterString, fnReplacements) {
   if (!filterString || !filterString.trim()) {
     return x => true;
   }
@@ -76,7 +76,7 @@ function replaceFieldNames(filterString, fnReplacements) {
  * type as a parameters and returns an integer indicating which of those
  * objects goes first in the sort.
  */
-export function getSortFunction(sortString, getSortingReplacement) {
+export function getSortFunc(sortString, getSortingReplacement) {
   if (!sortString || !sortString.trim()) {
     return (a, b) => 0;
   }

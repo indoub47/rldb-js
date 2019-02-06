@@ -4,19 +4,12 @@ import loginReducer from "./loginReducer";
 import registerReducer from "./registerReducer";
 import queriesReducer from "./queriesReducer";
 
-import allDefectsReducer from "./defects/allDefectsReducer";
-import defectsFSReducer from "./defects/defectsFSReducer";
-import defectsPagerReducer from "./defects/defectsPagerReducer";
-import defectsShowReducer from "./defects/defectsShowReducer";
-import defectsStatusReducer from "./defects/defectsStatusReducer";
-import fsedDefectsReducer from "./defects/fsedDefectsReducer";
-
-import allWeldingsReducer from "./weldings/allWeldingsReducer";
-import weldingsFSReducer from "./weldings/weldingsFSReducer";
-import weldingsPagerReducer from "./weldings/weldingsPagerReducer";
-import weldingsShowReducer from "./weldings/weldingsShowReducer";
-import weldingsStatusReducer from "./weldings/weldingsStatusReducer";
-import fsedWeldingsReducer from "./weldings/fsedWeldingsReducer";
+import allItemsReducer from "./items/allItemsReducer";
+import itemsFSReducer from "./items/itemsFSReducer";
+import itemsPagerReducer from "./items/itemsPagerReducer";
+import itemsShowReducer from "./items/itemsShowReducer";
+import itemsStatusReducer from "./items/itemsStatusReducer";
+import fsedItemsReducer from "./items/fsedItemsReducer";
 
 
 export default combineReducers({
@@ -25,17 +18,10 @@ export default combineReducers({
   register: registerReducer,
   queries: queriesReducer,
 
-  allDefects: allDefectsReducer,
-  defectsFS: defectsFSReducer,
-  defectsPager: defectsPagerReducer,
-  defectsShow: defectsShowReducer,
-  defectsStatus: defectsStatusReducer,
-  fsedDefects: fsedDefectsReducer,
-
-  allWeldings: allWeldingsReducer,
-  weldingsFS: weldingsFSReducer,
-  weldingsPager: weldingsPagerReducer,
-  weldingsShow: weldingsShowReducer,
-  weldingsStatus: weldingsStatusReducer,
-  fsedWeldings: fsedWeldingsReducer
+  allItems: allItemsReducer,
+  itemsFS: itemsFSReducer,
+  itemsPager: itemsPagerReducer,
+  itemsShow: itemsShowReducer,
+  itemsStatus: itemsStatusReducer,
+  fsedItems: fsedItemsReducer
 });

@@ -8,50 +8,50 @@ import {
   QUERIES_UPDATE_FAILURE
 } from "./types";
 
-export const fetchQueriesBegin = (thingType) => ({
+export const fetchQueriesBegin = (itype) => ({
   type: QUERIES_FETCH_BEGIN,
-  payload: {thingType}
+  payload: {itype}
 });
 
-export const fetchQueriesSuccess = (queries, thingType) => ({
+export const fetchQueriesSuccess = (queries, itype) => ({
   type: QUERIES_FETCH_SUCCESS,
-  payload: { queries, thingType }
+  payload: { queries, itype }
 });
 
-export const fetchQueriesFailure = (error, thingType) => ({
+export const fetchQueriesFailure = (error, itype) => ({
   type: QUERIES_FETCH_FAILURE,
-  payload: { error, thingType }
+  payload: { error, itype }
 });
 
 // Get fsqueries for defects
-export const fetchQueries = (thingType) => dispatch => {
-  dispatch(fetchQueriesBegin(thingType));
+export const fetchQueries = (itype) => dispatch => {
+  dispatch(fetchQueriesBegin(itype));
   axios
-    .get(`/api/things/fs/${thingType}`)
-    .then(res => dispatch(fetchQueriesSuccess(res.data, thingType)))
-    .catch(err => dispatch(fetchQueriesFailure(err, thingType)));
+    .get(`/api/things/fs/${itype}`)
+    .then(res => dispatch(fetchQueriesSuccess(res.data, itype)))
+    .catch(err => dispatch(fetchQueriesFailure(err, itype)));
 };
 
-export const updateQueriesBegin = (thingType) => ({
+export const updateQueriesBegin = (itype) => ({
   type: QUERIES_UPDATE_BEGIN,
-  payload: {thingType}
+  payload: {itype}
 });
 
-export const updateQueriesSuccess = (queries, thingType) => ({
+export const updateQueriesSuccess = (queries, itype) => ({
   type: QUERIES_UPDATE_SUCCESS,
-  payload: {queries, thingType}
+  payload: {queries, itype}
 });
 
-export const updateQueriesFailure = (err, thingType) => ({
+export const updateQueriesFailure = (err, itype) => ({
   type: QUERIES_UPDATE_FAILURE,
-  payload: { err, thingType }
+  payload: { err, itype }
 });
 
 // update fsqueries
-export const updateQueries = (queries, thingType) => dispatch => {
-  dispatch(updateQueriesBegin(thingType));
+export const updateQueries = (queries, itype) => dispatch => {
+  dispatch(updateQueriesBegin(itype));
   axios
-    .post(`/api/things/fs/${thingType}/update`, { queries })
-    .then(res => dispatch(updateQueriesSuccess(res.data, thingType)))
-    .catch(err => dispatch(updateQueriesFailure(err, thingType)));
+    .post(`/api/things/fs/${itype}/update`, { queries })
+    .then(res => dispatch(updateQueriesSuccess(res.data, itype)))
+    .catch(err => dispatch(updateQueriesFailure(err, itype)));
 };

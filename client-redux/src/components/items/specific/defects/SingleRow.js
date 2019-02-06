@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-const ItemRow = ({ item, editItem, deleteItem }) => {
+const ItemRow = ({ item, editItem, deleteItem, key }) => {
   const liko = strTermin =>
     Math.floor((Date.parse(strTermin)-Date.now())/86400000);
   return (

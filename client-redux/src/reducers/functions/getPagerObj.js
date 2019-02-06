@@ -1,59 +1,8 @@
-import {
-  DEFECTS_PAGE_CHANGE,
-  DEFECTS_PER_PAGE_CHANGE,
-  DEFECTS_FILTERSORT_APPLIED,
-  DEFECTS_REFRESH,
-  LOGOUT
-} from "../../actions/types";
-//import getPagerObj from '../actions/functions/getPagerObj';
-import {pagerSettings} from '../../components/common/pager/settings';
-
-
-const initialState = {
-  itemsPerPage: 0,
-  currPageIndex: 0,
-  firstItemIndex: 0,
-  buttons: [],
+const pagerSettings = {
+  showPageCount: 3,
+  navBase: 10
 };
 
-export default function defectsPagerReducer(state = initialState, action) {
-  var pagerObj;
-  switch (action.type) {
-
-    case DEFECTS_PAGE_CHANGE:
-      if (action.payload.pageIndex === state.currPageIndex) {
-        // tas neturėtų įvykti, nes knopkė su currentPage yra neaktyvi
-        return state;
-      }
-      pagerObj = getPagerObj(
-        state.itemsPerPage, 
-        action.payload.itemCount,
-        action.payload.pageIndex);
-      return pagerObj;
-
-
-    case DEFECTS_PER_PAGE_CHANGE:
-      if (action.payload.itemsPerPage === state.itemsPerPage) {
-        return state;
-      }
-      pagerObj = getPagerObj(
-        action.payload.itemsPerPage, 
-        action.payload.itemCount, 
-        0);
-      return pagerObj;
-
-    case DEFECTS_FILTERSORT_APPLIED: 
-      pagerObj = getPagerObj(10, action.payload.items.length, 0);
-      return pagerObj;
-
-    case DEFECTS_REFRESH:
-    case LOGOUT: 
-      return initialState;
-
-    default:
-      return state;
-  }
-}
 
 const getPagerObj = (itemsPerPage, itemCount, currPageIndex) => {
   const firstItemIndex = currPageIndex * itemsPerPage;
@@ -164,3 +113,5 @@ const getPagerObj = (itemsPerPage, itemCount, currPageIndex) => {
     buttons,
   };
 }
+
+export default getPagerObj;

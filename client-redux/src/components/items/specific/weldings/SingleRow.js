@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-const ItemRow = ({ item, editItem, deleteItem }) => {
+const ItemRow = ({ item, editItem, deleteItem, key }) => {
   return (
     <tr>
       <td className="id text-right">{item.id}</td>

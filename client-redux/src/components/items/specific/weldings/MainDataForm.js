@@ -1,10 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
-import TextFieldGroup from "../../common/TextFieldGroup";
-import TextAreaGroup from "../../common/TextAreaGroup";
-//mport SelectInputGroup from "../../common/SelectInputGroup";
+import TextFieldGroup from "../../../common/TextFieldGroup";
+import TextAreaGroup from "../../../common/TextAreaGroup";
+//import SelectInputGroup from "../../common/SelectInputGroup";
 //import { createOptions } from "../../createOptions";
-import absent from "../../../utils/absent-props";
+import absent from "../../../../utils/absent-props";
 
 const MainDataForm = ({ welding, onChange, things }) => {
   // select controls options
@@ -275,4 +275,4 @@ MainDataForm.propTypes = {
   onChange: PropTypes.func.isRequired
 };
 
-export default MainDataForm;
+export {MainDataForm};

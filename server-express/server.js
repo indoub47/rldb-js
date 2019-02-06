@@ -38,7 +38,7 @@ mongoose
 app.use(passport.initialize());
 
 app.use("/api/users", users);
-app.use(["/api/defects", "/api/weldings"], items);
+app.use("/api/items", items);
 app.use("/api/things", things);
 app.use("/", express.static("../client-redux/"));
 

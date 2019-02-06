@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {ItemRow, ItemHeadRow} from "./DefectRow";
-const ItemTable = ({items, editItem, deleteItem}) => {
+import itemSpecific from "../../itemSpecific";
+
+const ItemTable = ({items, editItem, deleteItem, itype}) => {
 
   if (items.length < 1) {
     return (
@@ -10,15 +11,11 @@ const ItemTable = ({items, editItem, deleteItem}) => {
       </div>
     );
   }
+
+  const singleRow = itemSpecific(itype).singleRow;
   
-  const itemRows = items.map(
-    item =>
-      <ItemRow 
-        item={item}
-        editItem={editItem}
-        deleteItem={deleteItem}
-        key={item.id}
-      />
+  const itemRows = items.map(item => 
+    singleRow.ItemRow({item, editItem, deleteItem, key: item.id})
   );
 
   return (      
@@ -26,7 +23,7 @@ const ItemTable = ({items, editItem, deleteItem}) => {
       className="table table-sm table-striped table-bordered defects" style={{fontSize: ".95rem"}}
     >
       <thead>
-        <ItemHeadRow />
+        {singleRow.ItemHeadRow()}
       </thead>
       <tbody>
         {itemRows}

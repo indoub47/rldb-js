@@ -7,31 +7,27 @@ import {
   QUERIES_UPDATE_FAILURE,
   LOGOUT
 } from "../actions/types";
+import * as iTypes from "../itypes";
+import getInitialState from "./functions/getInitialState";
 
-const initialState = {
-  defect: {
+const stateObj = {
     data: [],
     valid: false,
     isLoading: false,
     error: null
-  },
-  welding: {
-    data: [],
-    valid: false,
-    isLoading: false,
-    error: null
-  }
-};
+  };
 
-export default function queriesReducer(state = initialState, action) {
-  //const tt = action.payload.thingType;
+const initialState = getInitialState(iTypes, stateObj);
+
+export default function(state = initialState, action) {
+  //const tt = action.payload.itype;
   switch (action.type) {
     case QUERIES_FETCH_BEGIN:
     case QUERIES_UPDATE_BEGIN:
       return {
         ...state,
-        [action.payload.thingType]: {
-          ...state[action.payload.thingType],
+        [action.payload.itype]: {
+          ...state[action.payload.itype],
           isLoading: true
         }
       };
@@ -41,8 +37,8 @@ export default function queriesReducer(state = initialState, action) {
       console.log("queries fetch/update success - payload", action.payload);
       return {
         ...state,
-        [action.payload.thingType]: {
-          ...state[action.payload.thingType],
+        [action.payload.itype]: {
+          ...state[action.payload.itype],
           data: action.payload.queries,
           isLoading: false,
           error: null,
@@ -54,8 +50,8 @@ export default function queriesReducer(state = initialState, action) {
     case QUERIES_UPDATE_FAILURE:
       return {
         ...state,
-        [action.payload.thingType]: {
-          ...state[action.payload.thingType],
+        [action.payload.itype]: {
+          ...state[action.payload.itype],
           isLoading: false,
           error: action.payload.error
         }

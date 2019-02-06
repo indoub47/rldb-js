@@ -17,31 +17,18 @@ router.use(connectDb);
 // @desc Get nepanaikinti items
 // @access Public
 router.get("/", (req, res, next) => {
-  req.bnbldb.collection
-    .find({
-      region: req.user.region,
-      $or: [
+  let filter = { region: req.user.region };
+  if (!req.query.all) {
+    filter.$or = [
         { panaikinta: null },
         { panaikinta: 0 },
         { panaikinta: "" },
         { panaikinta: false },
         { panaikinta: "0000-00-00" }
-      ]
-    })
-    .toArray((err, result) => {
-      if (err) {
-        return next(err);
-      }
-      return res.status(200).send(result);
-    });
-});
-
-// @route GET api/items/all
-// @desc Get all items
-// @access Public
-router.get("/all", (req, res, next) => {
+      ];
+  }
   req.bnbldb.collection
-    .find({ region: req.user.region })
+    .find(filter)
     .toArray((err, result) => {
       if (err) {
         return next(err);
@@ -54,7 +41,6 @@ router.get("/all", (req, res, next) => {
 // @desc Update item and increment version
 // @access Public
 router.post("/update", (req, res, next) => {
-  //let draft = JSON.parse(req.body.draft);
   let draft = req.body.draft;
 
   // validate draft here
@@ -64,7 +50,7 @@ router.post("/update", (req, res, next) => {
   }
 
   const collection = req.bnbldb.collection;
-  const itemType = req.bnbldb.item;
+  const itemNames = req.bnbldb.names;
 
   const userRegion = req.user.region;
   const draftId = draft.id;
@@ -80,14 +66,14 @@ router.post("/update", (req, res, next) => {
       if (!found) {
         return res.status(200).send({
           case: "warning",
-          message: `Nepakeistas - ${itemType}, kurio id ${draftId}, buvo ką tik ištrintas kažkieno kito`
+          message: `${itemNames.Item}, kurio ID ${draftId}, nepakeistas, nes buvo ką tik ištrintas iš serverio kažkieno kito`
         });
       }
       // check if draft version doesn't equal db version
       if (found.v !== draftV) {
         return res.status(200).send({
           case: "warning",
-          message: `Nepakeistas - ${itemType}, kurio id ${draftId}, buvo ką tik redaguotas kažkieno kito`
+          message: `${itemNames.Item}, kurio ID ${draftId}, nepakeistas - jis ką tik buvo redaguotas kažkieno kito`
         });
       }
 
@@ -95,7 +81,7 @@ router.post("/update", (req, res, next) => {
       if (areEqual(draft, found)) {
         return res.status(200).send({
           case: "warning",
-          message: `Nepakeistas, nėra reikalo atnaujinti - ${itemType} toks pat kaip ir serveryje`
+          message: `${itemNames.Item} nepakeistas, nėra reikalo atnaujinti - ${itemNames.item} toks pat kaip ir serveryje`
         });
       }
 
@@ -112,7 +98,7 @@ router.post("/update", (req, res, next) => {
           if (samePlaceFound) {
             return res.status(200).send({
               case: "warning",
-              message: `Nepakeistas - šitoje vietoje jau yra įrašas, jo ID: ${samePlaceFound.id}`
+              message: `${itemNames.Item} nepakeistas - šitoje vietoje jau yra įrašas, jo ID: ${samePlaceFound.id}`
             });
           }
           // same place not found
@@ -135,13 +121,13 @@ router.post("/update", (req, res, next) => {
               }
               if (!updateResult) {
                 return next({
-                  message: `Nepakeistas - ${itemType}, kurio id ${draftId}, nepakeistas dėl nežinomos priežasties`
+                  message: `${itemNames.Item}, kurio ID ${draftId}, nepakeistas dėl nežinomos priežasties`
                 });
               }
 
               return res.status(200).send({
                 case: "success",
-                message: `${itemType}, kurio id ${draftId}, sėkmingai pakeistas`,
+                message: `${itemNames.Item}, kurio ID ${draftId}, sėkmingai pakeistas`,
                 data: updateResult.value
               });
             }
@@ -156,10 +142,10 @@ router.post("/update", (req, res, next) => {
 // @desc Insert item
 // @access Public
 router.put("/insert", (req, res, next) => {
-  //let draft = JSON.parse(req.body.draft);
+  let draft = req.body.draft;
   // validate draft here
   const userRegion = req.user.region;
-  const itemType = req.bnbldb.item;
+  const itemNames = req.bnbldb.names;
   let samePlaceFilter = getSamePlaceFilter(draft);
   //console.log("samePlaceFilter", samePlaceFilter);
 
@@ -173,7 +159,7 @@ router.put("/insert", (req, res, next) => {
       if (samePlaceFound) {
         return res.status(200).send({
           case: "warning",
-          message: `Nesukurtas - šitoje vietoje jau yra įrašas, jo ID: ${samePlaceFound.id}`
+          message: `${itemNames.Item} nesukurtas - šitoje vietoje jau yra įrašas, jo ID: ${samePlaceFound.id}`
         });
       }
 
@@ -189,13 +175,13 @@ router.put("/insert", (req, res, next) => {
         }
         if (!insertResult) {
           return next({
-            message: `${itemType} nesukurtas dėl nežinomos priežasties`
+            message: `${itemNames.Item} nesukurtas dėl nežinomos priežasties`
           });
         }
 
         return res.status(200).send({
           case: "success",
-          message: `${itemType} sėkmingai sukurtas. Jo ID: ${draft.id}`,
+          message: `${itemNames.Item} sėkmingai sukurtas. Jo ID: ${draft.id}`,
           data: insertResult.ops[0]
         });
       });
@@ -210,7 +196,7 @@ router.delete("/delete", (req, res, next) => {
   //console.log(req);
   const oid = ObjectId(req.query._id);
   const userRegion = req.user.region;
-  const itemType = req.bnbldb.item;
+  const itemNames = req.bnbldb.names;
   const v = req.query.v;
   console.log("oid, v", oid, v);
   // validate _id and v
@@ -227,7 +213,7 @@ router.delete("/delete", (req, res, next) => {
       if (!found) {
         return res.status(200).send({
             case: "warning",
-            message: `${itemType} jau buvo pašalintas`
+            message: `${itemNames.Item} jau buvo pašalintas`
           });
       }
 
@@ -236,7 +222,7 @@ router.delete("/delete", (req, res, next) => {
       if (found.hasOwnProperty("v") && parseInt(found.v) !== parseInt(v)) {
         return res.status(200).send({
           case: "warning",
-          message: `Neištrintas, nes ${itemType}, kurio ID ${found.id}, ką tik buvo redaguotas kažkieno kito`
+          message: `${itemNames.Item}, kurio ID ${found.id}, neištrintas, nes jis ką tik buvo redaguotas kažkieno kito`
         });
       }
 
@@ -250,13 +236,13 @@ router.delete("/delete", (req, res, next) => {
           }
           if (!deleteResult.value) {
             return next({
-              message: `${itemType} neištrintas dėl nežinomos priežasties`
+              message: `${itemNames.Item} neištrintas dėl nežinomos priežasties`
             });
           }
           //console.log("deleteResult", deleteResult);
           return res.status(200).send({
             case: "success",
-            message: `${itemType} sėkmingai pašalintas`,
+            message: `${itemNames.Item} sėkmingai pašalintas`,
             data: deleteResult.value._id
           });
         }

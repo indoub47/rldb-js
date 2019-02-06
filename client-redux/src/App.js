@@ -5,10 +5,8 @@ import Landing from "./components/layout/Landing";
 import Footer from "./components/layout/Footer";
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
-import Defects from "./components/defects/Defects";
-import EditDefect from './components/defects/EditDefect';
-import Weldings from "./components/weldings/Weldings";
-import EditWelding from './components/weldings/EditWelding';
+import Items from "./components/items/Items";
+import EditItem from './components/items/EditItem';
 import EditQueries from "./components/editQueries/EditQueries";
 import LoggedIn from "./components/layout/LoggedIn";
 
@@ -20,6 +18,7 @@ import { Provider } from "react-redux";
 import store from "./store";
 import PrivateRoute from './components/common/PrivateRoute';
 import { logoutUser } from "./actions/loginActions";
+import * as iTypes from "./itypes";
 
 // Check for token
 if (localStorage.jwtToken) {
@@ -58,12 +57,12 @@ class App extends Component {
               <Route exact path="/register" component={Register} />
             </div>
             <Switch>
-              <PrivateRoute exact path='/defects' component={Defects} />
-              <PrivateRoute path='/defects/edit/:_id' component={EditDefect} />
-              <PrivateRoute exact path='/defects/new' component={EditDefect} />
-              <PrivateRoute exact path='/weldings' component={Weldings} />
-              <PrivateRoute path='/weldings/edit/:_id' component={EditWelding} />
-              <PrivateRoute exact path='/weldings/new' component={EditWelding} />
+              <PrivateRoute exact path='/defects' component={Items} itype={iTypes.defect} />
+              <PrivateRoute path='/defects/edit/:_id' component={EditItem} itype={iTypes.defect} />
+              <PrivateRoute exact path='/defects/new' component={EditItem} itype={iTypes.defect} />
+              <PrivateRoute exact path='/weldings' component={Items} itype={iTypes.welding} />
+              <PrivateRoute path='/weldings/edit/:_id' component={EditItem} itype={iTypes.welding} />
+              <PrivateRoute exact path='/weldings/new' component={EditItem} itype={iTypes.welding} />
               <PrivateRoute exact path='/queries/edit/:thingType' component={EditQueries} />
             </Switch>
             <Footer />
