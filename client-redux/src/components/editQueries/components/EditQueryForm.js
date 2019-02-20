@@ -3,48 +3,39 @@ import PropTypes from "prop-types";
 //import { connect } from "react-redux";
 import TextFieldGroup from "../../common/TextFieldGroup";
 import TextAreaGroup from "../../common/TextAreaGroup";
-import validateFSQuery from "../../../validation/fsQuery";
 
 class EditQueryForm extends Component {
   constructor(props) {
     super(props);
-    this.state = {
+    this.state = this.props.query ? {
+      _id: this.props.query._id || "",
+      id: this.props.query.id || "",
+      filter: this.props.query.filter || "",
+      sort: this.props.query.sort || "",
+      name: this.props.query.name || ""
+    } : {
+      _id: "",
       id: "",
       filter: "",
       sort: "",
-      name: "",
-      errors: null
+      name: ""
     };
 
     this.onChange = this.onChange.bind(this);
     this.submit = this.submit.bind(this);
   }
 
-  componentDidUpdate(prevProps) {
-    if (this.props.query !== prevProps.query) {
-      this.setState({
-        id: this.props.query.id || "",
-        filter: this.props.query.filter || "",
-        sort: this.props.query.sort || "",
-        name: this.props.query.name || ""
-      });
-    }
-  }
-
   submit(e) {
     e.preventDefault();
     const modifiedQuery = {
+      _id: this.state._id,
       id: this.state.id,
       filter: this.state.filter,
       sort: this.state.sort,
       name: this.state.name
     };
-    const validation = validateFSQuery(modifiedQuery);
-    if (validation.isValid) {
-      this.props.submitQuery(modifiedQuery);
-    } else {
-      this.setState({ errors: validation.errors });
-    }
+    
+    this.props.submitQuery(modifiedQuery);
   }
 
   onChange(e) {
@@ -61,7 +52,6 @@ class EditQueryForm extends Component {
             <div className="form-group row">
               <TextAreaGroup
                 divClassname="form-group col-7"
-                //classname="form-control-plaintext"
                 id="filter"
                 name="filter"
                 rows="4"
@@ -85,10 +75,8 @@ class EditQueryForm extends Component {
                 name="name"
                 id="name"
                 placeholder="Name"
-                //label="Name"
                 value={this.state.name}
                 onChange={this.onChange}
-                error={this.props.nameErrorMsg}
               />
               <div className="form-group col-2">
                 <button
@@ -105,7 +93,6 @@ class EditQueryForm extends Component {
                 id="id"
                 placeholder="ID"
                 readonly={true}
-                //label="ID"
                 value={this.state.id}
               />
             </div>
@@ -118,10 +105,7 @@ class EditQueryForm extends Component {
 
 EditQueryForm.propTypes = {
   query: PropTypes.object,
-  submitQuery: PropTypes.func.isRequired,
-  nameErrorMsg: PropTypes.string
+  submitQuery: PropTypes.func.isRequired
 };
-
-//export default connect()(EditQueryForm);
 
 export default EditQueryForm;

@@ -4,34 +4,57 @@ import { connect } from "react-redux";
 import EditQueryForm from "./components/EditQueryForm";
 import QueryList from "./components/QueryList";
 import ErrorAlert from "../common/Alerts/ErrorAlert";
+import SuccessAlert from "../common/Alerts/SuccessAlert";
 import IsLoading from "../common/IsLoading";
-import { updateQueries } from "../../actions/queriesActions";
+import {
+  updateQuery,
+  insertQuery,
+  deleteQuery,
+  //hideWarning,
+  hideSuccess,
+  hideError
+} from "../../actions/queriesActions";
 import getId from "../../utils/getId";
 
 class EditQueries extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      queries: [],
       currentQuery: null,
-      queryNameErrorMsg: ""
+      error: ""
     };
 
-    this.submitQueries = this.submitQueries.bind(this);
-    this.submitQuery = this.submitQuery.bind(this);
+    //this.submitQueries = this.submitQueries.bind(this);
+    this.submitDraft = this.submitDraft.bind(this);
     this.setForEditing = this.setForEditing.bind(this);
-    this.remove = this.remove.bind(this);
-    this.moveUp = this.moveUp.bind(this);
-    this.moveDown = this.moveDown.bind(this);
+    this.submitDelete = this.submitDelete.bind(this);
+    //this.hideWarning = this.hideWarning.bind(this);
+    this.hideSuccess = this.hideSuccess.bind(this);
+    this.hideError = this.hideError.bind(this);
+    this.hideErrorInState = this.hideErrorInState.bind(this);
+    //this.moveUp = this.moveUp.bind(this);
+    //this.moveDown = this.moveDown.bind(this);
   }
 
   componentDidMount() {
+    // no valid query
+    if (
+      this.props.filterSort.filterText === "" &&
+      this.props.filterSort.sortText === ""
+    ) {
+      this.setState({ currentQuery: null });
+      return;
+    }
+
+    // some valid query
+    // if found - it's a query from queries list
     let query = this.props.queries.find(
       q =>
         q.filter === this.props.filterSort.filterText &&
         q.sort === this.props.filterSort.sortText
     );
 
+    // if not found - it's a new query, not in queries list
     if (!query) {
       query = {
         filter: this.props.filterSort.filterText,
@@ -39,12 +62,18 @@ class EditQueries extends Component {
       };
     }
 
-    this.setState({
-      queries: this.props.queries,
-      currentQuery: query
-    });
+    this.setState({ currentQuery: query });
   }
 
+  componentDidUpdate(prevProps) {
+    // must check if currentQuery is in new queries. if not, then currentQuery - null
+    if (this.state.currentQuery && this.state.currentQuery.id && 
+    !this.props.queries.some(q => q.id === this.state.currentQuery.id)) {
+      this.setState({currentQuery: null});
+    }
+  }
+
+  /*
   moveUp(e) {
     const id = e.target.dataset.id;
     const ind = this.state.queries.findIndex(q => q.id === id);
@@ -76,100 +105,85 @@ class EditQueries extends Component {
       queries: modifiedQueries
     });
   }
+*/
 
-  remove(e) {
+  hideError() {
+    this.props.hideError(this.props.match.params.itype);
+  }
+  hideErrorInState() {
+    this.state.set({error: ""});
+  }
+  hideSuccess() {
+    this.props.hideSuccess(this.props.match.params.itype);
+  }
+  hideWarning() {
+    this.props.hideWarning(this.props.match.params.itype);
+  }
+  submitDelete(e) {
     const id = e.target.dataset.id;
-    const ind = this.state.queries.findIndex(q => q.id === id);
-    if (ind < 0) return;
-    const modifiedQueries = [
-      ...this.state.queries.slice(0, ind),
-      ...this.state.queries.slice(ind + 1)
-    ];
-    this.setState({
-      queries: modifiedQueries
-    });
+    const itype = this.props.match.params.itype;
+    this.props.deleteQuery(id, itype);
+  }
+
+  submitDraft() {
+    const draft = this.state.currentQuery;
+
+    if (!draft.name || draft.name.trim() === "") {
+      this.setState({ error: "Name must be not empty" });
+      return;
+    }
+
+    const sameNameQuery = this.props.queries.find(
+      q => q.name.trim() === draft.name.trim()
+    );
+    if (sameNameQuery) {
+      this.setState({
+        error: `Same name as ${sameNameQuery.id}; name must be unique`
+      });
+      return;
+    }
+
+    const itype = this.props.match.params.itype;
+    draft.itype = itype;
+    if (draft.id) {
+      draft.id = getId();
+      this.props.updateQuery(draft, itype);
+    } else {
+      this.props.insertQuery(draft, itype);
+    }
   }
 
   setForEditing(e) {
     const id = e.target.dataset.id;
-    const query = this.state.queries.find(q => q.id === id);
+    const query = this.props.queries.find(q => q.id === id);
     if (query) {
       this.setState({ currentQuery: query });
     }
   }
 
-  submitQuery(draft) {
-    // validate query
-    // name must be not empty
-    if (draft.name.trim() === "") {
-      this.setState({ queryNameErrorMsg: "Name must be not empty" });
-      return;
-    }
-
-    // ...and must be unique
-    const sameNameQuery = this.state.queries.find(
-      q => q.name.trim() === draft.name.trim()
-    );
-    if (sameNameQuery) {
-      this.setState({
-        queryNameErrorMsg: `Same name as ${
-          sameNameQuery.id
-        }; The name must be unique`
-      });
-      return;
-    }
-
-    let modifiedQueries;
-    if (draft.id) {
-      const ind = this.state.queries.findIndex(q => q.id === draft.id);
-      if (ind < 0) return;
-      modifiedQueries = [
-        ...this.state.queries.slice(0, ind),
-        draft,
-        ...this.state.queries.slice(ind + 1)
-      ];
-    } else {
-      draft.id = getId();
-      modifiedQueries = [...this.state.queries, draft];
-    }
-
-    this.setState({
-      queryNameErrorMsg: "",
-      queries: modifiedQueries,
-      currentQuery: draft
-    });
-  }
-
-  submitQueries() {
-    this.props.updateQueries(
-      this.state.queries,
-      this.props.match.params.thingType
-    );
-  }
-
   render() {
     return (
       <div className="container thing-edit">
-        {this.props.queriesUpdateError ? (
-          <ErrorAlert message={this.props.queriesUpdateError.message} />
+        {this.props.error ? (
+          <ErrorAlert message={this.props.error.message} hide={this.hideError} />
         ) : null}
-        <IsLoading when={this.props.queriesIsLoading} />
+        {this.state.error ? <ErrorAlert message={this.state.error} hide={this.hideErrorInState} /> : null}
+        {this.props.success ? (
+          <SuccessAlert message={this.props.success} hide={this.hideSuccess} />
+        ) : null}
+
+        <IsLoading when={this.props.isLoading} />
+
         <QueryList
-          queries={this.state.queries}
-          remove={this.remove}
+          queries={this.props.queries}
+          remove={this.submitDelete}
           setItemForEditing={this.setForEditing}
-          moveUp={this.moveUp}
-          moveDown={this.moveDown}
         />
+
         <EditQueryForm
           query={this.state.currentQuery}
-          submitQuery={this.submitQuery}
-          nameErrorMsg={this.state.queryNameErrorMsg}
+          submitQuery={this.submitDraft}
         />
-        {/*{this.props.error && <ErrorAlert message={this.props.error.message} />}*/}
-        <button className="btn btn-primary btn-lg" onClick={this.submitQueries}>
-          Submit Changes
-        </button>
       </div>
     );
   }
@@ -177,35 +191,30 @@ class EditQueries extends Component {
 
 EditQueries.propTypes = {
   queries: PropTypes.arrayOf(PropTypes.object),
-  queriesUpdateError: PropTypes.object,
-  queriesIsLoading: PropTypes.bool,
-  currentQuery: PropTypes.object,
+  error: PropTypes.object,
+  success: PropTypes.string,
+  isLoading: PropTypes.bool,
   filterSort: PropTypes.object,
-  updateQueries: PropTypes.func.isRequired
+  updateQuery: PropTypes.func.isRequired,
+  insertQuery: PropTypes.func.isRequired,
+  deleteQuery: PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state, ownProps) => {
-  const thingType = ownProps.match.params.thingType;
-  const stateQueries = state.queries[thingType];  
-  let stateFilterSort;
-  switch(thingType) {
-    case "defect":
-      stateFilterSort = state.defectsFS;
-      break;
-    case "welding":
-      stateFilterSort = state.weldingsFS;
-      break;
-    default: throw(Error(`bad thingType argument ${thingType} for EditQueries`));
-  }
+  const itype = ownProps.match.params.itype;
+  const stateQueries = state.queries[itype];
   return {
     queries: stateQueries.data,
-    queriesIsLoading: stateQueries.isLoading,
-    queriesUpdateError: stateQueries.error,
-    filterSort: stateFilterSort
+    isLoading: stateQueries.isLoading,
+    error: stateQueries.error,
+    success: stateQueries.success,
+    filterSort: state.itemsFS[itype]
   };
 };
 
 export default connect(
   mapStateToProps,
-  { updateQueries }
+  { updateQuery, deleteQuery, insertQuery,
+  //hideWarning, 
+  hideSuccess, hideError }
 )(EditQueries);

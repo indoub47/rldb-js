@@ -198,7 +198,6 @@ router.delete("/delete", (req, res, next) => {
   const userRegion = req.user.region;
   const itemNames = req.bnbldb.names;
   const v = req.query.v;
-  console.log("oid, v", oid, v);
   // validate _id and v
   // if invalid - code 400, message
 
@@ -218,7 +217,6 @@ router.delete("/delete", (req, res, next) => {
       }
 
       // check version
-      console.log("check version: v, found.v", v, found.v);
       if (found.hasOwnProperty("v") && parseInt(found.v) !== parseInt(v)) {
         return res.status(200).send({
           case: "warning",

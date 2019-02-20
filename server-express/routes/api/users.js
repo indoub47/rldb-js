@@ -90,7 +90,6 @@ router.post("/login", (req, res) => {
     }
     // active email not found
     if (!user) {
-      console.log("user not found");
       return res.status(404).json(badLoginResponse);
     }
     // email found, check if passwords match

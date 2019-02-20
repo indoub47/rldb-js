@@ -1,7 +1,7 @@
 import React from 'react';
 import QueryRow from './QueryRow';
 
-const QueryList = ({queries, remove, setItemForEditing, moveUp, moveDown}) => {
+const QueryList = ({queries, remove, setItemForEditing}) => {
  
   const queryRows = queries.map(q => 
       <QueryRow 
@@ -9,8 +9,6 @@ const QueryList = ({queries, remove, setItemForEditing, moveUp, moveDown}) => {
         query={q} 
         remove={remove}
         setForEditing={setItemForEditing}
-        moveUp={moveUp}
-        moveDown={moveDown}
       />
   );
 

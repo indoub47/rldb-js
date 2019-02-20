@@ -14,14 +14,16 @@ export default function itemSpecific(itype) {
     case iTypes.defect:
       return {
         replacements: defectReplacements,
-        mainDataForm: defectMainDataForm,
-        singleRow: defectSingleRow
+        mainDataForm: defectMainDataForm.MainDataForm,
+        singleRow: defectSingleRow,
+        listPath: "/defects"
       };
     case iTypes.welding:
       return {
         replacements: weldingReplacements,
-        mainDataForm: weldingMainDataForm,
-        singleRow: weldingSingleRow
+        mainDataForm: weldingMainDataForm.MainDataForm,
+        singleRow: weldingSingleRow,
+        listPath: "/weldings"
       };
     default: // do nothing so far
   }

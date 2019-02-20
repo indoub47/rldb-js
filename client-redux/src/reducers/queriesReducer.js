@@ -2,9 +2,17 @@ import {
   QUERIES_FETCH_BEGIN,
   QUERIES_FETCH_SUCCESS,
   QUERIES_FETCH_FAILURE,
-  QUERIES_UPDATE_BEGIN,
-  QUERIES_UPDATE_SUCCESS,
-  QUERIES_UPDATE_FAILURE,
+  QUERY_INSERT_BEGIN,
+  QUERY_INSERT_SUCCESS,
+  QUERY_INSERT_FAILURE,
+  QUERY_UPDATE_BEGIN,
+  QUERY_UPDATE_SUCCESS,
+  QUERY_UPDATE_FAILURE,
+  QUERY_DELETE_BEGIN,
+  QUERY_DELETE_SUCCESS,
+  QUERY_DELETE_FAILURE,
+  HIDE_QUERIES_SUCCESS,
+  HIDE_QUERIES_ERROR,
   LOGOUT
 } from "../actions/types";
 import * as iTypes from "../itypes";
@@ -14,46 +22,177 @@ const stateObj = {
     data: [],
     valid: false,
     isLoading: false,
-    error: null
+    error: null,
+    success: null
   };
 
 const initialState = getInitialState(iTypes, stateObj);
 
 export default function(state = initialState, action) {
-  //const tt = action.payload.itype;
+  let itype; 
+  let query; 
+  let queries;
+  let id; 
+  let ind;
+
   switch (action.type) {
     case QUERIES_FETCH_BEGIN:
-    case QUERIES_UPDATE_BEGIN:
+    case QUERY_UPDATE_BEGIN:
+    case QUERY_INSERT_BEGIN:
+    case QUERY_DELETE_BEGIN:
+      itype = action.payload.itype;
       return {
         ...state,
-        [action.payload.itype]: {
-          ...state[action.payload.itype],
-          isLoading: true
+        [itype]: {
+          ...state[itype],
+          isLoading: true,
+          error: null,
+          success: null
         }
       };
 
     case QUERIES_FETCH_SUCCESS:
-    case QUERIES_UPDATE_SUCCESS:
-      console.log("queries fetch/update success - payload", action.payload);
+      itype = action.payload.itype;
       return {
         ...state,
-        [action.payload.itype]: {
-          ...state[action.payload.itype],
+        [itype]: {
+          ...state[itype],
           data: action.payload.queries,
           isLoading: false,
           error: null,
-          valid: true
+          valid: true,
+          success: null
+        }
+      };
+      
+    case QUERY_UPDATE_SUCCESS:
+      query = action.payload.query;
+      itype = action.payload.itype;
+      ind = state[itype].data.findIndex(q => q.id === query.id);
+      
+      if (ind < 0) { // should not happen
+        return {
+          ...state,
+          [itype]: {
+            ...state[itype],
+            error: "Įvyko nesuprantama klaida",
+            success: null,
+            valid: false,
+            isLoading: false
+          }
+        };
+      }
+
+      queries = [
+        ...state[itype].data.slice(0, ind),
+        query,
+        ...state[itype].data.slice(ind + 1)
+      ];
+
+      return {
+        ...state,
+        [itype]: {
+          ...state[itype],
+          data: queries,
+          isLoading: false,
+          error: null,
+          valid: true,
+          success: "Užklausa pakeista sėkmingai"
+        }
+      };
+      
+
+    case QUERY_INSERT_SUCCESS:
+      query = action.payload.query;
+      itype = action.payload.itype;
+
+      queries = [
+        ...state[itype].data,
+        query
+      ];
+
+      return {
+        ...state,
+        [itype]: {
+          ...state[itype],
+          data: queries,
+          isLoading: false,
+          error: null,
+          valid: true,
+          success: "Užklausa sukurta sėkmingai"
+        }
+      };
+      
+
+    case QUERY_DELETE_SUCCESS:
+      console.log("QUERY_DELETE_SUCCESS action", action);
+      id = action.payload.id;
+      itype = action.payload.itype;
+      ind = state[itype].data.findIndex(q => q._id === id);
+      console.log("QUERY_DELETE_SUCCESS index", ind);
+      
+      if (ind < 0) { // should not happen
+        return {
+          ...state,
+          [itype]: {
+            ...state[itype],
+            error: "Įvyko nesuprantama klaida",
+            success: null,
+            valid: false,
+            isLoading: false
+          }
+        };
+      }
+
+      queries = [
+        ...state[itype].data.slice(0, ind),
+        ...state[itype].data.slice(ind + 1)
+      ];
+
+      return {
+        ...state,
+        [itype]: {
+          ...state[itype],
+          data: queries,
+          isLoading: false,
+          error: null,
+          valid: true,
+          success: "Užklausa panaikinta sėkmingai"
         }
       };
 
+
     case QUERIES_FETCH_FAILURE:
-    case QUERIES_UPDATE_FAILURE:
+    case QUERY_UPDATE_FAILURE:
+    case QUERY_INSERT_FAILURE:
+    case QUERY_DELETE_FAILURE:
+      itype = action.payload.itype;
       return {
         ...state,
-        [action.payload.itype]: {
-          ...state[action.payload.itype],
+        [itype]: {
+          ...state[itype],
           isLoading: false,
-          error: action.payload.error
+          error: action.payload.err
+        }
+      };
+
+    case HIDE_QUERIES_ERROR:
+      itype = action.payload.itype;
+      return {
+        ...state,
+        [itype]: {
+          ...state[itype],
+          error: null
+        }
+      };
+
+    case HIDE_QUERIES_SUCCESS:
+      itype = action.payload.itype;
+      return {
+        ...state,
+        [itype]: {
+          ...state[itype],
+          success: null
         }
       };
 

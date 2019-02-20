@@ -32,9 +32,15 @@ class EditItem extends Component {
   }
 
   onChange(e) {
+    const numberProps = ["km", "pk", "m", "bmetai", "dl", "dh"];
+    const propName = e.target.name;
+    let propValue = e.target.value;
+    if (numberProps.includes(propName)) {
+      propValue = Number(e.target.value);
+    }
     const item = {
       ...this.state.item,
-      [e.target.name]: e.target.value
+      [propName]: propValue
     };
     this.setState({ item });
   }

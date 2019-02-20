@@ -21,6 +21,7 @@ const ItemsPerPageSelector =
       options={options}
       name='items-per-page'
       onChange={onItemsPerPageChanged}
+      value={itemsPerPage + ''}
     />);
 };
 

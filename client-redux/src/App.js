@@ -63,7 +63,7 @@ class App extends Component {
               <PrivateRoute exact path='/weldings' component={Items} itype={iTypes.welding} />
               <PrivateRoute path='/weldings/edit/:_id' component={EditItem} itype={iTypes.welding} />
               <PrivateRoute exact path='/weldings/new' component={EditItem} itype={iTypes.welding} />
-              <PrivateRoute exact path='/queries/edit/:thingType' component={EditQueries} />
+              <PrivateRoute exact path='/queries/edit/:itype' component={EditQueries} />
             </Switch>
             <Footer />
           </div>

@@ -6,59 +6,59 @@ import TextAreaGroup from "../../../common/TextAreaGroup";
 //import { createOptions } from "../../createOptions";
 import absent from "../../../../utils/absent-props";
 
-const MainDataForm = ({ welding, onChange, things }) => {
+const MainDataForm = ({ item, onChange, things }) => {
   // select controls options
   // galbūt reikėtų iškelti prieš funciją, kad nekurtų kaskart kai renderina
   //console.log("things", things);
 
   return (
-    <div className="container welding-info border border-primary text-center">
+    <div className="container item-info border border-primary text-center">
       <div className="form-group row main-data text-center">
         <TextFieldGroup
           divClassname="form-group"
           label="ID"
-          id="welding-id"
+          id="item-id"
           name="id"
           placeholder="Suvirinimo ID"
           readonly={true}
-          value={absent(welding.id)}
+          value={absent(item.id)}
           onChange={onChange}
         />
         <TextFieldGroup
           divClassname="form-group"
           label="Region"
-          id="welding-region"
+          id="item-region"
           name="region"
           placeholder="Regionas"
           readonly={true}
-          value={absent(welding.region)}
+          value={absent(item.region)}
           onChange={onChange}
         />
         <TextFieldGroup
           divClassname="form-group"
           label="Kas virino"
-          id="welding-virino"
+          id="item-virino"
           name="virino"
           placeholder="Kas virino"
-          value={absent(welding.virino)}
+          value={absent(item.virino)}
           onChange={onChange}
         />
         <TextFieldGroup
           divClassname="form-group"
           label="Virinimo būdas"
-          id="welding-vbudas"
+          id="item-vbudas"
           name="vbudas"
           placeholder="Virinimo būdas"
-          value={absent(welding.vbudas)}
+          value={absent(item.vbudas)}
           onChange={onChange}
         />
         <div className="radio">
           <label>
             <input
               type="radio"
-              id="welding-panaikinta"
+              id="item-panaikinta"
               name="panaikinta"
-              value={welding.panaikinta ? true : false}
+              value={item.panaikinta ? true : false}
               onChange={onChange}
             />
             Panaikinta
@@ -67,10 +67,10 @@ const MainDataForm = ({ welding, onChange, things }) => {
         <TextFieldGroup
           divClassname="form-group"
           label="Defekto ID"
-          id="welding-defectid"
+          id="item-defectid"
           name="defectid"
           placeholder="Defekto ID"
-          value={absent(welding.defectid)}
+          value={absent(item.defectid)}
           onChange={onChange}
         />
       </div>
@@ -79,55 +79,55 @@ const MainDataForm = ({ welding, onChange, things }) => {
         <TextFieldGroup
           divClassname="form-group"
           label="Linija"
-          id="welding-linija"
+          id="item-linija"
           name="linija"
           placeholder="Linija"
-          value={absent(welding.linija)}
+          value={absent(item.linija)}
           onChange={onChange}
         />
         <TextFieldGroup
           divClassname="form-group"
           label="Kelias"
-          id="welding-kelias"
+          id="item-kelias"
           name="kelias"
           placeholder="Kelias"
-          value={absent(welding.kelias)}
+          value={absent(item.kelias)}
           onChange={onChange}
         />
         <TextFieldGroup
           divClassname="form-group"
           label="Km"
-          id="welding-km"
+          id="item-km"
           name="km"
           placeholder="Km"
-          value={absent(welding.km) + ""}
+          value={absent(item.km) + ""}
           onChange={onChange}
         />
         <TextFieldGroup
           divClassname="form-group"
           label="Pk"
-          id="welding-pk"
+          id="item-pk"
           name="pk"
           placeholder="Pk"
-          value={absent(welding.pk) + ""}
+          value={absent(item.pk) + ""}
           onChange={onChange}
         />
         <TextFieldGroup
           divClassname="form-group"
           label="M"
-          id="welding-m"
+          id="item-m"
           name="m"
           placeholder="M"
-          value={absent(welding.m) + ""}
+          value={absent(item.m) + ""}
           onChange={onChange}
         />
         <TextFieldGroup
           divClassname="form-group"
           label="Siūlė"
-          id="welding-siule"
+          id="item-siule"
           name="siule"
           placeholder="Siūlė"
-          value={absent(welding.siule)}
+          value={absent(item.siule)}
           onChange={onChange}
         />
       </div>
@@ -137,28 +137,28 @@ const MainDataForm = ({ welding, onChange, things }) => {
           divClassname="form-group"
           type="date"
           label="Data 1"
-          id="welding-data1"
+          id="item-data1"
           name="data1"
           placeholder="Data 1"
-          value={absent(welding.data1)}
+          value={absent(item.data1)}
           onChange={onChange}
         />
         <TextFieldGroup
           divClassname="form-group"
           label="Defektoskopas 1"
-          id="welding-apar1"
+          id="item-apar1"
           name="apar1"
           placeholder="Defektoskopas 1"
-          value={absent(welding.apar1)}
+          value={absent(item.apar1)}
           onChange={onChange}
         />
         <TextFieldGroup
           divClassname="form-group"
           label="Operatorius 1"
-          id="welding-oper1"
+          id="item-oper1"
           name="oper1"
           placeholder="Operatorius 1"
-          value={absent(welding.oper1)}
+          value={absent(item.oper1)}
           onChange={onChange}
         />
       </div>
@@ -168,28 +168,28 @@ const MainDataForm = ({ welding, onChange, things }) => {
           divClassname="form-group"
           type="date"
           label="Data 2"
-          id="welding-data2"
+          id="item-data2"
           name="data2"
           placeholder="Data 2"
-          value={absent(welding.data2)}
+          value={absent(item.data2)}
           onChange={onChange}
         />
         <TextFieldGroup
           divClassname="form-group"
           label="Defektoskopas 2"
-          id="welding-apar2"
+          id="item-apar2"
           name="apar2"
           placeholder="Defektoskopas 2"
-          value={absent(welding.apar2)}
+          value={absent(item.apar2)}
           onChange={onChange}
         />
         <TextFieldGroup
           divClassname="form-group"
           label="Operatorius 2"
-          id="welding-oper2"
+          id="item-oper2"
           name="oper2"
           placeholder="Operatorius 2"
-          value={absent(welding.oper2)}
+          value={absent(item.oper2)}
           onChange={onChange}
         />
       </div>
@@ -199,28 +199,28 @@ const MainDataForm = ({ welding, onChange, things }) => {
           divClassname="form-group"
           type="date"
           label="Data 3"
-          id="welding-data3"
+          id="item-data3"
           name="data3"
           placeholder="Data 3"
-          value={absent(welding.data3)}
+          value={absent(item.data3)}
           onChange={onChange}
         />
         <TextFieldGroup
           divClassname="form-group"
           label="Defektoskopas 3"
-          id="welding-apar3"
+          id="item-apar3"
           name="apar3"
           placeholder="Defektoskopas 3"
-          value={absent(welding.apar3)}
+          value={absent(item.apar3)}
           onChange={onChange}
         />
         <TextFieldGroup
           divClassname="form-group"
           label="Operatorius 3"
-          id="welding-oper3"
+          id="item-oper3"
           name="oper3"
           placeholder="Operatorius 3"
-          value={absent(welding.oper3)}
+          value={absent(item.oper3)}
           onChange={onChange}
         />
       </div>
@@ -230,28 +230,28 @@ const MainDataForm = ({ welding, onChange, things }) => {
           divClassname="form-group"
           type="date"
           label="Data 4"
-          id="welding-data4"
+          id="item-data4"
           name="data4"
           placeholder="Data 4"
-          value={absent(welding.data4)}
+          value={absent(item.data4)}
           onChange={onChange}
         />
         <TextFieldGroup
           divClassname="form-group"
           label="Defektoskopas 4"
-          id="welding-apar4"
+          id="item-apar4"
           name="apar4"
           placeholder="Defektoskopas 4"
-          value={absent(welding.apar4)}
+          value={absent(item.apar4)}
           onChange={onChange}
         />
         <TextFieldGroup
           divClassname="form-group"
           label="Operatorius 4"
-          id="welding-oper4"
+          id="item-oper4"
           name="oper4"
           placeholder="Operatorius 4"
-          value={absent(welding.oper4)}
+          value={absent(item.oper4)}
           onChange={onChange}
         />
       </div>
@@ -259,10 +259,10 @@ const MainDataForm = ({ welding, onChange, things }) => {
         <TextAreaGroup
           divClassname="form-group"
           label="Pastaba"
-          id="welding-pastaba"
+          id="item-pastaba"
           name="pastaba"
           placeholder="Pastaba"
-          value={absent(welding.pastaba)}
+          value={absent(item.pastaba)}
           onChange={onChange}
         />
       </div>
@@ -271,7 +271,7 @@ const MainDataForm = ({ welding, onChange, things }) => {
 };
 
 MainDataForm.propTypes = {
-  welding: PropTypes.object,
+  item: PropTypes.object,
   onChange: PropTypes.func.isRequired
 };
 

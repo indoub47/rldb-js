@@ -1,7 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
+import {nuoIki} from "./functions";
 
-const ItemRow = ({ item, editItem, deleteItem, key }) => {
+const ItemRow = ({ item, editItem, deleteItem }) => {
+  const ni = nuoIki(item);
   return (
     <tr>
       <td className="id text-right">{item.id}</td>
@@ -28,21 +30,27 @@ const ItemRow = ({ item, editItem, deleteItem, key }) => {
       <td className="oper">{item.oper4}</td>
       <td className="panaikinta">{item.panaikinta}</td>
       <td className="pastaba">{item.pastaba}</td>
+      <td className="nuo">{ni.nuo}</td>
+      <td className="iki">{ni.iki}</td>
       <td>
         <div className="button-group">
           <button
             className="btn btn-xs btn-warning"
-            data-id={item.id}
+            data-id={item._id}
             onClick={editItem}
           >
-            <i className="fas fa-edit" data-id={item.id} />
+            <i className="fas fa-edit" data-id={item._id} />
           </button>
           <button
             className="btn btn-xs btn-danger"
-            data-id={item.id}
+            data-id={item._id}
+            data-v={item.v}
             onClick={deleteItem}
           >
-            <i className="fas fa-trash-alt" data-id={item.id} />
+            <i className="fas fa-trash-alt" 
+              data-id={item._id}
+              data-v={item.v} 
+            />
           </button>
         </div>
       </td>
@@ -83,6 +91,9 @@ const ItemHeadRow = () => {
       <th className="oper">oper4</th>
       <th className="panaikinta">panaikinta</th>
       <th className="pastaba">pastaba</th>
+      <th className="nuo">nuo</th>
+      <th className="iki">iki</th>
+      <th className="controls">controls</th>
     </tr>
   );
 };

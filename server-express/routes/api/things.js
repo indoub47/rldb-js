@@ -175,7 +175,6 @@ router.post(
         client.db(dbName).collection(collectionName)
           .findOneAndUpdate(filter, setCommand, options, (err, result) => {
             if (err) return res.status(500).send(err);
-            console.log("result", result);
             return res.status(200).json(result.value.defect);
         });
     });

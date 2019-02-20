@@ -1,8 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
-const ItemRow = ({ item, editItem, deleteItem, key }) => {
-  const liko = strTermin =>
-    Math.floor((Date.parse(strTermin)-Date.now())/86400000);
+import {liko} from "./functions";
+
+const ItemRow = ({ item, editItem, deleteItem }) => {
   return (
     <tr>
       <td className="region">{item.region}</td>
@@ -28,10 +28,8 @@ const ItemRow = ({ item, editItem, deleteItem, key }) => {
       <td className="daptik">{item.daptik}</td>
       <td className="dtermin">{item.dtermin}</td>
       <td className="dtvarsl">{item.dtvarsl}</td>
-      <td className="dpanaik">{item.panaikinta}</td>
-      <td className="liko">
-        {item.dtermin && !item.panaikinta ? liko(item.dtermin) : ""}
-      </td>
+      <td className="panaikinta">{item.panaikinta}</td>
+      <td className="liko">{liko(item)}</td>
       <td className="pastaba">{item.pastaba}</td>
       <td>
         <div className="button-group">
@@ -58,7 +56,7 @@ const ItemRow = ({ item, editItem, deleteItem, key }) => {
       </td>
     </tr>
   );
-};
+}
 
 ItemRow.propTypes = {
   item: PropTypes.object.isRequired,
@@ -94,6 +92,7 @@ const ItemHeadRow = () => {
       <th className="dtvarsl">dtvarsl</th>
       <th className="panaikinta">panaikinta</th>
       <th className="liko">liko</th>
+      <th className="pastaba">pastaba</th>
       <th className="controls">controls</th>
     </tr>
   );

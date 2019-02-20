@@ -27,6 +27,7 @@ import {
   SET_CURRENT_ITEM_TYPE
 } from "./types";
 import funcCreator from "./functions/filterSort/itemFilterSort";
+import itemSpecific from "../itemSpecific";
 
 export const setCurrentItemType = itype => dispatch =>
   dispatch({
@@ -224,16 +225,16 @@ export const updateItem = (draft, history, itype) => (dispatch, getState) => {
 
       if (res.data.data != null) {
         if (getState().itemsStatus[itype].all) {
-          // jeigu yra data ir rodyti visus - updateinamas
+          // jeigu yra data ir rodyti visus - updateinamas local
           dispatch(itemUpdateSuccess(res.data.data, itype));
         } else {          
           if (res.data.data.panaikinta) {
             // jeigu yra data, rodyti tik nepanaikintus, o yra panaikintas -
-            // ištrinamas
+            // ištrinamas iš local
             dispatch(itemDeleteSuccess(res.data.data._id, itype));
           } else {   
             // jeigu yra data, rodyti tik nepanaikintus, ir nėra panaikintas -
-            // updateinamas 
+            // updateinamas local
             dispatch(itemUpdateSuccess(res.data.data, itype));
           }
         }
@@ -242,7 +243,8 @@ export const updateItem = (draft, history, itype) => (dispatch, getState) => {
         // jeigu nėra data - nedaroma nieko
         dispatch(itemUpdateSuccess(itype)); 
       }
-      history.push("/items");
+      // return to list
+      history.push(itemSpecific(itype).listPath);
     })
     .catch(err => {
       dispatch(itemUpdateFailure(err, itype));

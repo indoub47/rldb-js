@@ -247,7 +247,6 @@ router.delete("/delete", (req, res, next) => {
               } has not been deleted for unknown reason`
             });
           }
-          console.log("deleteResult", deleteResult);
           return res.status(200).send(deleteResult.value._id);
         }
       );

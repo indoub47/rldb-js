@@ -6,7 +6,6 @@ import Sort from "./components/Sort";
 import QuerySelect from "./components/QuerySelect";
 import Manual from "./components/Manual";
 import ErrorAlert from "../Alerts/ErrorAlert";
-import { createOptions } from "../../createOptions";
 
 class FilterSort extends Component {
   constructor(props) {
@@ -24,38 +23,37 @@ class FilterSort extends Component {
     this.useSelectedQuery = this.useSelectedQuery.bind(this);
     this.onSelectedQueryChange = this.onSelectedQueryChange.bind(this);
     this.editQueries = this.editQueries.bind(this);
-    this.toggleManual = this.toggleManual.bind(this);
+    this.toggleManual = this.toggleManual.bind(this); 
+  }
 
-    // in order to avoid recreating options each time new query is selected
-    this.querySelectOptions = createOptions(
-      this.props.queries,
-      "Filter-Sort Queries"
-    );
+  componentDidUpdate(prevProps) {
+    console.log("FilterSort componentDidUpdate props", this.props);
   }
 
   clearFilter() {
-    this.setState({ filterText: "", id: "" });
+    this.setState({ filterText: "", currentQueryId: "" });
   }
 
   clearSort() {
-    this.setState({ sortText: "", id: "" });
+    this.setState({ sortText: "", currentQueryId: "" });
   }
 
   changeFilter(e) {
-    this.setState({ filterText: e.target.value, id: "" });
+    this.setState({ filterText: e.target.value, currentQueryId: "" });
   }
 
   changeSort(e) {
-    this.setState({ sortText: e.target.value, id: "" });
+    this.setState({ sortText: e.target.value, currentQueryId: "" });
   }
 
   applyFS() {
+    console.log("Todo: galbūt galima fsAction pasiimti tiesiai į FilterSort, o ne kaip props iš Items");
     this.props.fsAction(this.state.filterText, this.state.sortText);
   }
 
   onSelectedQueryChange(e) {
     const id = e.target.value;
-    console.log("current query id set to ", id);
+    //console.log("current query id set to ", id);
     this.setState({ currentQueryId: id });
   }
 
@@ -88,11 +86,11 @@ class FilterSort extends Component {
   }
 
   editQueries() {
-    this.props.history.push(`/queries/edit/${this.props.thingType}`);
+    this.props.history.push(`/queries/edit/${this.props.itype}`);
   }
 
   // saveAsFSQuery() {
-  //   this.props.history.push(`/queries/edit/${this.props.thingType}`);
+  //   this.props.history.push(`/queries/edit/${this.props.itype}`);
   // }
 
   render() {
@@ -174,7 +172,7 @@ class FilterSort extends Component {
                 </button>
               </h5>
               <QuerySelect
-                options={this.querySelectOptions}
+                queries={this.props.queries}
                 onChange={this.onSelectedQueryChange}
                 value={this.state.currentQueryId}
               />
@@ -188,16 +186,16 @@ class FilterSort extends Component {
 
 FilterSort.propTypes = {
   history: PropTypes.object.isRequired,
-  thingType: PropTypes.string.isRequired,
   filterSortError: PropTypes.object,
   fsAction: PropTypes.func.isRequired,
   queries: PropTypes.arrayOf(PropTypes.object).isRequired,
   toggleFSManual: PropTypes.func.isRequired,
-  showFSManual: PropTypes.bool.isRequired
+  showFSManual: PropTypes.bool.isRequired,
+  itype: PropTypes.string.isRequired
 };
 
 const mapStateToProps = (state, ownProps) => ({
-  queries: state.queries[ownProps.thingType].data
+  queries: state.queries[ownProps.itype].data
 });
 
 FilterSort.defaultProps = {

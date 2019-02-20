@@ -28,7 +28,6 @@ import { fetchQueries } from "../../actions/queriesActions";
 class Items extends Component {
   constructor(props) {
     super(props);
-    console.log("this.props", this.props);    
     this.state = {
       showConfirmationDialog: false,
       _idToDelete: "",
@@ -44,10 +43,14 @@ class Items extends Component {
     this.unconfirmDelete = this.unconfirmDelete.bind(this);
     this.refreshItems = this.refreshItems.bind(this);
     this.refreshItemsAll = this.refreshItemsAll.bind(this);
+    this.hideSuccess = this.hideSuccess.bind(this);
+    this.hideWarning = this.hideWarning.bind(this);
+    this.hideError = this.hideError.bind(this);
+    this.filterSortItems = this.filterSortItems.bind(this);
   }
 
-  componentDidMount() {
-
+  componentDidMount() {   
+    
     if (!this.props.fsedItemsAreValid) {
       this.props.fetchItems(this.props.itype);
     }
@@ -57,9 +60,13 @@ class Items extends Component {
     }
   }
 
-  componentDidUpdate() {
-    if (!this.props.fsedItemsAreValid) {
+  componentDidUpdate(prevProps) {
+    console.log("items.componentDidUpdate props",this.props);
+    if (prevProps.fsedItemsAreValid &&!this.props.fsedItemsAreValid) {
       this.props.fetchItems(this.props.itype);
+    }
+    if (prevProps.queriesAreValid && !this.props.queriesAreValid) {
+      this.props.fetchQueries(this.props.itype);
     }
   }
 
@@ -118,6 +125,22 @@ class Items extends Component {
     this.props.invalidateItems(true, this.props.itype);
   }
 
+  hideSuccess() {
+    this.props.hideSuccess(this.props.itype);
+  }
+
+  hideWarning() {
+    this.props.hideWarning(this.props.itype);
+  }
+
+  hideError() {
+    this.props.hideError(this.props.itype);
+  }
+
+  filterSortItems(filterText, sortText) {
+    this.props.filterSortItems(filterText, sortText, this.props.itype);
+  }
+
   render() {
     if (this.props.itemsFetchError || this.props.queriesFetchError) {
       return (
@@ -142,7 +165,6 @@ class Items extends Component {
     ) {
       return <IsLoading />;
     }
-
     const { firstItemIndex, itemsPerPage, buttons } = this.props.pager;
 
     const pagerComponent =
@@ -198,8 +220,7 @@ class Items extends Component {
               <FilterSort
                 itype={this.props.itype}
                 history={this.props.history}
-                thingType={this.thingType}
-                fsAction={this.props.filterSortItems}
+                fsAction={this.filterSortItems}
                 toggleFSManual={this.props.toggleFSManual}
                 filterSortError={this.props.filterSortError}
                 showFSManual={this.props.showFSManual}
@@ -210,7 +231,7 @@ class Items extends Component {
                 <div className="col-12">
                   <WarningAlert
                     message={this.props.warning}
-                    hide={this.props.hideWarning}
+                    hide={this.hideWarning}
                   />
                 </div>
               ) : null}
@@ -218,7 +239,7 @@ class Items extends Component {
                 <div className="col-12">
                   <ErrorAlert
                     message={this.props.itemsError.message}
-                    hide={this.props.hideError}
+                    hide={this.hideError}
                   />
                 </div>
               ) : null}
@@ -226,7 +247,7 @@ class Items extends Component {
                 <div className="col-12">
                   <SuccessAlert
                     message={this.props.success}
-                    hide={this.props.hideSuccess}
+                    hide={this.hideSuccess}
                   />
                 </div>
               ) : null}

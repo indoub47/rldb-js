@@ -13,14 +13,20 @@ const ItemTable = ({items, editItem, deleteItem, itype}) => {
   }
 
   const singleRow = itemSpecific(itype).singleRow;
+  const ItemRow = singleRow.ItemRow;
   
   const itemRows = items.map(item => 
-    singleRow.ItemRow({item, editItem, deleteItem, key: item.id})
+    <ItemRow
+      item={item} 
+      editItem={editItem}
+      deleteItem={deleteItem}
+      key={item.id}
+    />
   );
 
   return (      
     <table 
-      className="table table-sm table-striped table-bordered defects" style={{fontSize: ".95rem"}}
+      className="table table-sm table-striped table-bordered items" style={{fontSize: ".9rem"}}
     >
       <thead>
         {singleRow.ItemHeadRow()}

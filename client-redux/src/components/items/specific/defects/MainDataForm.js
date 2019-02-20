@@ -5,65 +5,65 @@ import SelectInputGroup from '../../../common/SelectInputGroup';
 import {createOptions} from '../../../createOptions';
 import absent from '../../../../utils/absent-props';
 
-const MainDataForm = ({defect, onChange, things}) => {
+const MainDataForm = ({item, onChange, things}) => {
   
   // select controls options
   // galbūt reikėtų iškelti prieš funciją, kad nekurtų kaskart kai renderina
   //console.log("things", things);
-  const meistrijOptions = createOptions(things.meistrij, "Meistrija", x => x.abbr + ", " + x.name);
+  const meistrijaOptions = createOptions(things.meistrija, "Meistrija", x => x.abbr + ", " + x.name);
   const kkategOptions = createOptions(things.kkateg, "Kelio kategorija", x => x.id);
   const btipasOptions = createOptions(things.btipas, "Bėgio tipas", x => x.id);
   const bgamyklOptions = createOptions(things.bgamykl, "Bėgio gamykla", x => x.id);
   const siuleOptions = createOptions(things.siule, "Siūlė", x => x.id);
 
   return (     
-    <div className="container defect-info border border-primary text-center">
+    <div className="container item-info border border-primary text-center">
       <div className="form-group row main-data text-center">
         <TextFieldGroup 
           divClassname="form-group"
           label="Regionas"
-          id="defect-region"
+          id="item-region"
           name="region"
           placeholder="Regionas"
           readonly={true}
-          value={absent(defect.region)}
+          value={absent(item.region)}
           onChange={onChange}
         />
         <TextFieldGroup 
           divClassname="form-group"
           label="ID"
-          id="defect-id"
+          id="item-id"
           name="id"
           placeholder="Defekto ID"
           readonly={true}
-          value={absent(defect.id)}
+          value={absent(item.id)}
           onChange={onChange}
         />
         <TextFieldGroup 
           divClassname="form-group"
           label="ID1"
-          id="defect-id1"
+          id="item-id1"
           name="id1"
           placeholder="Defekto ID1"
           readonly={true}
-          value={absent(defect.id1)}
+          value={absent(item.id1)}
           onChange={onChange}
         />
         <SelectInputGroup
-          id="defect-meistrij"
-          name="meistrij"
+          id="item-meistrija"
+          name="meistrija"
           label="Meistrija"
           divClassname="form-group col-4"
-          value={absent(defect.meistrija)}
-          options={meistrijOptions}
+          value={absent(item.meistrija)}
+          options={meistrijaOptions}
           onChange={onChange}
         />
         <SelectInputGroup
-          id="defect-kkateg"
+          id="item-kkateg"
           name="kkateg"
           label="Kelio kategorija"
           divClassname="form-group col-4"
-          value={absent(defect.kkateg)}
+          value={absent(item.kkateg)}
           options={kkategOptions}
           onChange={onChange}
         />
@@ -71,28 +71,28 @@ const MainDataForm = ({defect, onChange, things}) => {
 
       <div className="form-group row begis text-center">
         <SelectInputGroup
-          id="defect-btipas"
+          id="item-btipas"
           name="btipas"
           label="Bėgio tipas"
-          value={absent(defect.btipas)}
+          value={absent(item.btipas)}
           options={btipasOptions}
           onChange={onChange}
         />
         <SelectInputGroup
-          id="defect-bgamykla"
+          id="item-bgamykla"
           name="bgamykla"
           label="Bėgio gamykla"
-          value={absent(defect.bgamykla)}
+          value={absent(item.bgamykla)}
           options={bgamyklOptions}
           onChange={onChange}
         />
         <TextFieldGroup 
           divClassname="form-group"
           label="Bėgio gam. metai"
-          id="defect-bmetai"
+          id="item-bmetai"
           name="bmetai"
           placeholder="Bėgio gam. metai"
-          value={absent(defect.bmetai) + ""}
+          value={absent(item.bmetai) + ""}
           onChange={onChange}
         />
       </div>
@@ -100,49 +100,49 @@ const MainDataForm = ({defect, onChange, things}) => {
       <div className="form-group row vieta text-center">        
         <TextFieldGroup
           label="Linija"
-          id="defect-linija"
+          id="item-linija"
           name="linija"
           placeholder="Linija"
-          value={absent(defect.linija)}
+          value={absent(item.linija)}
           onChange={onChange}
         />        
         <TextFieldGroup 
           label="Kelias"
-          id="defect-kelias"
+          id="item-kelias"
           name="kelias"
           placeholder="Kelio Nr."
-          value={absent(defect.kelias)}
+          value={absent(item.kelias)}
           onChange={onChange}
         />        
         <TextFieldGroup 
           label="km"
-          id="defect-km"
+          id="item-km"
           name="km"
           placeholder="km"
-          value={absent(defect.km) + ''}
+          value={absent(item.km) + ''}
           onChange={onChange}
         />        
         <TextFieldGroup 
           label="pk"
-          id="defect-pk"
+          id="item-pk"
           name="pk"
           placeholder="pk"
-          value={absent(defect.pk) + ''}
+          value={absent(item.pk) + ''}
           onChange={onChange}
         />        
         <TextFieldGroup 
           label="m"
-          id="defect-m"
+          id="item-m"
           name="m"
           placeholder="m"
-          value={absent(defect.m) + ''}
+          value={absent(item.m) + ''}
           onChange={onChange}
         />
         <SelectInputGroup
-          id="defect-siule"
+          id="item-siule"
           name="siule"
           label="Siūlė"
-          value={absent(defect.siule)}
+          value={absent(item.siule)}
           options={siuleOptions}
           onChange={onChange}
         />
@@ -151,34 +151,34 @@ const MainDataForm = ({defect, onChange, things}) => {
       <div className="form-group row charakteristikos text-center">                  
         <TextFieldGroup 
           label="Kodas"
-          id="defect-kodas"
+          id="item-kodas"
           name="kodas"
           placeholder="Kodas"
-          value={absent(defect.kodas)}
+          value={absent(item.kodas)}
           onChange={onChange}
         />                 
         <TextFieldGroup 
           label="L"
-          id="defect-dl"
+          id="item-dl"
           name="dl"
           placeholder="L"
-          value={absent(defect.dl) + ''}
+          value={absent(item.dl) + ''}
           onChange={onChange}
         />                 
         <TextFieldGroup 
           label="H"
-          id="defect-dh"
+          id="item-dh"
           name="dh"
           placeholder="H"
-          value={absent(defect.dh) + ''}
+          value={absent(item.dh) + ''}
           onChange={onChange}
         />                 
         <TextFieldGroup 
           label="Pavojingumas"
-          id="defect-pavoj"
+          id="item-pavoj"
           name="pavoj"
           placeholder="Pavojingumas"
-          value={absent(defect.pavoj)}
+          value={absent(item.pavoj)}
           onChange={onChange}
         />
       </div>  
@@ -186,18 +186,18 @@ const MainDataForm = ({defect, onChange, things}) => {
       <div className="form-group row aptiko text-center">                  
         <TextFieldGroup 
           label="Operatorius"
-          id="defect-oper"
+          id="item-oper"
           name="oper"
           placeholder="Operatoriaus kodas"
-          value={absent(defect.oper)}
+          value={absent(item.oper)}
           onChange={onChange}
         />                 
         <TextFieldGroup 
           label="Defektoskopas"
-          id="defect-apar"
+          id="item-apar"
           name="apar"
           placeholder="Defektoskopo kodas"
-          value={absent(defect.apar)}
+          value={absent(item.apar)}
           onChange={onChange}
         /> 
       </div>  
@@ -206,37 +206,37 @@ const MainDataForm = ({defect, onChange, things}) => {
         <TextFieldGroup 
           label="Aptikimo data"
           type="date"
-          id="defect-daptik"
+          id="item-daptik"
           name="daptik"
           placeholder="Aptikimo data"
-          value={absent(defect.daptik)}
+          value={absent(item.daptik)}
           onChange={onChange}
         />                  
         <TextFieldGroup 
           label="Pašalinimo terminas"
           type="date"
-          id="defect-dtermin"
+          id="item-dtermin"
           name="dtermin"
           placeholder="Terminas"
-          value={absent(defect.dtermin)}
+          value={absent(item.dtermin)}
           onChange={onChange}
         />                                  
         <TextFieldGroup 
           label="Tvarsliavimo data"
           type="date"
-          id="defect-dtvarsl"
+          id="item-dtvarsl"
           name="dtvarsl"
           placeholder="Tvarsliavimo data"
-          value={absent(defect.dtvarsl)}
+          value={absent(item.dtvarsl)}
           onChange={onChange}
         />                                  
         <TextFieldGroup 
           label="Panaikinimo data"
           type="date"
-          id="defect-dpanaik"
+          id="item-dpanaik"
           name="panaikinta"
           placeholder="Panaikinimo data"
-          value={absent(defect.panaikinta)}
+          value={absent(item.panaikinta)}
           onChange={onChange}
         />  
       </div>               
@@ -245,7 +245,7 @@ const MainDataForm = ({defect, onChange, things}) => {
 }
 
 MainDataForm.propTypes = {
-  defect: PropTypes.object,
+  item: PropTypes.object,
   onChange: PropTypes.func.isRequired
 };
 
