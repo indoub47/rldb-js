@@ -79,7 +79,8 @@ router.post(
       {useNewUrlParser: true},
       (err, client) => {
         if (err) return res.status(500).send(err);
-        let draft = JSON.parse(req.body.draft);
+        let draft = req.body.draft;
+        //let draft = JSON.parse(req.body.draft);
         const oid = ObjectId(draft._id);
         const email = req.user.email;
         draft.email = email;
@@ -119,7 +120,8 @@ router.put(
       {useNewUrlParser: true},
       (err, client) => {
         if (err) return res.status(500).send(err);
-        let draft = JSON.parse(req.body.draft);
+        let draft = req.body.draft;
+        //let draft = JSON.parse(req.body.draft);
         draft.email = req.user.email;
         const collName = 'fsqueries';
         client.db(dbName)

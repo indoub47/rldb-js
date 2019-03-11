@@ -38,10 +38,13 @@ class EditQueries extends Component {
 
   componentDidMount() {
     // no valid query
+    console.log("EditQueries cDM this.props.filterSort", this.props.filterSort);
+
     if (
       this.props.filterSort.filterText === "" &&
       this.props.filterSort.sortText === ""
     ) {
+      console.log("not empty");
       this.setState({ currentQuery: null });
       return;
     }
@@ -52,21 +55,19 @@ class EditQueries extends Component {
       q =>
         q.filter === this.props.filterSort.filterText &&
         q.sort === this.props.filterSort.sortText
-    );
-
-    // if not found - it's a new query, not in queries list
-    if (!query) {
-      query = {
+    ) || {
         filter: this.props.filterSort.filterText,
         sort: this.props.filterSort.sortText
       };
-    }
 
+    console.log("setting query to state", query);
     this.setState({ currentQuery: query });
+    console.log("EQs cDMount this.state", this.state);
+
   }
 
   componentDidUpdate(prevProps) {
-    // must check if currentQuery is in new queries. if not, then currentQuery - null
+    // must check if currentQuery is in queries. if not, then currentQuery - null
     if (this.state.currentQuery && this.state.currentQuery.id && 
     !this.props.queries.some(q => q.id === this.state.currentQuery.id)) {
       this.setState({currentQuery: null});
@@ -125,8 +126,8 @@ class EditQueries extends Component {
     this.props.deleteQuery(id, itype);
   }
 
-  submitDraft() {
-    const draft = this.state.currentQuery;
+  submitDraft(modifiedQuery) {
+    const draft = modifiedQuery;
 
     if (!draft.name || draft.name.trim() === "") {
       this.setState({ error: "Name must be not empty" });
@@ -145,20 +146,19 @@ class EditQueries extends Component {
 
     const itype = this.props.match.params.itype;
     draft.itype = itype;
+    console.log("EQs submitDraft, draft", draft);
     if (draft.id) {
-      draft.id = getId();
       this.props.updateQuery(draft, itype);
     } else {
+      draft.id = getId();
       this.props.insertQuery(draft, itype);
     }
   }
 
   setForEditing(e) {
-    const id = e.target.dataset.id;
-    const query = this.props.queries.find(q => q.id === id);
-    if (query) {
-      this.setState({ currentQuery: query });
-    }
+    console.log("setForEditing id", e.target.dataset.id);this.setState({ 
+      currentQuery: this.props.queries.find(q => q._id === e.target.dataset.id) || null
+      });
   }
 
   render() {

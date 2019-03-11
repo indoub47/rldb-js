@@ -22,7 +22,8 @@ exports.COLLECTIONS = [
 
 exports.URL_COLLECTION_MAP = [
   {url: "/api/defects", collection: "defects", item: "defect", items: "defects"},
-  {url: "/api/weldings", collection: "weldings", item: "welding", items: "weldings"}
+  {url: "/api/weldings", collection: "weldings", item: "welding", items: "weldings"},
+  {url: "/api/employees", collection: "operat", item: "employee", items: "employees"}
 ];
 
 // developement

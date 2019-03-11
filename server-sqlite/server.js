@@ -11,6 +11,7 @@ const users = require("./routes/api/users");
 //const defects = require("./routes/api/defects");
 const items = require("./routes/api/items");
 const things = require("./routes/api/things");
+const reports = require("./routes/api/reports");
 
 
 
@@ -40,6 +41,7 @@ app.use(passport.initialize());
 app.use("/api/users", users);
 app.use(["/api/defects", "/api/weldings"], items);
 app.use("/api/things", things);
+app.use("/api/report", reports);
 app.use("/", express.static("../client-redux/"));
 
 // Add a random delay to all requests. Set SHOULD_DELAY to false for a more

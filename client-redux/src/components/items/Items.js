@@ -9,16 +9,15 @@ import SuccessAlert from "../common/Alerts/SuccessAlert";
 import ItemsCount from "../common/ItemsCount";
 import Pager from "../common/pager/Pager";
 import Confirmation from "../common/Confirmation";
+import ExportItems from "../common/exportItems";
 import FilterSort from "../common/filterSort/FilterSort";
 import {
   deleteItem,
   fetchItems,
   invalidateItems,
-  filterSortItems,
   pageChange,
   itemsPerPageChange,
   toggleFS,
-  toggleFSManual,
   hideError,
   hideWarning,
   hideSuccess} from "../../actions/itemsActions";
@@ -46,7 +45,7 @@ class Items extends Component {
     this.hideSuccess = this.hideSuccess.bind(this);
     this.hideWarning = this.hideWarning.bind(this);
     this.hideError = this.hideError.bind(this);
-    this.filterSortItems = this.filterSortItems.bind(this);
+    this.getItems = this.getItems.bind(this);
   }
 
   componentDidMount() {   
@@ -137,8 +136,8 @@ class Items extends Component {
     this.props.hideError(this.props.itype);
   }
 
-  filterSortItems(filterText, sortText) {
-    this.props.filterSortItems(filterText, sortText, this.props.itype);
+  getItems() {
+    return this.props.fsedItems;
   }
 
   render() {
@@ -220,10 +219,6 @@ class Items extends Component {
               <FilterSort
                 itype={this.props.itype}
                 history={this.props.history}
-                fsAction={this.filterSortItems}
-                toggleFSManual={this.props.toggleFSManual}
-                filterSortError={this.props.filterSortError}
-                showFSManual={this.props.showFSManual}
               />
             ) : null}
             <div className="row">
@@ -274,9 +269,9 @@ class Items extends Component {
 
               <div className="col-7">{pagerComponent}</div>
 
-              {/*<div className="col-xl-2">
-                <ExportItems items={this.props.filterSort.items} />
-              </div>*/}
+              <div className="col-xl-2">
+                <ExportItems items={this.getItems} />
+              </div>
             </div>
           </div>
         </div>
@@ -321,9 +316,7 @@ const mapStateToProps = (state, ownProps) => ({
   success: state.itemsStatus[ownProps.itype].success,
   allItems: state.itemsStatus[ownProps.itype].all,
   pager: state.itemsPager[ownProps.itype],
-  showFS: state.itemsShow[ownProps.itype].fsOn,
-  filterSortError: state.itemsFS[ownProps.itype].error,
-  showFSManual: state.itemsShow[ownProps.itype].fsManualOn
+  showFS: state.itemsShow[ownProps.itype].fsOn
 });
 
 Items.defaultProps = {
@@ -338,11 +331,9 @@ export default connect(
     fetchItems,
     fetchQueries,
     invalidateItems,
-    filterSortItems,
     pageChange,
     itemsPerPageChange,
     toggleFS,
-    toggleFSManual,
     hideError,
     hideWarning,
     hideSuccess

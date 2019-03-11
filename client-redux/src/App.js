@@ -19,6 +19,7 @@ import store from "./store";
 import PrivateRoute from './components/common/PrivateRoute';
 import { logoutUser } from "./actions/loginActions";
 import * as iTypes from "./itypes";
+import * as rTypes from "./reportTypes";
 
 // Check for token
 if (localStorage.jwtToken) {
@@ -63,7 +64,13 @@ class App extends Component {
               <PrivateRoute exact path='/weldings' component={Items} itype={iTypes.welding} />
               <PrivateRoute path='/weldings/edit/:_id' component={EditItem} itype={iTypes.welding} />
               <PrivateRoute exact path='/weldings/new' component={EditItem} itype={iTypes.welding} />
+              <PrivateRoute exact path='/employees' component={Items} itype={iTypes.employee} />
+              <PrivateRoute path='/employees/edit/:_id' component={EditItem} itype={iTypes.employee} />
+              <PrivateRoute exact path='/employees/new' component={EditItem} itype={iTypes.employee} />
               <PrivateRoute exact path='/queries/edit/:itype' component={EditQueries} />
+              <PrivateRoute exact path='/report/defects-undone' component={Report} rtype={rTypes.defectsUndone} />
+              <PrivateRoute exact path='/report/k33' component={Report} rtype={rTypes.k33} />
+              <PrivateRoute exact path='/report/weldings-examine' component={Report} rtype={rTypes.weldingsExamine} />
             </Switch>
             <Footer />
           </div>

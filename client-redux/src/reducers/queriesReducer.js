@@ -66,6 +66,7 @@ export default function(state = initialState, action) {
       };
       
     case QUERY_UPDATE_SUCCESS:
+      console.log("Q_U_S action", action);
       query = action.payload.query;
       itype = action.payload.itype;
       ind = state[itype].data.findIndex(q => q.id === query.id);
@@ -75,7 +76,7 @@ export default function(state = initialState, action) {
           ...state,
           [itype]: {
             ...state[itype],
-            error: "Įvyko nesuprantama klaida",
+            error: Error("Įvyko nesuprantama klaida"),
             success: null,
             valid: false,
             isLoading: false
@@ -136,7 +137,7 @@ export default function(state = initialState, action) {
           ...state,
           [itype]: {
             ...state[itype],
-            error: "Įvyko nesuprantama klaida",
+            error: Error("Įvyko nesuprantama klaida"),
             success: null,
             valid: false,
             isLoading: false

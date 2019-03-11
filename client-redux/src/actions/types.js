@@ -65,3 +65,8 @@ export const HIDE_QUERIES_SUCCESS = "HIDE_QUERIES_SUCCESS";
 
 // current item
 export const SET_CURRENT_ITEM_TYPE = "SET_CURRENT_ITEM_TYPE";
+
+// report
+export const REPORT_BEGIN = "REPORT_BEGIN";
+export const REPORT_SUCCESS = "REPORT_SUCCESS";
+export const REPORT_ERROR = "REPORT_ERROR";

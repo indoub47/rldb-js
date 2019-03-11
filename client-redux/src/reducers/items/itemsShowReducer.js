@@ -20,7 +20,7 @@ export default function(state = initialState, action) {
         ...state,
         [action.payload.itype]: {
           ...state[action.payload.itype],
-          fsOn: !state.fsOn
+          fsOn: !state[action.payload.itype].fsOn
         }
       };
 
@@ -29,7 +29,7 @@ export default function(state = initialState, action) {
         ...state,
         [action.payload.itype]: {
           ...state[action.payload.itype],
-          fsManualOn: !state.fsManualOn
+          fsManualOn: !state[action.payload.itype].fsManualOn
         }
       };
 

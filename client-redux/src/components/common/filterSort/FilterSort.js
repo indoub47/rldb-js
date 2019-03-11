@@ -6,14 +6,15 @@ import Sort from "./components/Sort";
 import QuerySelect from "./components/QuerySelect";
 import Manual from "./components/Manual";
 import ErrorAlert from "../Alerts/ErrorAlert";
+import {toggleFSManual, filterSortItems,} from "../../../actions/itemsActions";
 
 class FilterSort extends Component {
   constructor(props) {
     super(props);
     this.state = {
       currentQueryId: "",
-      filterText: "",
-      sortText: ""
+      filterText: this.props.filterSort.filterText,
+      sortText: this.props.filterSort.sortText
     };
     this.clearFilter = this.clearFilter.bind(this);
     this.clearSort = this.clearSort.bind(this);
@@ -24,10 +25,6 @@ class FilterSort extends Component {
     this.onSelectedQueryChange = this.onSelectedQueryChange.bind(this);
     this.editQueries = this.editQueries.bind(this);
     this.toggleManual = this.toggleManual.bind(this); 
-  }
-
-  componentDidUpdate(prevProps) {
-    console.log("FilterSort componentDidUpdate props", this.props);
   }
 
   clearFilter() {
@@ -45,24 +42,22 @@ class FilterSort extends Component {
   changeSort(e) {
     this.setState({ sortText: e.target.value, currentQueryId: "" });
   }
+  
 
-  applyFS() {
-    console.log("Todo: galbūt galima fsAction pasiimti tiesiai į FilterSort, o ne kaip props iš Items");
-    this.props.fsAction(this.state.filterText, this.state.sortText);
+  applyFS(filterText, sortText) {
+    this.props.filterSortItems(this.state.filterText, this.state.sortText, this.props.itype);
   }
 
   onSelectedQueryChange(e) {
     const id = e.target.value;
-    //console.log("current query id set to ", id);
     this.setState({ currentQueryId: id });
   }
 
   toggleManual() {
-    this.props.toggleFSManual();
+    this.props.toggleFSManual(this.props.itype);
   }
 
   useSelectedQuery() {
-    //console.log("queries, state.id", this.props.queries, this.state.currentQueryId);
     if (!this.state.currentQueryId) return;
 
     const query = this.props.queries.find(
@@ -78,7 +73,6 @@ class FilterSort extends Component {
       return;
     }
 
-    //console.log("found query", query);
     this.setState({
       filterText: query.filter,
       sortText: query.sort
@@ -88,10 +82,6 @@ class FilterSort extends Component {
   editQueries() {
     this.props.history.push(`/queries/edit/${this.props.itype}`);
   }
-
-  // saveAsFSQuery() {
-  //   this.props.history.push(`/queries/edit/${this.props.itype}`);
-  // }
 
   render() {
     const isValidFS = null;
@@ -123,9 +113,9 @@ class FilterSort extends Component {
               />
             </div>
             {
-              this.props.filterSortError &&
+              this.props.filterSort.error &&
               <div className="col-12">
-                <ErrorAlert message={this.props.filterSortError.message} />
+                <ErrorAlert message={this.props.filterSort.error.message} />
               </div>
             }
           </div>
@@ -187,7 +177,6 @@ class FilterSort extends Component {
 FilterSort.propTypes = {
   history: PropTypes.object.isRequired,
   filterSortError: PropTypes.object,
-  fsAction: PropTypes.func.isRequired,
   queries: PropTypes.arrayOf(PropTypes.object).isRequired,
   toggleFSManual: PropTypes.func.isRequired,
   showFSManual: PropTypes.bool.isRequired,
@@ -195,11 +184,13 @@ FilterSort.propTypes = {
 };
 
 const mapStateToProps = (state, ownProps) => ({
-  queries: state.queries[ownProps.itype].data
+  queries: state.queries[ownProps.itype].data,
+  filterSort: state.itemsFS[ownProps.itype],
+  showFSManual: state.itemsShow[ownProps.itype].fsManualOn
 });
 
 FilterSort.defaultProps = {
   queries: []
 };
 
-export default connect(mapStateToProps)(FilterSort);
+export default connect(mapStateToProps, {toggleFSManual, filterSortItems})(FilterSort);

@@ -79,7 +79,7 @@ export const updateQuery = (draft, itype) => dispatch => {
   dispatch(updateQueryBegin(itype));
   axios
     .post(`/api/fsqueries/update`, { draft, itype })
-    .then(res => dispatch(updateQuerySuccess(res.data, itype)))
+    .then(res => dispatch(updateQuerySuccess(res.data.data, itype)))
     .catch(err => dispatch(updateQueryFailure(err, itype)));
 };
 
@@ -103,7 +103,7 @@ export const insertQuery = (draft, itype) => dispatch => {
   dispatch(insertQueryBegin(itype));
   axios
     .post(`/api/fsqueries/insert`, { draft, itype })
-    .then(res => dispatch(insertQuerySuccess(res.data, itype)))
+    .then(res => dispatch(insertQuerySuccess(res.data.data, itype)))
     .catch(err => dispatch(insertQueryFailure(err, itype)));
 };
 

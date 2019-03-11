@@ -3,6 +3,7 @@ import thingsReducer from "./thingsReducer";
 import loginReducer from "./loginReducer";
 import registerReducer from "./registerReducer";
 import queriesReducer from "./queriesReducer";
+import reportReducer from "./reportReducer";
 
 import allItemsReducer from "./items/allItemsReducer";
 import itemsFSReducer from "./items/itemsFSReducer";
@@ -17,6 +18,7 @@ export default combineReducers({
   things: thingsReducer,
   register: registerReducer,
   queries: queriesReducer,
+  report: reportReducer,
 
   allItems: allItemsReducer,
   itemsFS: itemsFSReducer,
