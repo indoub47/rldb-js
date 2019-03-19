@@ -65,7 +65,8 @@ export const itemsPerPageChange = (itemsPerPage, itemCount, itype) => dispatch =
     payload: {itemCount, itemsPerPage, itype}
   });
 
-export const toggleFS = itype => dispatch => dispatch({
+export const toggleFS = itype => dispatch => 
+  dispatch({
     type: ITEM_TOGGLE_FS,
     payload: {itype}
 });

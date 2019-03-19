@@ -73,6 +73,7 @@ class Navbar extends Component {
                   </Link>
                   <div className="dropdown-menu">
                     <Link className="dropdown-item" to="/report/defects-undone">Defektai kelyje</Link>
+                    <Link className="dropdown-item" to="/report/defects-undone-count">Defektai kelyje - kiekis</Link>
                     <Link className="dropdown-item" to="/report/k33">Mėnesio K-33</Link>
                     <Link className="dropdown-item" to="/report/weldings-examine">Suvirinimai - galima tikrinti</Link>
                   </div>

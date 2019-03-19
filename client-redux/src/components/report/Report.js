@@ -1,76 +1,60 @@
-import React, { Component } from "react";
-import ReportTable from "./ReportTable";
-import IsLoading from "../common/IsLoading";
-import ErrorAlert from "../common/Alerts/ErrorAlert";
-import ItemsCount from "../common/ItemsCount";
-import ExportItems from "../common/exportItems";
-import { fetchReport, hideError } from "../../actions/reportActions";
-import * as rTypes from "../../reportTypes";
-import ParamFields from "./ParamFields";
-import ReportTable from "./ReportTable";
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
+import ExportItems from '../common/exportItems/ExportItems';
+import {eraseReport} from '../../actions/reportActions';
+import rTypeComponentMap from './rTypeComponentMap';
+import IsLoading from '../common/IsLoading';
+import ErrorAlert from '../common/Alerts/ErrorAlert';
 
-class Report extends Report {
-  constructor(props) {
+class Report extends Component {
+  reporter = null;
+  constructor (props) {
     super(props);
-    this.submitParams = this.submitParams.bind(this);
+    this.reporter = rTypeComponentMap[props.rtype];
+    this.getItems = this.getItems.bind(this);
+  }
+  
+  componentWillUnmount() {
+    // sunaikinamas
+    this.props.eraseReport();
   }
 
-  // submitParams(params) {
-  //   this.props.fetchReport(this.props.rtype, params);
-  // }
-
-  getReport() {
-    return this.props.report.rows;
+  getItems() {
+    return this.props.report;
   }
 
   render() {
+    if (this.props.isLoading) return <IsLoading />;
 
-    let rest = null;
-    if (this.props.error) {
-      // if error
-      rest = (
-        <div className="row">
-          <div className="col-12">
-            <ErrorAlert message={this.props.error} />
-          </div>
-        </div>
-      );
-    } else if (this.props.isLoading) {
-      // if empty or loading
-      rest = <IsLoading />;
-    } else if (this.props.report){
-      // if report
-      rest = (
-        <div className="row">
-          <div className="col-12">
-            <ReportTable report={this.props.report} />
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-12">
-            <ExportItems items={this.getReport} />
-          </div>
-        </div>
-      );
-    }
+    const ParamsCollector = this.reporter.paramsCollector;
+    const ReportTable = this.reporter.reportTable;
 
     return (
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-12">
-            {<ParamFields rtype={this.props.rtype} />}
-          </div>
-        </div>
-        {rest}
+      <div className="container">
+        <div className="row"><ParamsCollector rtype={this.props.rtype} /></div>
+        {this.props.error ? 
+          <ErrorAlert error={this.props.error} /> : null}
+        {Object.keys(this.props.report).length !== 0 ? 
+          (
+            <div>
+              <div className="row"><ReportTable report={this.props.report} /></div>
+              <div className="row"><ExportItems getItems={this.getItems} /></div>
+            </div>
+          ) : null
+        }
       </div>
     );
   }
+
 }
 
-const mapStateToProps = state => ({
-  isLoading: state.report.isLoading,
-  report: state.report.report,
-  error: state.report.error
+const mapStateToProps = (state) => ({
+  report: state.report.data,
+  error: state.report.error,
+  isLoading: state.report.isLoading
 });
 
-export default connect(mapStateToProps,{fetchReport})(Report);
+export default connect (
+  mapStateToProps,
+  {eraseReport}
+)(Report);

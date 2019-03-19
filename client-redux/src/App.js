@@ -8,6 +8,7 @@ import Register from "./components/auth/Register";
 import Items from "./components/items/Items";
 import EditItem from './components/items/EditItem';
 import EditQueries from "./components/editQueries/EditQueries";
+import Report from "./components/report/Report";
 import LoggedIn from "./components/layout/LoggedIn";
 
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
@@ -69,6 +70,7 @@ class App extends Component {
               <PrivateRoute exact path='/employees/new' component={EditItem} itype={iTypes.employee} />
               <PrivateRoute exact path='/queries/edit/:itype' component={EditQueries} />
               <PrivateRoute exact path='/report/defects-undone' component={Report} rtype={rTypes.defectsUndone} />
+              <PrivateRoute exact path='/report/defects-undone-count' component={Report} rtype={rTypes.defectsUndoneCount} />
               <PrivateRoute exact path='/report/k33' component={Report} rtype={rTypes.k33} />
               <PrivateRoute exact path='/report/weldings-examine' component={Report} rtype={rTypes.weldingsExamine} />
             </Switch>

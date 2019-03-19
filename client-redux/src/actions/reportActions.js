@@ -1,95 +1,86 @@
 import axios from "axios";
-import { REPORT_BEGIN, REPORT_SUCCESS, REPORT_ERROR } from "./types";
+import {
+  REPORT_BEGIN,
+  REPORT_SUCCESS,
+  REPORT_ERROR,
+  ERASE_REPORT
+} from "./types";
+import Reporter from "./reporters/Reporter";
 
-const dispatchReportBegin = () => dispatch =>
+export const dispatchReportBegin = () => dispatch => {
+  console.log("dispatching ReportBegin");
   dispatch({
     type: REPORT_BEGIN
   });
+};
 
-const dispatchReportSuccess = report => dispatch =>
+export const dispatchReportSuccess = report => dispatch => {
+  console.log("dispatching Report success1");
   dispatch({
     type: REPORT_SUCCESS,
     payload: { report }
   });
+  // return dispatch => {
+  //   console.log("dispatching ReportSuccess2", report);
+  //   dispatch({
+  //     type: REPORT_SUCCESS,
+  //     payload: { report }
+  //   });
+  // };
+};
 
-const dispatchReportFailure = error => dispatch =>
+export const dispatchReportFailure = error => dispatch =>
   dispatch({
     type: REPORT_ERROR,
     payload: { error }
   });
 
-export const fetchReport = (rtype, params) => (dispatch, getState) => {
+export const eraseReport = () => dispatch => {
+  dispatch({
+    type: ERASE_REPORT
+  });
+};
+
+export const createReport = (rtype, params) => (dispatch, getState) => {
   // parinkti reporterį
-  const reporter = chooseReporterByRType(rtype);
+  const reporter = new Reporter(rtype, getState);
+  console.log("reporter", reporter);
   if (!reporter) {
-    dispatchReportFailure({message: "Unknown report type"});
+    dispatchReportFailure({ message: "Unknown report type" });
     return;
   }
-
-  // pagal rtype patikrinti, ar yra atsisiusti reikalingi duomenys
-  const hasData = reporter.checkLocalData(getState);
-
+  console.log("starting to check local data for a report");
   // čia bus pasidedamas report
   let report;
 
   // jeigu duomenys yra, sužinoti funciją, kuri duomenis pavers reportu
-  if (hasData) {
-    dispatchReportBegin();
+  if (reporter.localDataExists()) {
+    console.log("local data exists");
+    //dispatchReportBegin();
     try {
-      report = reporter.localDataToReport(params, getState);
+      const localData = reporter.getLocalData();
+      console.log("local data", localData);
+      report = reporter.createReport(localData, params);
+      console.log("report from local data", report);
       dispatchReportSuccess(report);
+      console.log("after dispatchReportSuccess");
     } catch (e) {
+      console.log("local data error", e);
       dispatchReportFailure(e);
     }
   } else {
+    console.log("local data doesn't exist");
     // fetch report data async and create report
     dispatchReportBegin();
     axios
-      .get(reporter.apiUrl, { rtype, ...params })
+      .get(reporter.getUrl(), { rtype, ...params })
       .then(res => {
-        report = reporter.fetchedDataToReport(params, res.data);
+        console.log("fetched data", res);
+        report = reporter.createReport(res.data, params);
+        console.log("report from fetched data", report);
         dispatchReportSuccess(report);
+        console.log("after dispatchReportSuccess");
       })
       .catch(err => dispatchReportFailure(err));
   }
 };
-
-chooseReporterByRType(rtype) {
-  switch(rtype) {
-    case rType.defectsUndone: return defectsUndoneReporter;
-    case rType.k33: return k33Reporter;
-    case rType.weldingsExamine: return weldingsExamineReporter;
-    default: return null;
-  }
-}
-
-
-
-
-
-
-const k33Reporter = {
-  apiUrl: "api/report/k33",
-  checkLocalData: getState => {
-
-  },
-  fetchedDataToReport: fetchedData => {
-
-  },
-  createReportFromLocalData: (params, getState) => {
-
-  }
-}
-
-const weldingsExamineReporter = {
-  apiUrl: "api/report/weldings-examine",
-  checkLocalData: getState => {
-
-  },
-  fetchedDataToReport: fetchedData => {
-
-  },
-  createReportFromLocalData: (params, getState) => {
-
-  }
-}

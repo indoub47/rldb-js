@@ -1,11 +1,12 @@
 import {
   REPORT_BEGIN,
   REPORT_SUCCESS,
-  REPORT_ERROR
+  REPORT_ERROR,
+  ERASE_REPORT,
   LOGOUT
-} from "../../actions/types";
+} from "../actions/types";
 
-const initialState = {report: {}, error: null, isLoading: false};
+const initialState = {data: {}, error: null, isLoading: false};
 
 export default function(state = initialState, action) {
   switch (action.type) {
@@ -14,16 +15,17 @@ export default function(state = initialState, action) {
     case REPORT_BEGIN:
       return {
         ...state,
-        report: {},
+        data: {},
         error: null,
         isLoading: true
       };
 
     // report success
     case REPORT_SUCCESS:
+      console.log("report reducer - report success - report", action.payload.report);
       return {
         ...state,
-        report: action.payload.report,
+        data: action.payload.report,
         error: null,
         isLoading: false
       };
@@ -32,11 +34,12 @@ export default function(state = initialState, action) {
     case REPORT_ERROR:
       return {
         ...state,
-        report: null,
+        data: {},
         error: action.payload.error,
         isLoading: false
       };
 
+    case ERASE_REPORT: 
     case LOGOUT:
       return initialState;
     

@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import TextFieldGroup from '../../../common/TextFieldGroup';
-import SelectInputGroup from '../../../common/SelectInputGroup';
-import {createOptions} from '../../../createOptions';
+// import SelectInputGroup from '../../../common/SelectInputGroup';
+// import {createOptions} from '../../../createOptions';
 import absent from '../../../../utils/absent-props';
 
 const MainDataForm = ({item, onChange, things}) => {

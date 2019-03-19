@@ -34,6 +34,13 @@ exports.COLLECTION_MAP = [
       item: "suvirinimas", 
       Item: "Suvirinimas"
     }
+  },
+  {itype: "employee", 
+    name: "operat", 
+    itemNames: {
+      item: "darbuotojas", 
+      Item: "Darbuotojas"
+    }
   }
 ];
 

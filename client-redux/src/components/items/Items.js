@@ -9,7 +9,7 @@ import SuccessAlert from "../common/Alerts/SuccessAlert";
 import ItemsCount from "../common/ItemsCount";
 import Pager from "../common/pager/Pager";
 import Confirmation from "../common/Confirmation";
-import ExportItems from "../common/exportItems";
+import ExportItems from "../common/exportItems/ExportItems";
 import FilterSort from "../common/filterSort/FilterSort";
 import {
   deleteItem,
