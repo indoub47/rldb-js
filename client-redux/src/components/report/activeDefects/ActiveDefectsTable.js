@@ -2,8 +2,10 @@ import React from "react";
 
 const ActiveDefectsTable = ({ report }) => {
   if (!report) return null;
+
+  console.log("active defects table report", report);
   
-  const THead = ({ report }) => (
+  const THead = () => (
     <thead>
       <tr>
         <th scope="col">Meistrija</th>
@@ -26,26 +28,27 @@ const ActiveDefectsTable = ({ report }) => {
       <tr>
         <th scope="row">{meistrijaLabel}</th>
         <td>{defect.linija}</td>
-        <td>defect.kelias</td>
-        <td>defect.km</td>
-        <td>defect.pk</td>
-        <td>defect.m</td>
-        <td>defect.siule</td>
-        <td>defect.skodas</td>
-        <td>defect.pavoj</td>
-        <td>defect.daptik</td>
-        <td>defect.dtermin</td>
+        <td>{defect.kelias}</td>
+        <td>{defect.km}</td>
+        <td>{defect.pk}</td>
+        <td>{defect.m}</td>
+        <td>{defect.siule}</td>
+        <td>{defect.skodas}</td>
+        <td>{defect.pavoj}</td>
+        <td>{defect.daptik}</td>
+        <td>{defect.dtermin}</td>
       </tr>
     );
   };
 
   const TBody = ({ report }) => {
+    console.log("report", report);
     return (
       <tbody>
         {report.map(meistrija =>
-          meistrija.map(defect => (
+          meistrija.defects.map(defect => (
             <DefectRow
-              meistrijaLabel={meistrija.label}
+              meistrijaLabel={meistrija.abbr}
               defect={defect}
               key={defect.id}
             />
@@ -57,7 +60,7 @@ const ActiveDefectsTable = ({ report }) => {
 
   return (
     <table className="table">
-      <THead report={report} />
+      <THead />
       <TBody report={report} />
     </table>
   );

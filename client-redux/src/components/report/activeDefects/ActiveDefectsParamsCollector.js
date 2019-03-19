@@ -10,7 +10,7 @@ export class ActiveDefectsParamsCollector extends Component {
     this.state = {
       byDate: null,
       whichDefects: "active", // 'overdued', 'both'
-      meistrijos: []
+      meistrijos: props.meistrijos.map(m => m.id)
     };
     this.submitParams = this.submitParams.bind(this);
     this.onChange = this.onChange.bind(this);
@@ -38,7 +38,7 @@ export class ActiveDefectsParamsCollector extends Component {
 
   render() {
     return (
-      <form className="form-inline">
+      <form className="form">
         <TextFieldGroup
           type="date"
           id="bydate"
@@ -46,23 +46,9 @@ export class ActiveDefectsParamsCollector extends Component {
           name="byDate"
           value={absent(this.state.byDate)}
           onChange={this.onChange}
-          className="form-group ml5"
+          className="form-group"
         />
-        <div className="form-group ml5 whichDefects">
-          <div className="form-check form-check-inline">
-            <input
-              className="form-check-input"
-              name="whichDefects"
-              type="radio"
-              id="radio-both"
-              value="both"
-              onChange={this.onChange}
-              disabled={true}
-            />
-            <label className="form-check-label" htmlFor="radio-both">
-              Kelyje/pradelsti
-            </label>
-          </div>
+        <div className="form-group whichDefects">
           <div className="form-check form-check-inline">
             <input
               className="form-check-input"
@@ -71,12 +57,13 @@ export class ActiveDefectsParamsCollector extends Component {
               id="radio-active"
               value="active"
               onChange={this.onChange}
+              defaultChecked={true}
             />
             <label
               className="form-check-label"
               htmlFor="radio-active"
             >
-              Kelyje
+              Visi esantys kelyje
             </label>
           </div>
           <div className="form-check form-check-inline">
@@ -89,15 +76,15 @@ export class ActiveDefectsParamsCollector extends Component {
               onChange={this.onChange}
             />
             <label className="form-check-label" htmlFor="radio-overdued">
-              Pradelsti
+              Tik pradelsti
             </label>
           </div>
-        </div>
-        <div className="form-group ml5">
+        </div>        
+        <div className="form-group">
           <label htmlFor="selectMeistrijos">Meistrijos</label>
           <select
             multiple={true}
-            defaultValue={this.props.meistrijos.map(m => m.id)}
+            value={this.state.meistrijos}
             onChange={this.onChange}
             className="form-control"
             name="meistrijos"
@@ -115,7 +102,8 @@ export class ActiveDefectsParamsCollector extends Component {
             ))}
           </select>
         </div>
-        <div className="form-group ml5">
+        
+        <div className="form-group">
           <button type="button" className="btn" onClick={this.submitParams}>
             Submit
           </button>

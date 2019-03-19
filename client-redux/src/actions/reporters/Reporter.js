@@ -15,7 +15,7 @@ export default class Reporter {
 
   // public
   localDataExists() {
-    console.log("Reporter getState", this. getState);
+    console.log("Reporter getState", this.getState);
     return this.reporter.localDataManager.hasLocalData(this.getState);
   }
 

@@ -29,6 +29,8 @@ class Report extends Component {
     const ParamsCollector = this.reporter.paramsCollector;
     const ReportTable = this.reporter.reportTable;
 
+    console.log("Report render", this.props.report);
+
     return (
       <div className="container">
         <div className="row"><ParamsCollector rtype={this.props.rtype} /></div>

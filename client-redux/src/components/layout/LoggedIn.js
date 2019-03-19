@@ -36,10 +36,10 @@ class LoggedIn extends Component {
             <div className="row">
               <div className="col-md-12 text-center">
                 <h1 className="display-3 mb-4">
-                  Rail Defect Investigation Data Base
+                  Rail Defect Data Base
                 </h1>
                 <p className="lead">
-                  Manage your rail defect investigation data
+                  Manage your rail defect data
                 </p>
                 <hr />
                 <p className="lead">

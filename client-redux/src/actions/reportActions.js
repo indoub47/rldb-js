@@ -7,33 +7,19 @@ import {
 } from "./types";
 import Reporter from "./reporters/Reporter";
 
-export const dispatchReportBegin = () => dispatch => {
-  console.log("dispatching ReportBegin");
-  dispatch({
-    type: REPORT_BEGIN
-  });
-};
+const reportBegin = () => ({
+  type: REPORT_BEGIN
+});
 
-export const dispatchReportSuccess = report => dispatch => {
-  console.log("dispatching Report success1");
-  dispatch({
-    type: REPORT_SUCCESS,
-    payload: { report }
-  });
-  // return dispatch => {
-  //   console.log("dispatching ReportSuccess2", report);
-  //   dispatch({
-  //     type: REPORT_SUCCESS,
-  //     payload: { report }
-  //   });
-  // };
-};
+const reportSuccess = report => ({
+  type: REPORT_SUCCESS,
+  payload: { report }
+});
 
-export const dispatchReportFailure = error => dispatch =>
-  dispatch({
-    type: REPORT_ERROR,
-    payload: { error }
-  });
+const reportFailure = error => ({
+  type: REPORT_ERROR,
+  payload: { error }
+});
 
 export const eraseReport = () => dispatch => {
   dispatch({
@@ -46,7 +32,7 @@ export const createReport = (rtype, params) => (dispatch, getState) => {
   const reporter = new Reporter(rtype, getState);
   console.log("reporter", reporter);
   if (!reporter) {
-    dispatchReportFailure({ message: "Unknown report type" });
+    dispatch(reportFailure({ message: "Unknown report type" }));
     return;
   }
   console.log("starting to check local data for a report");
@@ -62,25 +48,34 @@ export const createReport = (rtype, params) => (dispatch, getState) => {
       console.log("local data", localData);
       report = reporter.createReport(localData, params);
       console.log("report from local data", report);
-      dispatchReportSuccess(report);
+      //dispatchReportSuccess(report);
+      //console.log("dispatchReportSuccess", dispatchReportSuccess);
+      dispatch(reportSuccess(report));
+      //
       console.log("after dispatchReportSuccess");
     } catch (e) {
       console.log("local data error", e);
-      dispatchReportFailure(e);
+      dispatch(reportFailure(e));
     }
   } else {
     console.log("local data doesn't exist");
     // fetch report data async and create report
-    dispatchReportBegin();
+    dispatch(reportBegin());
     axios
       .get(reporter.getUrl(), { rtype, ...params })
       .then(res => {
         console.log("fetched data", res);
         report = reporter.createReport(res.data, params);
         console.log("report from fetched data", report);
-        dispatchReportSuccess(report);
+        //dispatchReportSuccess(report);
+        //console.log("dispatchReportSuccess", dispatchReportSuccess);
+        dispatch(reportSuccess(report));
+        //
         console.log("after dispatchReportSuccess");
       })
-      .catch(err => dispatchReportFailure(err));
+      .catch(err => {
+        console.log("error", err);
+        dispatch(reportFailure(err));
+      });
   }
 };

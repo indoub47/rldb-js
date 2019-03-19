@@ -13,6 +13,7 @@ export default function(state = initialState, action) {
 
     // begin report
     case REPORT_BEGIN:
+      console.log("report reducer - report begin");
       return {
         ...state,
         data: {},
