@@ -2,12 +2,13 @@ export default class UDDataTransformer {
   data;
   byDate;
   whichDefects;
-  meistrijos;
+  local;
 
   constructor(data, params) {
+    // data and params come from reportActions
     this.byDate = params.bydate || new Date().toISOString().split("T")[0];
     this.whichDefects = params.whichDefects; // active, overdued, both
-    this.meistrijos = params.meistrijos;    
+    this.local = params.local ? true : false;  
     this.data = data;
   }
 
@@ -23,22 +24,11 @@ export default class UDDataTransformer {
     }
   }
 
-  createReport() {
-    const filter = this.createFilter();
-    console.log("this.data", this.data);
-    const filteredDefects = this.data.defects.filter(filter);
-    const container = this.getContainer();
-    const report = this.distributeDefects(filteredDefects, container);
-    console.log("report in createReport", report);
-    return report;
-  }  
-
   // iš turimų data išfiltruoja visus defektus, kurie yra kelyje
   // ir tik tuos defektus, kurie yra reikalingose meistrijose
   activeFilter() {
     return defect => (defect.daptik <= this.byDate &&
-      (this.dateIsEmpty(defect.panaikinta) || defect.panaikinta > this.byDate) &&
-      this.meistrijos.includes(defect.meistrija));
+      (this.dateIsEmpty(defect.panaikinta) || defect.panaikinta > this.byDate));
   }
 
   // laikoma, kad esantys kelyje jau išfiltruoti,
@@ -52,7 +42,6 @@ export default class UDDataTransformer {
   activeAndOverduedFilter() {
     return defect => (defect.daptik <= this.byDate &&
       (this.dateIsEmpty(defect.panaikinta) || defect.panaikinta > this.byDate) &&
-      this.meistrijos.includes(defect.meistrija) &&
       !this.dateIsEmpty(defect.dtermin) &&
       defect.dtermin < this.byDate);
   }

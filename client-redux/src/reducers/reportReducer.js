@@ -6,24 +6,23 @@ import {
   LOGOUT
 } from "../actions/types";
 
-const initialState = {data: {}, error: null, isLoading: false};
+const initialState = {data: {}, params: null, error: null, isLoading: false};
 
 export default function(state = initialState, action) {
   switch (action.type) {
 
     // begin report
     case REPORT_BEGIN:
-      console.log("report reducer - report begin");
       return {
         ...state,
         data: {},
+        params: action.payload.params,
         error: null,
         isLoading: true
       };
 
     // report success
     case REPORT_SUCCESS:
-      console.log("report reducer - report success - report", action.payload.report);
       return {
         ...state,
         data: action.payload.report,

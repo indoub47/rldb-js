@@ -5,17 +5,13 @@ export default class Reporter {
   getState;
 
   constructor(rtype, getState) {
-    console.log("getState", getState);
     this.getState = getState;
-    console.log("reporterMap", reporterMap);
-    console.log("rtype", rtype);
     this.reporter = reporterMap[rtype]; 
-    //this.getState = this.getState.bind(this);    
   }
 
   // public
   localDataExists() {
-    console.log("Reporter getState", this.getState);
+    //console.log("Reporter getState", this.getState);
     return this.reporter.localDataManager.hasLocalData(this.getState);
   }
 
@@ -29,7 +25,7 @@ export default class Reporter {
 
   // public
   createReport(data, params) {
-    console.log("createReport data params", data, params);
+    //console.log("createReport data params", data, params);
     const transformer = new this.reporter.DataTransformerClass(data, params);
     return transformer.createReport();
   }

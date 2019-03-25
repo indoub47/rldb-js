@@ -112,32 +112,25 @@ router.post(
 // @desc Insert fsquery
 // @body draft object
 // @access Public
-router.put(
-  '/insert',
-  (req, res) => {
-    MongoClient.connect(
-      dbUri,
-      {useNewUrlParser: true},
-      (err, client) => {
-        if (err) return res.status(500).send(err);
-        let draft = req.body.draft;
-        //let draft = JSON.parse(req.body.draft);
-        draft.email = req.user.email;
-        const collName = 'fsqueries';
-        client.db(dbName)
-          .collection(collName)
-          .insertOne(
-            draft,
-            (err, result) => {
-              if (err) return res.status(500).send(err);
-              return res.status(200).send({
-                case: "success",
-                message: `Užklausa sėkmingai įkišta`,
-                data: result.ops[0]
-              });
+router.put('/insert', (req, res) => {
+  MongoClient.connect(dbUri, {useNewUrlParser: true})
+  .then(client => {
+      let draft = req.body.draft;   
+      //let draft = JSON.parse(req.body.draft);     
+      draft.email = req.user.email;
+      return client.db(dbName).collection('fsqueries').insertOne(draft)
+  })
+  .then(result => {
+    return res.status(200).send({
+              case: "success",
+              message: `Užklausa sėkmingai įkišta`,
+              data: result.ops[0]
             });
-      });
+  })
+  .catch(err => {
+    return res.status(500).send(err);
   });
+});
 
 
 module.exports = router;

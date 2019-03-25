@@ -3,9 +3,9 @@ import React from "react";
 const ActiveDefectsTable = ({ report }) => {
   if (!report) return null;
 
-  console.log("active defects table report", report);
+  //console.log("active defects table report", report);
   
-  const THead = () => (
+  const tHead = (
     <thead>
       <tr>
         <th scope="col">Meistrija</th>
@@ -33,7 +33,7 @@ const ActiveDefectsTable = ({ report }) => {
         <td>{defect.pk}</td>
         <td>{defect.m}</td>
         <td>{defect.siule}</td>
-        <td>{defect.skodas}</td>
+        <td>{defect.kodas}</td>
         <td>{defect.pavoj}</td>
         <td>{defect.daptik}</td>
         <td>{defect.dtermin}</td>
@@ -41,11 +41,8 @@ const ActiveDefectsTable = ({ report }) => {
     );
   };
 
-  const TBody = ({ report }) => {
-    console.log("report", report);
-    return (
-      <tbody>
-        {report.map(meistrija =>
+  //console.log("report right before bodyRows", report);
+  const bodyRows = report.map(meistrija =>
           meistrija.defects.map(defect => (
             <DefectRow
               meistrijaLabel={meistrija.abbr}
@@ -53,15 +50,15 @@ const ActiveDefectsTable = ({ report }) => {
               key={defect.id}
             />
           ))
-        )}
-      </tbody>
-    );
-  };
+        );
+  //console.log("bodyRows", bodyRows);
 
   return (
     <table className="table">
-      <THead />
-      <TBody report={report} />
+      {tHead}
+      <tbody>
+        {bodyRows}
+      </tbody>
     </table>
   );
 };

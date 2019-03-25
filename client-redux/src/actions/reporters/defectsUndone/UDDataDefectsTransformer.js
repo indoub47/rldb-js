@@ -7,12 +7,11 @@ export class UDDataDefectsTransformer extends UDDataTransformer {
   }
 
   getContainer() {
-    return this.data.things.meistrija
-      .filter(m => this.meistrijos.includes(m.id));
+    return this.data.things.meistrija;
   }
 
   distributeDefects(defs, container) {
-    console.log("distributeDefects defects, container", defs, container);
+    //console.log("distributeDefects defects, container", defs, container);
     const distributed = container.map(meistrija => {
       return {
         ...meistrija,
@@ -21,7 +20,7 @@ export class UDDataDefectsTransformer extends UDDataTransformer {
           .sort(this.byVietaSorter)
       };
     }).sort(this.byIndSorter);
-    console.log("distributeDefects container after distribution", distributed);
+    //console.log("distributeDefects container after distribution", distributed);
     return distributed;
   }
 
@@ -29,11 +28,11 @@ export class UDDataDefectsTransformer extends UDDataTransformer {
 
   createReport() {
     const filter = this.createFilter();
-    console.log("this.data", this.data);
+    //console.log("this.data", this.data);
     const filteredDefects = this.data.defects.filter(filter);
     const container = this.getContainer();
     const report = this.distributeDefects(filteredDefects, container);
-    console.log("report in createReport", report);
+    //console.log("report in createReport", report);
     return report;
   }
 }

@@ -32,9 +32,9 @@ const ActiveDefectsCountTable = ({ report }) => {
   const ReportRow = ({ meistrija }) => {
     return (
       <tr>
-        <th scope="row">meistrija.label</th>
+        <th scope="row">{meistrija.label}</th>
         {meistrija.kkateg.map(kk =>
-          kk.pavoj.map(p => <td key={kk.ind + "-" + p.ind}>{p.defects}</td>)
+          kk.pavoj.map(p => <td key={kk.ind + "-" + p.ind}>{p.count > 0 ? p.count : ""}</td>)
         )}
       </tr>
     );
@@ -51,7 +51,7 @@ const ActiveDefectsCountTable = ({ report }) => {
   };
 
   return (
-    <table className="table">
+    <table className="table table-bordered table-striped">
       <THead report={report} />
       <TBody report={report} />
     </table>

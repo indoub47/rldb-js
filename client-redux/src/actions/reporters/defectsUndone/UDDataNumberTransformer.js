@@ -1,99 +1,28 @@
 import UDDataTransformer from "./UDDataTransformer";
+import createDefectCountReport from "./createDefectCountReport";
+import transformDefectCounts from "./transformDefectCounts";
 
 export class UDDataNumberTransformer extends UDDataTransformer {
-
-  // data (defects, things (kkateg, pavoj, meistrija));
+  // data (counts/defects, things (kkateg, pavoj, meistrija));
   // byDate;
   // whichDefects;
-  // meistrijos;
+  // local;
 
   constructor(data, params) {
     super(data, params);
   }
-  
-
-   getKkategGroups() {
-    return [
-      {label: "1", ind: 1, ids: ["1"]},
-      {label: "2", ind: 2, ids: ["2"]},
-      {label: "3, 4", ind: 3, ids: ["3", "4"]},
-      {label: "kt.", ind: 4, ids: ["5", "6", "7"]}
-    ];
-  }
-
-  getMeistrijaGroups() {
-    return this.data.things.meistrija
-      .filter(m => this.meistrijos.includes(m.id))
-      .map(m => ({label: m.abbr, ind: m.ind, ids: [m.id]}));
-  }
-
-  getPavojGroups() {
-    return this.data.things.pavoj
-      .filter(p => true)
-      .map(p => ({label: p.id, ind: p.ind, ids: [p.id]}));
-  }
-
-  
 
   createReport() {
-    const filter = this.createFilter();
-    console.log("this.data", this.data);
-    const filteredDefects = this.data.defects.filter(filter);
-    const container = this.getContainer();
-    const report = this.distributeDefects(filteredDefects, container);
-    console.log("report in createReport", report);
-    return report;
-  }
+    if (this.local) {
+      const filter = this.createFilter();
+      const filteredDefects = this.data.defects.filter(filter);
+      return createDefectCountReport(this.data.things, filteredDefects);
+    }
 
-  getContainer() {
-    const grMeistrijos = this.getMeistrijaGroups();
-    const grPavoj = this.getPavojGroups();
-    const grKkateg = this.getKkategGroups();
-
-    return grMeistrijos.map(m => (
-    	{...m, kkateg: grKkateg.map(k => (
-      	{...k, pavoj: grPavoj.map(p => (
-        	{...p}
-        )).sort(this.byIndSorter)
-      })).sort(this.byIndSorter)
-    })).sort(this.byIndSorter);
-  }
-
-  distributeDefects(defects, container) {
-    // distributes, sorts and marks overdued
-    container.forEach(meistr => {
-        meistr.kkateg.forEach(kkateg => {
-          kkateg.pavoj.forEach(pavoj => {
-            pavoj.defects = defects.filter(d => 
-              meistr.ids.includes(d.meistrija) && 
-              kkateg.ids.includes(d.kkateg) && 
-              pavoj.ids.includes(d.pavoj))
-            .sort(this.byVietaSorter)
-            // .map(d => {
-            //   if (this.overduedFilter(d)) d.overdued = true;
-            //   return d
-            // });
-          });
-        });
-      });
-
-    const report = this.reduceToNumbers(container);
-
-    console.log("distributeDefects report", report);
-    return report;
-  }
-
-  reduceToNumbers(fullReport) {
-    return fullReport.map(m => (
-      {...m, kkateg: m.kkateg.map(k => (
-        {...k, pavoj: k.pavoj.map(p => (
-          {...p, defects: p.defects.length}
-        ))}
-      ))}
-    ))
+    // fetches filtered and transformed data from server
+    return transformDefectCounts(this.data.counts, this.data.things); 
   }
 }
-
 
 /*
 

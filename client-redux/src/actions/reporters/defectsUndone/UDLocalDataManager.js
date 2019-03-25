@@ -3,7 +3,7 @@ export class UDLocalDataManager {
 
   // public
   hasLocalData(getState) {
-    console.log("UDLocalDataManager.hasLocalData getState", getState);
+    //console.log("UDLocalDataManager.hasLocalData getState", getState);
     return (
       !isEmpty(getState().allItems["defect"]) &&
       !isEmpty(getState().things.data.kkateg) &&

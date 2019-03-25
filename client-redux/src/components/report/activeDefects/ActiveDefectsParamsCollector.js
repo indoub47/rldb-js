@@ -7,29 +7,45 @@ import absent from '../../../utils/absent-props';
 export class ActiveDefectsParamsCollector extends Component {
   constructor(props) {
     super(props);
+    console.log("paramscollector constructor, rtype", props.rtype);
     this.state = {
       byDate: null,
-      whichDefects: "active", // 'overdued', 'both'
-      meistrijos: props.meistrijos.map(m => m.id)
+      whichDefects: null // 'active', 'overdued', 'both'
     };
     this.submitParams = this.submitParams.bind(this);
     this.onChange = this.onChange.bind(this);
   }
 
-  onChange(e) {
-    if (e.target.name === "meistrijos") {
-      let values = [];
-      const options = e.target.options;
-      for (var i = 0; i < options.length; i++) {
-        if (options[i].selected) {
-          values.push(options[i].value);
-        }
-      }
-      this.setState({meistrijos: values});
+  componentDidMount() {
+    if (this.props.params === null) {
+      console.log("paramscollector didmount this.props.params=null, rtype", this.props.rtype);
+      this.setState({
+        byDate: new Date().toISOString().split("T")[0],
+        whichDefects: 'active'
+      });
     } else {
-      this.setState({ [e.target.name]: e.target.value });
-    }
-    console.log("state", this.state);
+      console.log("paramscollector didmount this.props.params!=null, this.props", this.props);
+      this.setState({
+        byDate: this.props.params.byDate,
+        whichDefects: this.props.params.whichDefects
+      });
+    }    
+  }
+
+  componentDidUpdate(prevProps) {
+    console.log("paramscollector didupdate, rtype", this.props.rtype);
+    // if (this.props.rtype !== prevProps.rtype) {
+    //   this.props.eraseReport();
+    // }
+  }
+
+  componentWillUnmount() {
+    console.log("paramscollector willunmount, rtype", this.props.rtype);
+    //this.props.eraseReport();
+  }
+
+  onChange(e) {
+    this.setState({ [e.target.name]: e.target.value });
   }
 
   submitParams() {
@@ -55,9 +71,9 @@ export class ActiveDefectsParamsCollector extends Component {
               name="whichDefects"
               type="radio"
               id="radio-active"
+              checked={this.state.whichDefects === "active"}
               value="active"
               onChange={this.onChange}
-              defaultChecked={true}
             />
             <label
               className="form-check-label"
@@ -72,6 +88,7 @@ export class ActiveDefectsParamsCollector extends Component {
               name="whichDefects"
               type="radio"
               id="radio-overdued"
+              checked={this.state.whichDefects === "overdued"}
               value="overdued"
               onChange={this.onChange}
             />
@@ -79,28 +96,6 @@ export class ActiveDefectsParamsCollector extends Component {
               Tik pradelsti
             </label>
           </div>
-        </div>        
-        <div className="form-group">
-          <label htmlFor="selectMeistrijos">Meistrijos</label>
-          <select
-            multiple={true}
-            value={this.state.meistrijos}
-            onChange={this.onChange}
-            className="form-control"
-            name="meistrijos"
-            id="selectMeistrijos"
-            size={
-              this.props.meistrijos.length < 5
-                ? this.props.meistrijos.length
-                : "5"
-            }
-          >
-            {this.props.meistrijos.sort((a, b) => a.ind - b.ind).map(m => (
-              <option value={m.id} key={m.id}>
-                {m.abbr}
-              </option>
-            ))}
-          </select>
         </div>
         
         <div className="form-group">
@@ -114,7 +109,7 @@ export class ActiveDefectsParamsCollector extends Component {
 }
 
 const mapStateToProps = state => ({
-  meistrijos: state.things.data.meistrija
+  params: state.report.params
 });
 
 export default connect(
