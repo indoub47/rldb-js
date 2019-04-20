@@ -270,7 +270,7 @@ class Items extends Component {
               <div className="col-7">{pagerComponent}</div>
 
               <div className="col-xl-2">
-                <ExportItems items={this.getItems} />
+                <ExportItems getItems={this.getItems} />
               </div>
             </div>
           </div>

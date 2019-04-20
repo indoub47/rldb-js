@@ -69,10 +69,10 @@ class App extends Component {
               <PrivateRoute path='/employees/edit/:_id' component={EditItem} itype={iTypes.employee} />
               <PrivateRoute exact path='/employees/new' component={EditItem} itype={iTypes.employee} />
               <PrivateRoute exact path='/queries/edit/:itype' component={EditQueries} />
-              <PrivateRoute exact path='/report/defects-undone' component={Report} rtype={rTypes.defectsUndone} />
-              <PrivateRoute exact path='/report/defects-undone-count' component={Report} rtype={rTypes.defectsUndoneCount} />
-              <PrivateRoute exact path='/report/k33' component={Report} rtype={rTypes.k33} />
-              <PrivateRoute exact path='/report/weldings-examine' component={Report} rtype={rTypes.weldingsExamine} />
+              <PrivateRoute exact path='/report/defects-undone' component={Report} rtype={rTypes.defectsUndone} key={rTypes.defectsUndone} />
+              <PrivateRoute exact path='/report/defects-undone-count' component={Report} rtype={rTypes.defectsUndoneCount} key={rTypes.defectsUndoneCount} />
+              <PrivateRoute exact path='/report/k33' component={Report} rtype={rTypes.k33} key={rTypes.k33} />
+              <PrivateRoute exact path='/report/to-inspect' component={Report} rtype={rTypes.toInspect} key={rTypes.toInspect} />
             </Switch>
             <Footer />
           </div>

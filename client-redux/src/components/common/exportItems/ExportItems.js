@@ -3,7 +3,7 @@ import modifiers from "./modifiers";
 import GenericExporter from "./GenericExporter"
 
 const ExportItems = ({getItems}) => {
-  
+  console.log("exportItems getItems", {getItems});
   const exporters = modifiers.map(m => 
     <GenericExporter  
       convertItems={m.convert} 

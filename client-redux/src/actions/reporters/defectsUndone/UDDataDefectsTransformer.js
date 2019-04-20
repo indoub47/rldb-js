@@ -1,18 +1,35 @@
 import UDDataTransformer from "./UDDataTransformer";
 
 export class UDDataDefectsTransformer extends UDDataTransformer {
-  constructor(data, params) {
-    super(data, params);
-    //
+  constructor(thingsAndData) {
+    super(thingsAndData);
+    // params reikalingas?
+  }  
+
+  byVietaSorter(a, b) {
+    if (a.linija > b.linija) return 1;
+    if (a.linija < b.linija) return -1;
+    if (a.kelias > b.kelias) return 1;
+    if (a.kelias < b.kelias) return -1;
+    if (a.km > b.km) return 1;
+    if (a.km < b.km) return -1;
+    if (a.pk > b.pk) return 1;
+    if (a.pk < b.pk) return -1;
+    if (a.m > b.m) return 1;
+    if (a.m < b.m) return -1;
+    if (a.siule > b.siule) return 1;
+    if (a.siule < b.siule) return -1;
+    if (a.iesmas > b.iesmas) return 1;
+    if (a.iesmas < b.iesmas) return -1;
+    if (a.nr > b.nr) return 1;
+    if (a.nr < b.nr) return -1;
+    return 0;
   }
 
-  getContainer() {
-    return this.data.things.meistrija;
-  }
-
-  distributeDefects(defs, container) {
-    //console.log("distributeDefects defects, container", defs, container);
-    const distributed = container.map(meistrija => {
+  distributeDefects(defs) {
+    // gauna filtruotus defektus iš serverio.
+    // paskirsto defektus po meistrijas ir tinkamai išrikiuoja
+    return this.things.meistrija.map(meistrija => {
       return {
         ...meistrija,
         defects: defs
@@ -20,19 +37,10 @@ export class UDDataDefectsTransformer extends UDDataTransformer {
           .sort(this.byVietaSorter)
       };
     }).sort(this.byIndSorter);
-    //console.log("distributeDefects container after distribution", distributed);
-    return distributed;
-  }
-
-  
+  }  
 
   createReport() {
-    const filter = this.createFilter();
     //console.log("this.data", this.data);
-    const filteredDefects = this.data.defects.filter(filter);
-    const container = this.getContainer();
-    const report = this.distributeDefects(filteredDefects, container);
-    //console.log("report in createReport", report);
-    return report;
+    return this.distributeDefects(this.data);
   }
 }

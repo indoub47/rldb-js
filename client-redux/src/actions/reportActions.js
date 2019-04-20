@@ -12,71 +12,43 @@ const reportBegin = params => ({
   payload: {params}
 });
 
-const reportSuccess = report => ({
+const reportSuccess = (report, rtype) => ({
   type: REPORT_SUCCESS,
-  payload: { report }
+  payload: { report, rtype }
 });
 
 const reportFailure = error => ({
   type: REPORT_ERROR,
-  payload: { error }
+  payload: {error}
 });
 
 export const eraseReport = () => dispatch => {
+  console.log("dispatching erase report");
   dispatch({
     type: ERASE_REPORT
   });
 };
 
-export const createReport = (rtype, params) => (dispatch, getState) => {
+export const createReport = (rtype, params) => dispatch => {
   // parinkti reporterį
-  const reporter = new Reporter(rtype, getState);
+  const reporter = new Reporter(rtype);
   //console.log("reporter", reporter);
   if (!reporter) {
     dispatch(reportFailure({ message: "Unknown report type" }));
     return;
   }
-  //console.log("starting to check local data for a report");
-  // čia bus pasidedamas report
-  let report;
-
-  // jeigu duomenys yra, sužinoti funciją, kuri duomenis pavers reportu
-  if (reporter.localDataExists()) {
-    //console.log("local data exists. WARNING: REPORT_BEGIN SYNCHRONOUSLY");
-    dispatch(reportBegin(params));
-    try {
-      const localData = reporter.getLocalData();
-      //console.log("local data", localData);
-      report = reporter.createReport(localData, {local: true, ...params});
-      //console.log("report from local data", report);
-      //dispatchReportSuccess(report);
-      //console.log("dispatchReportSuccess", dispatchReportSuccess);
-      dispatch(reportSuccess(report));
-      //
-      //console.log("after dispatchReportSuccess");
-    } catch (e) {
-      //console.log("local data error", e);
-      dispatch(reportFailure(e));
-    }
-  } else {
-    //console.log("local data doesn't exist");
-    // fetch report data async and create report
-    dispatch(reportBegin(params));
-    axios
-      .get(reporter.getUrl(), { rtype, ...params })
-      .then(res => {
-        //console.log("fetched data", res);
-        report = reporter.createReport(res.data, params);
-        //console.log("report from fetched data", report);
-        //dispatchReportSuccess(report);
-        //console.log("dispatchReportSuccess", dispatchReportSuccess);
-        dispatch(reportSuccess(report));
-        //
-        //console.log("after dispatchReportSuccess");
-      })
-      .catch(err => {
-        console.log("error", err);
-        dispatch(reportFailure(err));
-      });
-  }
+  
+  dispatch(reportBegin(params));
+  
+  // fetch report data async and create report
+  axios
+    .get(reporter.getUrl(), {params: {...params}})
+    .then(res => {
+      const report = reporter.createReport(res.data);
+      dispatch(reportSuccess(report, rtype));
+    })
+    .catch(err => {
+      console.log("errr", err);
+      dispatch(reportFailure(err));
+    });
 };

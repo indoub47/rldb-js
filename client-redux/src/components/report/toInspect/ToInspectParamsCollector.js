@@ -4,12 +4,12 @@ import { connect } from "react-redux";
 import TextFieldGroup from "../../common/TextFieldGroup";
 import absent from '../../../utils/absent-props';
 
-export class ActiveDefectsParamsCollector extends Component {
+export class ToInspectParamsCollector extends Component {
   constructor(props) {
     super(props);
     this.state = {
         byDate: new Date().toISOString().split("T")[0],
-        whichDefects: 'active'
+        onlyOverdued: false
     };
     this.submitParams = this.submitParams.bind(this);
     this.onChange = this.onChange.bind(this);
@@ -28,10 +28,10 @@ export class ActiveDefectsParamsCollector extends Component {
       <form className="form">
         <TextFieldGroup
           type="date"
-          id="bydate"
+          id="todate"
           label="Datai"
-          name="byDate"
-          value={absent(this.state.byDate)}
+          name="toDate"
+          value={absent(this.state.toDate)}
           onChange={this.onChange}
           className="form-group"
         />
@@ -39,31 +39,17 @@ export class ActiveDefectsParamsCollector extends Component {
           <div className="form-check form-check-inline">
             <input
               className="form-check-input"
-              name="whichDefects"
+              name="onlyover"
               type="radio"
-              id="radio-active"
-              checked={this.state.whichDefects === "active"}
-              value="active"
+              id="checkbox"
+              checked={this.state.onlyOverdued}
+              value={false}
               onChange={this.onChange}
             />
             <label
               className="form-check-label"
               htmlFor="radio-active"
             >
-              Visi esantys kelyje
-            </label>
-          </div>
-          <div className="form-check form-check-inline">
-            <input
-              className="form-check-input"
-              name="whichDefects"
-              type="radio"
-              id="radio-overdued"
-              checked={this.state.whichDefects === "overdued"}
-              value="overdued"
-              onChange={this.onChange}
-            />
-            <label className="form-check-label" htmlFor="radio-overdued">
               Tik pradelsti
             </label>
           </div>
@@ -86,4 +72,4 @@ const mapStateToProps = state => ({
 export default connect(
   mapStateToProps,
   { createReport }
-)(ActiveDefectsParamsCollector);
+)(ToInspectParamsCollector);

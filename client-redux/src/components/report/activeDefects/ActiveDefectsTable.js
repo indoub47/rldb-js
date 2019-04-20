@@ -2,8 +2,6 @@ import React from "react";
 
 const ActiveDefectsTable = ({ report }) => {
   if (!report) return null;
-
-  //console.log("active defects table report", report);
   
   const tHead = (
     <thead>

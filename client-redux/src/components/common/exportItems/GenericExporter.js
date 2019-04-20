@@ -5,7 +5,9 @@ import FileSaver from 'file-saver';
 
 const GenericExporter = ({convertItems, label, fname, getItems}) => {
   //if (!getItems) getItems = () => ["empty"];
+  console.log("genericExporter getItems", getItems);
   if (!getItems) return null;
+  console.log("GenericExporter");
   const getBlob = () => new Blob([convertItems(getItems())], {type: "text/plain;charset=utf-8"});
   const fileName = fname;
   const saveToFile = () => FileSaver.saveAs(getBlob(), fileName);

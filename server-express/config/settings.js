@@ -1,23 +1,22 @@
 exports.COLLECTIONS = [
-  {name: "defects", actions: []},
-  {name: "weldings", actions: []},
-  {name: "bgamykl", actions: ["all"]},
-  {name: "btipas", actions: ["all"]},
-  {name: "defskop", actions: ["all"]},
-  {name: "operat", actions: ["all"]},
-  {name: "tbudas", actions: ["defectoscopes", "all"]},
-  {name: "kkateg", actions: ["all"]},
-  {name: "linst", actions: ["all"]},
-  {name: "action", actions: ["all"]},
-  {name: "linija", actions: ["all"]},
-  {name: "siule", actions: ["all"]},
-  {name: "meistrija", actions: ["all"]},
-  {name: "pavoj", actions: ["all"]},
+  {name: "defects", actions: [], autoId: true},
+  {name: "weldings", actions: [], autoId: true},
+  {name: "bgamykl", actions: ["all"], hasRegion: false, autoId: false},
+  {name: "btipas", actions: ["all"], hasRegion: false, autoId: false},
+  {name: "defskop", actions: ["all"], hasRegion: true, autoId: false},
+  {name: "operat", actions: ["all"], hasRegion: true, autoId: false},
+  {name: "tbudas", actions: ["defectoscopes", "all"], hasRegion: false, autoId: false},
+  {name: "kkateg", actions: ["all"], hasRegion: false, autoId: false},
+  {name: "linst", actions: ["all"], hasRegion: true, autoId: false},
+  {name: "linija", actions: ["all"], hasRegion: true, autoId: false},
+  {name: "siule", actions: ["all"], hasRegion: false, autoId: false},
+  {name: "meistrija", actions: ["all"], hasRegion: true, autoId: false},
+  {name: "pavoj", actions: ["all"], hasRegion: false, autoId: false},
   {name: "region", actions: ["register_user"]},
   {name: "urole", actions: ["register_user"]},
   {name: "ttype", actions: []},
-  {name: "fsqueries", actions: []},
-  {name: "user", actions: []}
+  {name: "fsqueries", actions: [], hasRegion: false, autoId: true},
+  {name: "users", actions: []}
 ];
 
 exports.COLLECTION_MAP = [

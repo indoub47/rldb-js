@@ -3,23 +3,22 @@ export default function reduceDefectCountReport(report) {
   let counts = [];
 
   for (var m = 0; m < report.length; m++) {
-    let currentM = [];
+    let currentMKks = []; // kkategs of current meistrija
     for (var kk = 0; kk < report[m].kkateg.length; kk++) {
-      let currentKk = [];
+      let currentKkPavojs = []; // pavojs of current kkateg
       for (var p = 0; p < report[m].kkateg[kk].pavoj.length; p++) {
-        currentP = report[m].kkateg[kk].pavoj[p];
-        if (currentP.count > 0) {
-          currentKk.push(currentP);
+        if (report[m].kkateg[kk].pavoj[p].count > 0) {
+          currentKkPavojs.push({...report[m].kkateg[kk].pavoj[p]});
         }
       }
-      if (currentKk.length > 0) {
-        currentM.push(currentKk);
+      if (currentKkPavojs.length > 0) {
+        currentMKks.push({...report[m].kkateg[kk], pavoj: currentKkPavojs});
       }
     }
-    if (currentM.length > 0) {
-      counts.push(currentM);
+    if (currentMKks.length > 0) {
+      counts.push({...report[m], kkateg: currentMKks});
     }
   }
 
-  return {counts, things};
+  return counts;
 }

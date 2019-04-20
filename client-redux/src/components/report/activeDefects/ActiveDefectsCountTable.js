@@ -2,6 +2,7 @@ import React from "react";
 
 const ActiveDefectsCountTable = ({ report }) => {
   if (!report) return null;
+  console.log("active defects count report", report);
 
   const kkategColSpan = report[0].kkateg[0].pavoj.length;
 
