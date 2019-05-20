@@ -35,22 +35,26 @@ export default function(state = initialState, action) {
 
     // edit item
     case ITEM_UPDATE_SUCCESS:
-      if (!action.payload) return state;
+      console.log("action", action);
+      if (!action.payload || !action.payload.item) return state;
       const updatedItem = action.payload.item;
-      let ind = state[action.payload.itype].findIndex(x => x._id === updatedItem._id);
+      const itype = action.payload.itype;
+      const allItems = state[itype];
+      console.log("itype, allItems", itype, allItems);
+      let ind = allItems.findIndex(x => x.id === updatedItem.id);
       return {
         ...state,
-        [action.payload.itype]: [
-          ...state[action.payload.itype].slice(0, ind),
+        [itype]: [
+          ...allItems.slice(0, ind),
           updatedItem,
-          ...state[action.payload.itype].slice(ind + 1)
+          ...allItems.slice(ind + 1)
         ]
       };
 
     // delete item success
     case ITEM_DELETE_SUCCESS:
       if (action.payload.id == null) return state;
-      ind = state[action.payload.itype].findIndex(x => x._id === action.payload.id);
+      ind = state[action.payload.itype].findIndex(x => x.id === action.payload.id);
       if (ind < 0) return state; // jeigu kartais nerastų tokio id...
       return {
         ...state,

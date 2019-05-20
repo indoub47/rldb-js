@@ -12,10 +12,6 @@ const items = require("./routes/api/items");
 const things = require("./routes/api/things");
 const fsqueries = require("./routes/api/fsqueries");
 const reports = require("./routes/api/reports");
-const things_sqlite = require("./routes/api/things_sqlite");
-const fsqueries_sqlite = require("./routes/api/fsqueries_sqlite");
-
-
 
 const app = express();
 require("./config/passport")(passport);
@@ -30,21 +26,16 @@ app.use((req, res, next) => {
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-mongoose
-  .connect(
-    secret.DB_URI,
-    { useNewUrlParser: true }
-  )
-  .then(() => console.log("MongoDB Connected"))
-  .catch(err => console.log(err));
+// mongoose
+//   .connect(secret.DB_URI, { useNewUrlParser: true })
+//   .then(() => console.log("MongoDB Connected"))
+//   .catch(err => console.log(err));
 
 app.use(passport.initialize());
 
 app.use("/api/users", users);
 app.use("/api/items", items);
 app.use("/api/things", things);
-app.use("/api/sqlite/things", things_sqlite);
-app.use("/api/sqlite/fsqueries", fsqueries_sqlite);
 app.use("/api/fsqueries", fsqueries);
 app.use("/api/report", reports);
 app.use("/", express.static("../client-redux/"));

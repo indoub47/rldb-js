@@ -7,7 +7,7 @@ const ItemTable = ({items, editItem, deleteItem, itype}) => {
   if (items.length < 1) {
     return (
       <div className="alert alert-info">
-        There's no defects for this view.
+        There's no items for this view.
       </div>
     );
   }

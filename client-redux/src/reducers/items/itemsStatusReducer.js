@@ -23,10 +23,10 @@ import * as iTypes from "../../itypes";
 import getInitialState from "../functions/getInitialState";
 
 const stateObj = {
-  error: null,
+  errormsg: null,
   fetchError: null,
-  warning: null,
-  success: null,
+  warningmsg: null,
+  successmsg: null,
   isBusy: false,
   all: false
 };
@@ -40,9 +40,9 @@ export default function(state = initialState, action) {
         ...state,
         [action.payload.itype]: {
           ...state[action.payload.itype],
-          warning: null,
-          success: null,
-          error: null,
+          warningmsg: null,
+          successmsg: null,
+          errormsg: null,
           fetchError: null,
           isBusy: true,
         }
@@ -55,9 +55,9 @@ export default function(state = initialState, action) {
         ...state,
         [action.payload.itype]: {
           ...state[action.payload.itype],
-          warning: null,
-          success: null,
-          error: null,
+          warningmsg: null,
+          successmsg: null,
+          errormsg: null,
           isBusy: true
         }
       };
@@ -79,7 +79,7 @@ export default function(state = initialState, action) {
         ...state,
         [action.payload.itype]: {
           ...state[action.payload.itype],
-          error: null,
+          errormsg: null,
           isBusy: false
         }
       };
@@ -101,7 +101,7 @@ export default function(state = initialState, action) {
         ...state,
         [action.payload.itype]: {
           ...state[action.payload.itype],
-          error: action.payload.error,
+          errormsg: action.payload.errormsg,
           isBusy: false
         }
       };
@@ -111,7 +111,7 @@ export default function(state = initialState, action) {
         ...state,
         [action.payload.itype]: {
           ...state[action.payload.itype],
-          error: null
+          errormsg: null
         }
       };
 
@@ -129,7 +129,7 @@ export default function(state = initialState, action) {
         ...state,
         [action.payload.itype]: {
           ...state[action.payload.itype],
-          warning: action.payload.message
+          warningmsg: action.payload.message
         }
       };
 
@@ -138,7 +138,7 @@ export default function(state = initialState, action) {
         ...state,
         [action.payload.itype]: {
           ...state[action.payload.itype],
-          warning: null
+          warningmsg: null
         }
       };
 
@@ -147,7 +147,7 @@ export default function(state = initialState, action) {
         ...state,
         [action.payload.itype]: {
           ...state[action.payload.itype],
-          success: action.payload.message
+          successmsg: action.payload.message
         }
       };
 
@@ -156,7 +156,7 @@ export default function(state = initialState, action) {
         ...state,
         [action.payload.itype]: {
           ...state[action.payload.itype],
-          success: null
+          successmsg: null
         }
       };
 

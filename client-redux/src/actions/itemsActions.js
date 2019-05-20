@@ -170,6 +170,10 @@ const itemInsertFailure = (error, itype) => ({
   payload: { error, itype }
 });
 
+function errorsToMsg(errors) {
+  return Object.keys(errors).map(key => key + ": " + errors[key]).join("<br>");
+}
+
 export const insertItem = (draft, itype) => (dispatch, getState) => {
   dispatch(itemInsertBegin(itype));
   axios
@@ -183,7 +187,7 @@ export const insertItem = (draft, itype) => (dispatch, getState) => {
 
       if (
         res.data.data == null || 
-        (!getState().itemsStatus[itype].all && res.data.data.panaikinta) 
+        (!getState().itemsStatus[itype].all && itemSpecific.panaikinta(res.data.data)) 
       ) {  
         dispatch(itemInsertSuccess(itype)); 
       } else {     
@@ -208,9 +212,9 @@ const itemUpdateSuccess = (item, itype) => ({
   payload: {item, itype}
 });
 
-const itemUpdateFailure = (error, itype) => ({
+const itemUpdateFailure = (errormsg, itype) => ({
   type: ITEM_UPDATE_FAILURE,
-  payload: { error, itype }
+  payload: { errormsg, itype }
 });
 
 export const updateItem = (draft, history, itype) => (dispatch, getState) => {
@@ -218,37 +222,65 @@ export const updateItem = (draft, history, itype) => (dispatch, getState) => {
   axios
     .post("/api/items/update", {draft, itype})
     .then(res => {
-      if (res.data.case === "warning") {
-        dispatch(setWarning(res.data.message, itype));
-      } else if (res.data.case === "success") {
-        dispatch(setSuccess(res.data.message, itype));
+      console.log("res.data", res.data);
+
+      // suformuojamas pranešimas apie rezultatą
+      if (res.data.ok) {
+        dispatch(setSuccess(res.data.msg, itype));
+      } else {
+        dispatch(setWarning(res.data.msg, itype));
       }
 
-      if (res.data.data != null) {
-        if (getState().itemsStatus[itype].all) {
-          // jeigu yra data ir rodyti visus - updateinamas local
-          dispatch(itemUpdateSuccess(res.data.data, itype));
-        } else {          
-          if (res.data.data.panaikinta) {
-            // jeigu yra data, rodyti tik nepanaikintus, o yra panaikintas -
-            // ištrinamas iš local
-            dispatch(itemDeleteSuccess(res.data.data._id, itype));
-          } else {   
-            // jeigu yra data, rodyti tik nepanaikintus, ir nėra panaikintas -
-            // updateinamas local
-            dispatch(itemUpdateSuccess(res.data.data, itype));
-          }
+      // pagal rezultatą updateinamas local cache
+      if (getState().itemsStatus[itype].all) {
+        // jeigu rodyti visus (ir panaikintus, ir ne) - updateinamas local
+        console.log("perform local action: 1");
+        dispatch(itemUpdateSuccess(res.data.item, itype));
+      } else { 
+        // jeigu rodyti tik nepanaikintus
+        if (itemSpecific(itype).panaikinta(res.data.item)) {
+          console.log("perform local action: 2");
+          // jeigu updateinant buvo panaikintas -
+          // ištrinamas iš local
+          dispatch(itemDeleteSuccess(res.data.item.id, itype));
+        } else {
+          console.log("perform local action: 3");   
+          // jeigu updateinant nebuvo panaikintas -
+          // updateinamas local
+          dispatch(itemUpdateSuccess(res.data.item, itype));
         }
-        refilter(dispatch, getState, itype);
-      } else {
-        // jeigu nėra data - nedaroma nieko
-        dispatch(itemUpdateSuccess(itype)); 
       }
+
+      // refilter local cache  
+      refilter(dispatch, getState, itype);
+      
       // return to list
       history.push(itemSpecific(itype).listPath);
     })
     .catch(err => {
-      dispatch(itemUpdateFailure(err, itype));
+      console.log("perform local action: 4 (error)", err);
+      const error = JSON.parse(JSON.stringify(err));
+      console.log("error", error);
+      let errmsg = "";
+      if (error.response && error.response.data) {
+        if (error.response.data.msg) {
+          errmsg = error.response.data.msg;
+        } else if (error.response.data.errors) {
+          errmsg = errorsToMsg(error.response.data.errors);
+        } else {
+          errmsg = "Error: " + err.message;
+        }
+      } else {
+        errmsg = "Error: " + err.message;
+      }
+      console.log("error-msg", errmsg);
+      dispatch(itemUpdateFailure(errmsg, itype));
+
+      if (error.response && 
+      error.response.data && 
+      err.response.data.reason === "bad criteria") {
+        history.push(itemSpecific(itype).listPath);
+      }
     });
 };
 
@@ -264,15 +296,15 @@ const itemDeleteSuccess = (id, itype) => ({
   payload: {id, itype}
 });
 
-const itemDeleteFailure = (error, itype) => ({
+const itemDeleteFailure = (errormsg, itype) => ({
   type: ITEM_DELETE_FAILURE,
-  payload: { error, itype }
+  payload: { errormsg, itype }
 });
 
-export const deleteItem = (_itemId, itemV, itype) => (dispatch, getState) => {
+export const deleteItem = (itemId, itemV, itype) => (dispatch, getState) => {
   dispatch(itemDeleteBegin(itype));
   axios
-    .delete("/api/items/delete", { params: { _id: _itemId, v: itemV, itype } })
+    .delete("/api/items/delete", { params: { id: itemId, v: itemV, itype } })
     .then(res => {
       if (res.data.case === "warning") {
         dispatch(setWarning(res.data.message, itype));

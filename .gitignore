@@ -1,9 +1,5 @@
-client-flux-babel6
-client-flux-babel7
 client-redux/node_modules
 server-express/node_modules
 server-express/config/secret.js
 backups
-server-sqlite/db
-server-sqlite/node_modules
-server-sqlite/config/secret.js
+MDBtoSQL

@@ -19,21 +19,24 @@ export default function itemSpecific(itype) {
         replacements: defectReplacements,
         mainDataForm: defectMainDataForm.MainDataForm,
         singleRow: defectSingleRow,
-        listPath: "/defects"
+        listPath: "/defects",
+        panaikinta: item => !!item.daction
       };
     case iTypes.welding:
       return {
         replacements: weldingReplacements,
         mainDataForm: weldingMainDataForm.MainDataForm,
         singleRow: weldingSingleRow,
-        listPath: "/weldings"
+        listPath: "/weldings",
+        panaikinta: item => {throw "panaikinta for welding is not implemented"}
       };
     case iTypes.employee:
       return {
         replacements: employeeReplacements,
         mainDataForm: employeeMainDataForm.MainDataForm,
         singleRow: employeeSingleRow,
-        listPath: "/employees"
+        listPath: "/employees",
+        panaikinta: item => {throw "panaikinta for employee is not implemented"}
       };
     default: // do nothing so far
   }

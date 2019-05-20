@@ -5,7 +5,7 @@ import {liko} from "./functions";
 const ItemRow = ({ item, editItem, deleteItem }) => {
   return (
     <tr>
-      <td className="region">{item.region}</td>
+      <td className="regbit">{item.regbit}</td>
       <td className="meistrija">{item.meistrija}</td>
       <td className="id text-right">{item.id}</td>
       <td className="id1 text-right">{item.id1}</td>
@@ -27,28 +27,27 @@ const ItemRow = ({ item, editItem, deleteItem }) => {
       <td className="apar">{item.apar}</td>
       <td className="daptik">{item.daptik}</td>
       <td className="dtermin">{item.dtermin}</td>
-      <td className="dtvarsl">{item.dtvarsl}</td>
-      <td className="panaikinta">{item.panaikinta}</td>
+      <td className="daction">{item.daction}</td>
       <td className="liko">{liko(item)}</td>
       <td className="pastaba">{item.pastaba}</td>
       <td>
         <div className="button-group">
           <button
             className="btn btn-xs btn-warning"
-            data-id={item._id}
+            data-id={item.id}
             onClick={editItem}
           >
-            <i className="fas fa-edit" data-id={item._id} />
+            <i className="fas fa-edit" data-id={item.id} />
           </button>
           <button
             className="btn btn-xs btn-danger"
-            data-id={item._id}
+            data-id={item.id}
             data-v={item.v}
             onClick={deleteItem}
           >
             <i 
               className="fas fa-trash-alt" 
-              data-id={item._id}
+              data-id={item.id}
               data-v={item.v} 
             />
           </button>
@@ -67,7 +66,7 @@ ItemRow.propTypes = {
 const ItemHeadRow = () => {
   return (
     <tr>
-      <th className="region">region</th>
+      <th className="region">regbit</th>
       <th className="meistrija">meistrija</th>
       <th className="id">id</th>
       <th className="id1">id1</th>
@@ -89,8 +88,7 @@ const ItemHeadRow = () => {
       <th className="apar">apar</th>
       <th className="daptik">daptik</th>
       <th className="dtermin">dtermin</th>
-      <th className="dtvarsl">dtvarsl</th>
-      <th className="panaikinta">panaikinta</th>
+      <th className="daction">daction</th>
       <th className="liko">liko</th>
       <th className="pastaba">pastaba</th>
       <th className="controls">controls</th>

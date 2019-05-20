@@ -1,0 +1,28 @@
+module.exports = {
+  id: {type: 'integer'}, // insert - generates automatically, update - if wrong doesnt find
+  v: {type: 'integer'}, // insert - generates automatically, update - if wrong doesnt update or updates the item which has been updated by someone other
+  id1: {type: 'integer', validator: "isNegative"},
+  regbit: {type: 'integer', required: true, validator: "isNegative"},  
+  meistrija: {type: 'string', required: true, validator: "isEmptyString"},
+  linija: {type: 'string', required: true, validator: "isEmptyString"},
+  kelias: {type: 'string', required: true, validator: "isEmptyString"},
+  km: {type: 'integer', required: true, validator: "isNegative"},
+  pk: {type: 'integer', required: true, validator: "isNegative"},
+  m: {type: 'integer', required: true, validator: "isNegative"},
+  siule: {type: 'string'},
+  kodas: {type: 'string', required: true, validator: "isEmptyString"},
+  dl: {type: 'number', validator: "isNegative"},
+  dh: {type: 'number', validator: "isNegative"},
+  pavoj: {type: 'string', required: true, validator: "isEmptyString"},
+  kkateg: {type: 'string', required: true, validator: "isEmptyString"},
+  btipas: {type: 'string', required: true, validator: "isEmptyString"},
+  bgamykl: {type: 'string', required: true, validator: "isEmptyString"},
+  bmetai: {type: 'integer', required: true, validator: "isNotYear"},
+  oper: {type: 'string', required: true, validator: "isEmptyString"},
+  apar: {type: 'string', required: true, validator: "isEmptyString"},
+  daptik: {type: 'string', required: true, validator: "isNotShortDate"},
+  dtermin: {type: 'string', validator: "isNeitherEmptyStringNorShortDate"},
+  daction: {type: 'string', validator: "isNeitherEmptyStringNorShortDate"},
+  action: {type: 'integer', validator: "outOfLimits", params: {min: 0, max: 2}},
+  note: {type: 'string', validator: "wrongLength", params: {min: 0, max: 255}},
+};

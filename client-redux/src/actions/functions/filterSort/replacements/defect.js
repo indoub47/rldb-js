@@ -1,7 +1,7 @@
 export const filterReplacements = {
   id: "x.id",
   id1: "x.id1",
-  region: "x.region",
+  regbit: "x.regbit",
   meistrija: "x.meistrija",
   linija: "x.linija",
   kelias: "x.kelias",
@@ -21,9 +21,8 @@ export const filterReplacements = {
   apar: "x.apar",
   daptik: "x.daptik",
   dtermin: "x.dtermin",
-  dtvarsl: "x.dtvars",
-  panaikinta: "x.panaikinta",
-  liko: "(x.dtermin && !x.panaikinta) && Math.floor((Date.parse(x.dtermin)-Date.now())/86400000)",
+  daction: "x.daction",
+  liko: "(x.dtermin && !x.daction) && Math.floor((Date.parse(x.dtermin)-Date.now())/86400000)",
   vt: "(x.kelias && (x.kelias==='1' || x.kelias==='2') && x.km && x.pk && (x.m || x.m===0)) && (x.km*1000+(x.pk-1)*100+x.m)"
 };
 
@@ -31,7 +30,7 @@ export function getSortingReplacement(fieldName, x) {
   switch (fieldName) {
     case "id": return x.id;
     case "id1": return x.id1;
-    case "region": return x.region;
+    case "regbit": return x.regbit;
     case "kkateg": return x.kkateg;
     case "meistrija": return x.meistrija;
     case "linija": return x.linija;
@@ -51,9 +50,8 @@ export function getSortingReplacement(fieldName, x) {
     case "bmetai": return x.bmetai;
     case "daptik": return x.daptik;
     case "dtermin": return x.dtermin;
-    case "dtvarsl": return x.dtvarsl;
-    case "panaikinta": return x.panaikinta;
-    case "liko": return x.dtermin && !x.panaikinta ? Math.floor((Date.parse(x.dtermin)-Date.now())/86400000) : Number.MAX_SAFE_INTEGER;
+    case "daction": return x.daction;
+    case "liko": return x.dtermin && !x.daction ? Math.floor((Date.parse(x.dtermin)-Date.now())/86400000) : Number.MAX_SAFE_INTEGER;
 
     default:
       throw new Error("Nesuprantamas rikiavimo parametras " + fieldName);

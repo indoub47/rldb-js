@@ -20,7 +20,8 @@ class Register extends Component {
       role: "",
       region: "",
       password: "",
-      password2: ""
+      password2: "",
+      // passwordMatchError: {}
     };
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -39,6 +40,10 @@ class Register extends Component {
 
   onSubmit = e => {
     e.preventDefault();
+    // if (this.state.password !== this.state.password2) {
+    //   this.setState(passwordMatchError: {password2: "passwords don't match"});
+    //   return;
+    // }
     const newUser = {
       name: this.state.name,
       email: this.state.email,

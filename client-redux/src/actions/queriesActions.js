@@ -51,7 +51,7 @@ const fetchQueriesFailure = (err, itype) => ({
 });
 
 // Get fsqueries
-export const fetchQueries = (itype) => dispatch => {
+export const fetchQueries = itype => dispatch => {
   dispatch(fetchQueriesBegin(itype));
   axios
     .get(`/api/fsqueries/fetch`, {params: {itype}})
@@ -75,10 +75,11 @@ const updateQueryFailure = (err, itype) => ({
 });
 
 // update fsquery
-export const updateQuery = (draft, itype) => dispatch => {
+export const updateQuery = draft => dispatch => {
+  const itype = draft.itype;
   dispatch(updateQueryBegin(itype));
   axios
-    .post(`/api/fsqueries/update`, { draft, itype })
+    .post(`/api/fsqueries/update`, draft)
     .then(res => dispatch(updateQuerySuccess(res.data.data, itype)))
     .catch(err => dispatch(updateQueryFailure(err, itype)));
 };
@@ -99,10 +100,11 @@ const insertQueryFailure = (err, itype) => ({
 });
 
 // insert fsquery
-export const insertQuery = (draft, itype) => dispatch => {
+export const insertQuery = draft => dispatch => {
+  const itype = draft.itype;
   dispatch(insertQueryBegin(itype));
   axios
-    .post(`/api/fsqueries/insert`, { draft, itype })
+    .post(`/api/fsqueries/insert`, draft)
     .then(res => dispatch(insertQuerySuccess(res.data.data, itype)))
     .catch(err => dispatch(insertQueryFailure(err, itype)));
 };

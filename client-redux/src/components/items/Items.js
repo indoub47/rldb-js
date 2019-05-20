@@ -29,7 +29,7 @@ class Items extends Component {
     super(props);
     this.state = {
       showConfirmationDialog: false,
-      _idToDelete: "",
+      idToDelete: "",
       vToDelete: ""
     };
     this.toggleFilterSort = this.toggleFilterSort.bind(this);
@@ -60,7 +60,7 @@ class Items extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    console.log("items.componentDidUpdate props",this.props);
+    //console.log("items.componentDidUpdate props",this.props);
     if (prevProps.fsedItemsAreValid &&!this.props.fsedItemsAreValid) {
       this.props.fetchItems(this.props.itype);
     }
@@ -94,16 +94,16 @@ class Items extends Component {
   showDeleteConfirmation(e) {
     this.setState({
       showConfirmationDialog: true,
-      _idToDelete: e.target.dataset.id,
+      idToDelete: e.target.dataset.id,
       vToDelete: e.target.dataset.v
     });
   }
 
   confirmDelete() {
-    this.props.deleteItem(this.state._idToDelete, this.state.vToDelete,this.props.itype);
+    this.props.deleteItem(this.state.idToDelete, this.state.vToDelete,this.props.itype);
     this.setState({
       showConfirmationDialog: false,
-      _idToDelete: "",
+      idToDelete: "",
       vToDelete: ""
     });
   }
@@ -111,7 +111,7 @@ class Items extends Component {
   unconfirmDelete() {
     this.setState({
       showConfirmationDialog: false,
-      _idToDelete: "",
+      idToDelete: "",
       vToDelete: ""
     });
   }
@@ -202,13 +202,13 @@ class Items extends Component {
               New Item
             </button>
             <button
-              className={"btn btn-sm btn-warning" + (!this.props.allItems ? " active" : "")}
+              className="btn btn-sm btn-warning"
               onClick={this.refreshItems}
             >
               Refresh
             </button>
             <button
-              className={"btn btn-sm btn-warning" + (this.props.allItems ? " active" : "")}
+              className="btn btn-sm btn-warning"
               onClick={this.refreshItemsAll}
             >
               Refresh All
@@ -222,26 +222,26 @@ class Items extends Component {
               />
             ) : null}
             <div className="row">
-              {this.props.warning ? (
+              {this.props.warningmsg ? (
                 <div className="col-12">
                   <WarningAlert
-                    message={this.props.warning}
+                    message={this.props.warningmsg}
                     hide={this.hideWarning}
                   />
                 </div>
               ) : null}
-              {this.props.itemsError ? (
+              {this.props.errormsg ? (
                 <div className="col-12">
                   <ErrorAlert
-                    message={this.props.itemsError.message}
+                    message={this.props.errormsg}
                     hide={this.hideError}
                   />
                 </div>
               ) : null}
-              {this.props.success ? (
+              {this.props.successmsg ? (
                 <div className="col-12">
                   <SuccessAlert
-                    message={this.props.success}
+                    message={this.props.successmsg}
                     hide={this.hideSuccess}
                   />
                 </div>
@@ -290,7 +290,7 @@ Items.propTypes = {
   deleteItem: PropTypes.func.isRequired,
   invalidateItems: PropTypes.func.isRequired,
   itemsIsLoading: PropTypes.bool,
-  itemsError: PropTypes.object,
+  errormsg: PropTypes.string,
   pager: PropTypes.object.isRequired,
   fetchQueries: PropTypes.func.isRequired,
   queriesIsLoading: PropTypes.bool,
@@ -310,10 +310,10 @@ const mapStateToProps = (state, ownProps) => ({
   fsedItems: state.fsedItems[ownProps.itype].data,
   fsedItemsAreValid: state.fsedItems[ownProps.itype].valid,
   itemsIsLoading: state.itemsStatus[ownProps.itype].isBusy,
-  itemsError: state.itemsStatus[ownProps.itype].error,
+  errormsg: state.itemsStatus[ownProps.itype].errormsg,
   itemsFetchError: state.itemsStatus[ownProps.itype].fetchError,
-  warning: state.itemsStatus[ownProps.itype].warning,
-  success: state.itemsStatus[ownProps.itype].success,
+  warningmsg: state.itemsStatus[ownProps.itype].warningmsg,
+  successmsg: state.itemsStatus[ownProps.itype].successmsg,
   allItems: state.itemsStatus[ownProps.itype].all,
   pager: state.itemsPager[ownProps.itype],
   showFS: state.itemsShow[ownProps.itype].fsOn

@@ -18,7 +18,7 @@ function minMax(data1, termin) {
 }
 
 function nuoIki(weld) {
-  if (weld.data4) return {nuo: "", iki: ""};
+  if (weld.status == -1 || weld.data4) return { nuo: "", iki: "" };
   if (!weld.data2) return minMax(weld.data1, terminai[0]);
   if (!weld.data3) return minMax(weld.data1, terminai[1]);
   if (!weld.data4) return minMax(weld.data1, terminai[2]);
@@ -32,7 +32,7 @@ function toShort(d) {
 }
 
 function zerofill(n, total) {
-  return ('0000' + n).slice(-total);
+  return ("0000" + n).slice(-total);
 }
 
-export {nuoIki};
+export { nuoIki };

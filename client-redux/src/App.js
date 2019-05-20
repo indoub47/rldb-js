@@ -60,13 +60,13 @@ class App extends Component {
             </div>
             <Switch>
               <PrivateRoute exact path='/defects' component={Items} itype={iTypes.defect} />
-              <PrivateRoute path='/defects/edit/:_id' component={EditItem} itype={iTypes.defect} />
+              <PrivateRoute path='/defects/edit/:id' component={EditItem} itype={iTypes.defect} />
               <PrivateRoute exact path='/defects/new' component={EditItem} itype={iTypes.defect} />
               <PrivateRoute exact path='/weldings' component={Items} itype={iTypes.welding} />
-              <PrivateRoute path='/weldings/edit/:_id' component={EditItem} itype={iTypes.welding} />
+              <PrivateRoute path='/weldings/edit/:id' component={EditItem} itype={iTypes.welding} />
               <PrivateRoute exact path='/weldings/new' component={EditItem} itype={iTypes.welding} />
               <PrivateRoute exact path='/employees' component={Items} itype={iTypes.employee} />
-              <PrivateRoute path='/employees/edit/:_id' component={EditItem} itype={iTypes.employee} />
+              <PrivateRoute path='/employees/edit/:id' component={EditItem} itype={iTypes.employee} />
               <PrivateRoute exact path='/employees/new' component={EditItem} itype={iTypes.employee} />
               <PrivateRoute exact path='/queries/edit/:itype' component={EditQueries} />
               <PrivateRoute exact path='/report/defects-undone' component={Report} rtype={rTypes.defectsUndone} key={rTypes.defectsUndone} />

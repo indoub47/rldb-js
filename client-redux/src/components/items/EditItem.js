@@ -19,12 +19,14 @@ class EditItem extends Component {
   }
 
   componentDidMount() {
-    if (this.props.match.params._id) {
-      const _id = this.props.match.params._id;
+    if (this.props.match.params.id) {
+      const id = parseInt(this.props.match.params.id);
+      //console.log("id", id);
+      //console.log("items", this.props.items);
       const item = this.props.items.find(
-        d => d._id === _id
+        item => item.id === id
       );
-      //console.log("item", item);
+      ///console.log("item", item);
       if (item) {
         this.setState({ item });
       }
@@ -32,12 +34,12 @@ class EditItem extends Component {
   }
 
   onChange(e) {
-    const numberProps = ["km", "pk", "m", "bmetai", "dl", "dh"];
+    //const numberProps = ["km", "pk", "m", "bmetai", "dl", "dh"];
     const propName = e.target.name;
     let propValue = e.target.value;
-    if (numberProps.includes(propName)) {
-      propValue = Number(e.target.value);
-    }
+    //if (numberProps.includes(propName)) {
+    //  propValue = Number(e.target.value);
+    //}
     const item = {
       ...this.state.item,
       [propName]: propValue
@@ -53,7 +55,7 @@ class EditItem extends Component {
     if (item.id) {
       this.props.updateItem(item, this.props.history, this.props.itype);
     } else {
-      item.id = getId();
+      // item.id = getId();
       this.props.insertItem(item, this.props.itype);
     }
   }
@@ -64,7 +66,7 @@ class EditItem extends Component {
 
     return (
       <React.Fragment>
-        {this.props.error && <ErrorAlert message={this.props.error.message} />}
+        {this.props.errormsg && <ErrorAlert message={this.props.errormsg} />}
         <IsLoading when={this.props.isBusy} />
         {mainDataForm({
           item: this.state.item, 
@@ -83,13 +85,13 @@ EditItem.propTypes = {
   updateItem: PropTypes.func.isRequired,
   insertItem: PropTypes.func.isRequired,
   isBusy: PropTypes.bool,
-  error: PropTypes.object,
+  errormsg: PropTypes.string,
   itype: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = (state, ownProps) => ({
   isBusy: state.itemsStatus[ownProps.itype].isBusy,
-  error: state.itemsStatus[ownProps.itype].error,
+  errormsg: state.itemsStatus[ownProps.itype].errormsg,
   things: state.things.data,
   items: state.fsedItems[ownProps.itype].data
 });

@@ -1,17 +1,22 @@
 const express = require("express");
 const router = express.Router();
-const secret = require("../../config/secret.js");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
 const validateRegisterInput = require("../../validation/register");
 const validateLoginInput = require("../../validation/login");
-//const getUserId = require("../../utilities/get-user-id");
+const insertStmtText = require("../SQLStatements").insert;
+const SECRET_KEY = require("../../config/secret.js").SECRET_KEY;
+const REGIONS = require("../../config/settings").REGIONS;
 
-// Load User model
-const User = require("../../models/User");
 
-// @route POST api/users/register
+const Database = require("better-sqlite3");
+const db = new Database("./db/dnbl.sqlite", {
+  verbose: console.log,
+  fileMustExist: true
+});
+
+// @route POST api/sqlite/users/register
 // @desc Signup user
 // @access Public
 router.post("/register", (req, res) => {
@@ -22,47 +27,51 @@ router.post("/register", (req, res) => {
   }
 
   // if email exists, response with 400 status
-  User.findOne({ email: req.body.email })
-    .then(user => {
-      if (user) {
-        return res.status(400).json({ email: "Email already exists" });
-      } else {
-        // create new user
-        let newUser = new User({
-          name: req.body.name,
-          email: req.body.email,
-          password: req.body.password,
-          role: req.body.role,
-          region: req.body.region,
-          active: false
-        });
+  const stmtCheckEmailText = 'SELECT COUNT(*) AS count FROM users WHERE email = ?';
+  try {
+    const stmtCheckEmail = db.prepare(stmtCheckEmailText);
+    const emailExists = stmtCheckEmail.get(req.body.email).count > 0;
+    if (emailExists) {
+      return res.status(400).json({ email: "Email already exists" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({error});
+  }
 
-        // hash user's password and response with a newly created user
-        bcrypt.genSalt(10, (err, salt) => {
-          bcrypt.hash(newUser.password, salt, (err, hash) => {
-            if (err) return res.status(500).json({ error });
-            // change user's password with a hash
-            newUser.password = hash;
-            // save new user and respond with a new user
-            newUser
-              .save()
-              .then(user => {
-                delete user.password;
-                res.status(200).json(user);
-              })
-              .catch(err => {
-                return res.status(500).json({ error });
-              }); // catch(err =>...)
-          }); // bcrypt.hash(newUser.password...)
-        }); // bcrypt.genSalt(10...)
-      } // else
-    }) // .then(user => ...
-    .catch(error => {
-      return res.status(500).json({ error });
-    }); // .catch(error =>... )
+  // create new user
+  let newUser = {
+    email: req.body.email,
+    name: req.body.name,
+    role: req.body.role,
+    regbit: REGIONS[req.body.region].bit,
+    active: 0
+  };
+
+   // hash user's password and response with a newly created user
+  bcrypt.genSalt(10, (error, salt) => {
+    if (error) return res.status(500).json({error});
+    bcrypt.hash(req.body.password, salt, (error, hash) => {
+      if (error) return res.status(500).json({error});
+      // set user's password with a hash
+      newUser.password = hash; 
+
+      const stmtText = insertStmtText(newUser, "users");
+      console.log("stmtText", stmtText);
+      try {
+        const stmt = db.prepare(stmtText);
+        const info = stmt.run(newUser);
+        delete newUser.password;
+        res.status(200).json(newUser);
+      } catch (error) {
+        console.log("error inserting user", error);
+        return res.status(500).json({error});
+      }
+    });
+  });
 });
 
-// @route POST api/users/login
+// @route POST api/sqlite/users/login
 // @desc Login user
 // @access Public
 router.post("/login", (req, res) => {
@@ -71,61 +80,64 @@ router.post("/login", (req, res) => {
   const badLoginResponse = { msg: "wrong password or email" };
 
   // validate fields
-  //console.log("req.body", req.body);
-
   const { errors, isValid } = validateLoginInput(req.body);
   if (!isValid) {
     return res.status(400).json(errors);
   }
 
-  // find the user by email
   const email = req.body.email;
   const password = req.body.password;
 
   // Find user by email
-  User.findOne({ email, active: true }, (err, user) => {
-    // some error occured
-    if (err) {
-      return res.status(500).json({ err });
-    }
-    // active email not found
+  const stmtTxt = 'SELECT * FROM users WHERE email = ? AND active = 1';
+  let user = null;
+  try {
+    const stmt = db.prepare(stmtTxt);
+    user = stmt.get(email);
     if (!user) {
       return res.status(404).json(badLoginResponse);
-    }
-    // email found, check if passwords match
-    bcrypt.compare(password, user.password).then(isMatch => {
-      if (isMatch) {
-        // email and password match
-        // create jwt payload
-        const payload = {
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          region: user.region
-        };
-        // sign the jwt
-        jwt.sign(
-          payload,
-          secret.SECRET_KEY,
-          { expiresIn: 36000 },
-          (err, token) => {
-            if (!err) {
-              res.status(200).json({ success: true, user: payload, token: "Bearer " + token });
-            } else {
-              // error signing token
-              res.status(500).json({ err });
-            }
-          }
+    }    
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({error});
+  }
+
+  // email found, check if passwords match
+  bcrypt.compare(password, user.password)
+  .then(isMatch => {
+    if (isMatch) {
+      // email and password match
+      // create jwt payload
+      const payload = {
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        region: Object.keys(REGIONS).find(regionId => REGIONS[regionId].bit === user.regbit)
+      };
+      // sign the jwt
+      jwt.sign(payload, SECRET_KEY, { expiresIn: 36000 }, (err, token) => {
+        if (err) {
+          // error signing token
+          console.log("token signing error", err)
+          return res.status(500).json({ err });
+        }
+        
+        return res.status(200).json(
+          {success: true, user: payload, token: "Bearer " + token}
         );
-      } else {
-        // email and password don't match
-        res.status(400).json(badLoginResponse);
-      }
-    });
+      });
+    } else {
+      // isMatch = false, email and password don't match
+      return res.status(400).json(badLoginResponse);
+    }
+  })
+  .catch(error => {
+    console.log("Bcrypt error", error);
+    return res.status(500).json({error})
   });
 });
 
-// @route GET api/users/current
+// @route GET api/sqlite/users/current
 // @desc Get current user
 // @access Private
 router.get(
@@ -136,7 +148,7 @@ router.get(
       email: req.user.email,
       name: req.user.name,
       role: req.user.role,
-      region: req.user.region
+      region: Object.keys(REGIONS).find(regionId => REGIONS[regionId].bit === req.user.regbit)
     });
   }
 );

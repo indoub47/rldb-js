@@ -1,5 +1,5 @@
 function liko(defect) {
-  if (defect.panaikinta || defect.dtvarsl || !defect.dtermin) return "";
+  if (!defect.dtermin || defect.daction) return "";
   return Math.floor((Date.parse(defect.dtermin) - Date.now())/86400000)
 }
 

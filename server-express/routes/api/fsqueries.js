@@ -1,136 +1,188 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const passport = require('passport');
-const secret = require('../../config/secret');
-const dbName = secret.DB_NAME;
-const dbUri = secret.DB_URI;
-const ObjectId = require("mongodb").ObjectID;
+const passport = require("passport");
+const SQLStatements = require("../SQLStatements");
 
-const MongoClient = require('mongodb').MongoClient;
+const Database = require("better-sqlite3");
+const db = new Database("./db/dnbl.sqlite", {
+  verbose: console.log,
+  fileMustExist: true
+});
+const collName = "fsqueries";
+
+const nameIsNotUnique = (name, email, db) => {
+  const stmtText = `SELECT COUNT(*) AS count FROM ${collName} WHERE email = ? AND name = ?`;
+  const stmt = db.prepare(stmtText);
+  return stmt.get(email, name).count > 0;
+};
+
+const validate = (draft, exclude) => {
+  let result = [];
+  if (!exclude.includes("id")) {
+    if (draft.id == null || !(Number.isInteger(draft.id) && draft.id > 0)) {
+      result.push({
+        prop: "id",
+        msg: "id is required and must be a positive integer"
+      });
+    }
+  }
+  if (!exclude.includes("name")) {
+    if (draft.name == null || draft.name.length < 1 || draft.name.length > 25) {
+      result.push({
+        prop: "name",
+        msg:
+          "name is required and its length must be between 1 and 25 characters"
+      });
+    }
+  }
+  if (!exclude.includes("filter")) {
+    if (draft.filter != null && draft.filter.length > 500) {
+      result.push({
+        prop: "filter",
+        msg: "filter length must up to 500 characters"
+      });
+    }
+  }
+  if (!exclude.includes("sort")) {
+    if (draft.sort != null && draft.sort.length > 500) {
+      result.push({
+        prop: "sort",
+        msg: "sort length must up to 500 characters"
+      });
+    }
+  }
+  if (!exclude.includes("itype")) {
+    if (draft.itype == null || !["defect", "welding"].includes(draft.itype)) {
+      result.push({
+        prop: "itype",
+        msg: "itype is required and must be chosen from itypes list"
+      });
+    }
+  }
+  if (!exclude.includes("email")) {
+    if (
+      draft.email == null ||
+      draft.email.length < 5 ||
+      draft.name.length > 255
+    ) {
+      result.push({
+        prop: "email",
+        msg:
+          "email is required and its length must be between 5 and 255 characters"
+      });
+    }
+  }
+  if (result.length === 0) return null;
+  let obj = {};
+  result.forEach(item => (obj[item.prop] = item.msg));
+  return obj;
+};
 
 // force to authenticate
-router.use(passport.authenticate('jwt', { session: false }));
+router.use(passport.authenticate("jwt", { session: false }));
 
-// @route GET api/fsquery/fetch
+// @route GET api/sqlite/fsquery/fetch
 // @desc Get fsqueries for particular itype and email
 // @params itype string
 // @access Public
-router.get(
-  '/fetch',
-  (req, res) => {
-    MongoClient.connect(
-      dbUri,
-      {useNewUrlParser: true},
-      (err, client) => {
-        if (err) return res.status(500).send(err);
-        const filter = {email: req.user.email, itype: req.query.itype};
-        const collName = 'fsqueries';
-        client.db(dbName)
-          .collection(collName)
-          .find(filter)
-          .toArray((err, result) => {
-            if (err) return res.status(500).send(err);
-            return res.status(200).json(result);
-          });
-      });
-  });
+router.get("/fetch", (req, res) => {
+  const email = req.user.email;
+  const itype = req.query.itype;
+  const stmtText = `SELECT * FROM ${collName} WHERE email = ? AND itype = ?`;
+  try {
+    const stmt = db.prepare(stmtText);
+    const fsqueries = stmt.all(email, itype);
+    return res.status(200).json(fsqueries);
+  } catch (err) {
+    console.log("email, itype, err", email, itype, err);
+    return res.status(500).send(err);
+  }
+});
 
-// @route DELETE api/fsquery/delete
+// @route DELETE api/sqlite/fsquery/delete
 // @desc Delete fsquery
 // @params id string
 // @access Public
-router.delete(
-  '/delete',
-  (req, res) => {
-    MongoClient.connect(
-      dbUri,
-      {useNewUrlParser: true},
-      (err, client) => {
-        if (err) return res.status(500).send(err);
-        const oid = ObjectId(req.query.id);
-        const filter = {_id: oid, email: req.user.email};
-        const collName = 'fsqueries';
-        client.db(dbName)
-          .collection(collName)
-          .findOneAndDelete(
-            filter,
-            {projection: { _id: true }},
-            (err, result) => {
-              if (err) return res.status(500).send(err);
-              return res.status(200).send({
-                case: 'success',
-                message: 'Užklausa sėkmingai pašalinta',
-                data: result.value._id
-              });
-            });
-      });
-  });
+router.delete("/delete", (req, res) => {
+  const email = req.user.email;
+  const id = req.query.id;
+  const stmtText = SQLStatements.delete(collName, 'email = ? AND id = ?');
+  // email - kad apsaugoti, kad galėtų ištrinti tik savus
+  try {
+    const stmt = db.prepare(stmtText);
+    const info = stmt.run(email, id);
+    return res.status(200).json({ ...info, id });
+  } catch (err) {
+    console.log("email, id, err", email, id, err);
+    return res.status(500).send(err);
+  }
+});
 
-
-// @route POST api/fsquery/update
+// @route POST api/sqlite/fsquery/update
 // @desc Delete fsquery
 // @body draft object
 // @access Public
-router.post(
-  '/update',
-  (req, res) => {
-    MongoClient.connect(
-      dbUri,
-      {useNewUrlParser: true},
-      (err, client) => {
-        if (err) return res.status(500).send(err);
-        let draft = req.body.draft;
-        //let draft = JSON.parse(req.body.draft);
-        const oid = ObjectId(draft._id);
-        const email = req.user.email;
-        draft.email = email;
-        delete draft._id;
-        const filter = {_id: oid, email: req.user.email};
-        const collName = 'fsqueries';
-        client.db(dbName)
-          .collection(collName)
-          .findOneAndUpdate(
-            filter,
-            {$set: draft}, // update query
-            {
-              returnNewDocument: true,
-              new: true,
-              returnOriginal: false
-            }, // options
-            (err, result) => {
-              if (err) return res.status(500).send(err);
-              return res.status(200).send({
-                case: "success",
-                message: `Užklausa, kurios ID ${draft.id}, sėkmingai pakeista`,
-                data: result.value
-              });
-            });
-      });
-  });
-  
-// @route PUT api/fsquery/insert
+router.post("/update", (req, res) => {
+  let draft = req.body;
+  draft.email = req.user.email;
+
+  const validation = validate(draft, ["email"]);
+  if (validation) {
+    return res.status(400).send(validation);
+  }  
+
+  try {
+    // check if name is unique
+    const stmtUniqueText = `SELECT COUNT(*) AS count FROM ${collName} WHERE email = ? AND name = ? AND itype = ? AND id <> ?`;
+    const stmtUnique = db.prepare(stmtUniqueText);
+    const unique =
+      stmtUnique.get(draft.email, draft.name, draft.itype, draft.id).count ===
+      0;
+    if (!unique) return res.status(400).send({ msg: "name must be unique" });
+
+    // perform update
+    const filter = 'email = @email AND id = @id';
+    const stmtText = SQLStatements.update(draft, collName, filter, ["id", "email"]);
+    const stmt = db.prepare(stmtText);
+    const info = stmt.run(draft);
+    return res.status(200).json({ ...info, draft });
+  } catch (err) {
+    console.log("draft, err", draft, err);
+    return res.status(500).send(err);
+  }
+});
+
+// @route PUT api/sqlite/fsquery/insert
 // @desc Insert fsquery
 // @body draft object
 // @access Public
-router.put('/insert', (req, res) => {
-  MongoClient.connect(dbUri, {useNewUrlParser: true})
-  .then(client => {
-      let draft = req.body.draft;   
-      //let draft = JSON.parse(req.body.draft);     
-      draft.email = req.user.email;
-      return client.db(dbName).collection('fsqueries').insertOne(draft)
-  })
-  .then(result => {
-    return res.status(200).send({
-              case: "success",
-              message: `Užklausa sėkmingai įkišta`,
-              data: result.ops[0]
-            });
-  })
-  .catch(err => {
-    return res.status(500).send(err);
-  });
-});
+router.put("/insert", (req, res) => {
+  let draft = req.body;
+  draft.email = req.user.email;
+  delete draft.id;
 
+  const validation = validate(draft, ["email", "id"]);
+  if (validation) {
+    return res.status(400).send(validation);
+  }
+  
+  try {
+    // check if name is unique
+    const stmtUniqueText = `SELECT COUNT(*) AS count FROM ${collName} WHERE email = ? AND name = ? AND itype = ?`;
+    const stmtUnique = db.prepare(stmtUniqueText);
+    const unique =
+      stmtUnique.get(draft.email, draft.name, draft.itype).count === 0;
+    if (!unique) return res.status(400).send({ msg: "name must be unique" });
+    
+    // perform insert
+    const stmtText = SQLStatements.insert(draft, collName);
+    const stmt = db.prepare(stmtText);
+    const info = stmt.run(draft);
+    return res.status(200).json({ ...draft, id: info.lastInsertRowid });
+  } catch (err) {
+    console.log("draft, err", draft, err);
+    return res.status(500).send(err);
+  }
+});
 
 module.exports = router;

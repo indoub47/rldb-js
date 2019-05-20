@@ -146,12 +146,11 @@ class EditQueries extends Component {
 
     const itype = this.props.match.params.itype;
     draft.itype = itype;
-    console.log("EQs submitDraft, draft", draft);
+    
     if (draft.id) {
-      this.props.updateQuery(draft, itype);
+      this.props.updateQuery(draft);
     } else {
-      draft.id = getId();
-      this.props.insertQuery(draft, itype);
+      this.props.insertQuery(draft);
     }
   }
 
