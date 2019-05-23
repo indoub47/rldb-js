@@ -11,14 +11,15 @@ const MainDataForm = ({item, onChange, things}) => {
   // select controls options
   // galbūt reikėtų iškelti prieš funciją, kad nekurtų kaskart kai renderina
   //console.log("things", things);
-  const meistrijaOptions = createOptions(things.meistrija, "Meistrija", x => x.abbr + ", " + x.name);
-  const kkategOptions = createOptions(things.kkateg, "Kelio kategorija", x => x.id);
-  const btipasOptions = createOptions(things.btipas, "Bėgio tipas", x => x.id);
-  const bgamyklOptions = createOptions(things.bgamykl, "Bėgio gamykla", x => x.id);
-  const siuleOptions = createOptions(things.siule, "Siūlė", x => x.id);
-  const aparOptions = createOptions(things.defskop, "Defektoskopas", x => x.id);
-  const operOptions = createOptions(things.operat, "Operatorius", x => x.id);
-  const actionOptions = createOptions([{id: 0, name: "-"}, {id: 1, name: "pakeistas bėgis"},{id: 2, name: "sutvarsliuota"}], "Veiksmas", x => x.name);
+  const meistrijaOptions = createOptions(things.meistrija.sort((m1, m2) => (m1.ind - m2.ind)), "-- nenurodyta --", x => x.abbr + ", " + x.name);
+  const kkategOptions = createOptions(things.kkateg, "-- nenurodyta --", x => x.id);
+  const pavojOptions = createOptions(things.pavoj.sort((p1, p2) => (p1.ind - p2.ind)), "-- nenurodyta --", x => x.id);
+  const btipasOptions = createOptions(things.btipas, "-- nenurodyta --", x => x.id);
+  const bgamyklOptions = createOptions(things.bgamykl, "-- nenurodyta --", x => x.id);
+  const siuleOptions = createOptions(things.siule, "-- nenurodyta --", x => x.id);
+  const aparOptions = createOptions(things.defskop, "-- nenurodyta --", x => x.id);
+  const operOptions = createOptions(things.operat, "-- nenurodyta --", x => x.id);
+  const actionOptions = createOptions([{id: 0, name: ""}, {id: 1, name: "pakeistas bėgis"},{id: 2, name: "sutvarsliuota"}], "-- nenurodyta --", x => x.name);
 
   return (     
     <div className="container item-info border border-primary text-center">
@@ -186,14 +187,14 @@ const MainDataForm = ({item, onChange, things}) => {
           placeholder="H"
           value={absent(item.dh)}
           onChange={onChange}
-        />                 
-        <TextFieldGroup 
-          label="Pavojingumas"
-          divClassname="form-group col-3"
+        />
+        <SelectInputGroup
           id="item-pavoj"
           name="pavoj"
-          placeholder="Pavojingumas"
+          label="Pavojingumo laipsnis"
+          divClassname="form-group col-3"
           value={absent(item.pavoj)}
+          options={pavojOptions}
           onChange={onChange}
         />
       </div>  

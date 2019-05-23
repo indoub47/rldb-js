@@ -23,7 +23,8 @@ import * as iTypes from "../../itypes";
 import getInitialState from "../functions/getInitialState";
 
 const stateObj = {
-  errormsg: null,
+  itemListErrorMsg: null,
+  singleItemErrorMsg: null,
   fetchError: null,
   warningmsg: null,
   successmsg: null,
@@ -42,9 +43,10 @@ export default function(state = initialState, action) {
           ...state[action.payload.itype],
           warningmsg: null,
           successmsg: null,
-          errormsg: null,
+          itemListErrorMsg: null,
+          singleItemErrorMsg: null,
           fetchError: null,
-          isBusy: true,
+          isBusy: true
         }
       };
 
@@ -57,7 +59,8 @@ export default function(state = initialState, action) {
           ...state[action.payload.itype],
           warningmsg: null,
           successmsg: null,
-          errormsg: null,
+          itemListErrorMsg: null,
+          singleItemErrorMsg: null,
           isBusy: true
         }
       };
@@ -79,7 +82,8 @@ export default function(state = initialState, action) {
         ...state,
         [action.payload.itype]: {
           ...state[action.payload.itype],
-          errormsg: null,
+          itemListErrorMsg: null,
+          singleItemErrorMsg: null,
           isBusy: false
         }
       };
@@ -97,11 +101,19 @@ export default function(state = initialState, action) {
     case ITEM_DELETE_FAILURE:
     case ITEM_UPDATE_FAILURE:
     case ITEM_INSERT_FAILURE:
+      console.log("ITEM_..._FAILURE action.payload", action.payload);
       return {
         ...state,
         [action.payload.itype]: {
           ...state[action.payload.itype],
-          errormsg: action.payload.errormsg,
+          itemListErrorMsg:
+            action.payload.target === "ITEM_LIST"
+              ? action.payload.errormsg
+              : null,
+          singleItemErrorMsg:
+            action.payload.target === "SINGLE_ITEM"
+              ? action.payload.errormsg
+              : null,
           isBusy: false
         }
       };
@@ -111,7 +123,8 @@ export default function(state = initialState, action) {
         ...state,
         [action.payload.itype]: {
           ...state[action.payload.itype],
-          errormsg: null
+          itemListErrorMsg: null,
+          singleItemErrorMsg: null
         }
       };
 

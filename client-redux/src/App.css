@@ -167,3 +167,7 @@ li.ellipsis {
 }
 
 /* end of spinner */
+
+label {
+  font-weight: bold;
+}

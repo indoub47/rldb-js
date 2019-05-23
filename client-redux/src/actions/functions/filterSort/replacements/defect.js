@@ -14,7 +14,7 @@ export const filterReplacements = {
   dl: "x.dl",
   pavoj: "x.pavoj",
   btipas: "x.btipas",
-  bgamykla: "x.bgamykla",
+  bgamykl: "x.bgamykl",
   bmetai: "x.bmetai",
   kkateg: "x.kkateg",
   oper: "x.oper",
@@ -46,7 +46,7 @@ export function getSortingReplacement(fieldName, x) {
     case "dl": return x.dl;
     case "pavoj": return x.pavoj;
     case "btipas": return x.btipas;
-    case "bgamykla": return x.bgamykla;
+    case "bgamykl": return x.bgamykl;
     case "bmetai": return x.bmetai;
     case "daptik": return x.daptik;
     case "dtermin": return x.dtermin;

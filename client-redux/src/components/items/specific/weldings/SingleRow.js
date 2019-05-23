@@ -70,7 +70,7 @@ const ItemHeadRow = () => {
   return (
     <tr>
       <th className="id text-right">id</th>
-      <td className="id text-right">oldid</td>
+      <th className="id text-right">oldid</th>
       <th className="region">region</th>
       <th className="linija">linija</th>
       <th className="kelias">kelias</th>

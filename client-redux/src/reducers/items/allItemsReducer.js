@@ -55,6 +55,7 @@ export default function(state = initialState, action) {
     case ITEM_DELETE_SUCCESS:
       if (action.payload.id == null) return state;
       ind = state[action.payload.itype].findIndex(x => x.id === action.payload.id);
+      console.log("locally found index of id", ind, action.payload.id);
       if (ind < 0) return state; // jeigu kartais nerastų tokio id...
       return {
         ...state,

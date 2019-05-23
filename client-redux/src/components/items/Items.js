@@ -18,7 +18,7 @@ import {
   pageChange,
   itemsPerPageChange,
   toggleFS,
-  hideError,
+  hideItemListError,
   hideWarning,
   hideSuccess} from "../../actions/itemsActions";
 import { fetchQueries } from "../../actions/queriesActions";
@@ -44,7 +44,7 @@ class Items extends Component {
     this.refreshItemsAll = this.refreshItemsAll.bind(this);
     this.hideSuccess = this.hideSuccess.bind(this);
     this.hideWarning = this.hideWarning.bind(this);
-    this.hideError = this.hideError.bind(this);
+    //this.hideError = this.hideError.bind(this);
     this.getItems = this.getItems.bind(this);
   }
 
@@ -67,6 +67,13 @@ class Items extends Component {
     if (prevProps.queriesAreValid && !this.props.queriesAreValid) {
       this.props.fetchQueries(this.props.itype);
     }
+  }
+
+  componentWillUnmount() {
+    this.props.hideItemListError(this.props.itype);
+    this.props.hideWarning(this.props.itype);
+    this.props.hideSuccess(this.props.itype);
+    console.log("items component will unmount");
   }
 
   pageChange(pageIndex) {
@@ -132,8 +139,8 @@ class Items extends Component {
     this.props.hideWarning(this.props.itype);
   }
 
-  hideError() {
-    this.props.hideError(this.props.itype);
+  hideItemListError() {
+    this.props.hideItemListError(this.props.itype);
   }
 
   getItems() {
@@ -310,7 +317,7 @@ const mapStateToProps = (state, ownProps) => ({
   fsedItems: state.fsedItems[ownProps.itype].data,
   fsedItemsAreValid: state.fsedItems[ownProps.itype].valid,
   itemsIsLoading: state.itemsStatus[ownProps.itype].isBusy,
-  errormsg: state.itemsStatus[ownProps.itype].errormsg,
+  errormsg: state.itemsStatus[ownProps.itype].itemListErrorMsg,
   itemsFetchError: state.itemsStatus[ownProps.itype].fetchError,
   warningmsg: state.itemsStatus[ownProps.itype].warningmsg,
   successmsg: state.itemsStatus[ownProps.itype].successmsg,
@@ -334,7 +341,7 @@ export default connect(
     pageChange,
     itemsPerPageChange,
     toggleFS,
-    hideError,
+    hideItemListError,
     hideWarning,
     hideSuccess
   }

@@ -179,7 +179,7 @@ router.post("/update", (req, res) => {
   try {
     const stmtText = SQLStatements.update(draft, coll.name, filter, ["id", "regbit"]);
     const info = db.prepare(stmtText).run(draft);
-    if (info.changes = 0) {
+    if (info.changes === 0) {
       return res.status(500).send({
         ok: 0,
         reason: "unknown",
@@ -207,7 +207,7 @@ router.post("/update", (req, res) => {
     return res.status(200).send({
       ok: 0,
       reason: "server error",
-      message:  `${coll.itemNames.Item}, kurio ID ${draftId}, buvo pakeistas, bet mėginant atsisiųsti atnaujintą įrašo versiją, įvyko duomenų bazės klaida. Siūloma atnaujinti įrašus programoje`,
+      msg: `${coll.itemNames.Item}, kurio ID ${draftId}, buvo pakeistas, bet mėginant atsisiųsti atnaujintą įrašo versiją, įvyko duomenų bazės klaida. Siūloma atnaujinti įrašus programoje`,
       item: {...draft, id: draftId, regbit: req.user.regbit}
     });
   }
@@ -219,23 +219,41 @@ router.post("/update", (req, res) => {
 router.put("/insert", (req, res, next) => {
   const itype = req.body.itype || req.query.itype;
   const coll = COLLECTIONMAP.find(c => c.itype === itype);
-  if (!coll) return res.status(404).send("no collection");
+  if (!coll) return res.status(400).send({
+    ok: 0,
+    reason: "bad criteria",
+    msg: "no collection " + itype
+  });
 
   // check if sufficient rights to update
   if (!coll.insertBy.includes(req.user.role)) {
-    return res.status(400).send({
-        case: "warning",
-        message: `tu neturi teisės redaguoti ${coll.name} įrašų`
-      });
+    return res.status(403).send({
+      ok: 0,
+      reason: "bad criteria",
+      msg: `tu neturi teisės redaguoti ${coll.name} įrašų`
+    });
   }
 
   // validate draft here
-  const result = validate(req.body.draft, itype, false);
+  let draft = req.body.draft;
+  
+  draft.regbit = req.user.regbit;
+  draft.v = 0;
+  if (COLLECTIONMAP.autoId) {
+    delete draft.id;
+  }
+
+  const result = validate(req.body.draft, itype, true);
+  console.log("insert item validation result", result);
   if (result.hasErrors) {
-    return res.status(200).send(result.errors);
+    return res.status(400).send({
+        ok: 0,
+        reason: "bad draft",
+        errors: result.errors
+    });
   }
   
-  let draft = result.item;    
+  draft = result.item;    
 
   // check if there exist some record with the same place
   if (coll.samePlace) {
@@ -246,55 +264,58 @@ router.put("/insert", (req, res, next) => {
       const spStmtText = "SELECT * FROM " + coll.name + spFilter;
       const samePlaceItem = db.prepare(spStmtText).get(draft, req.user.regbit);
       if (samePlaceItem) {
-      return res.status(200).send({
-          case: "warning",
-          message: `${coll.itemNames.Item} nesukurtas - šitoje vietoje jau yra įrašas, jo ID: ${samePlaceItem.id}`
+        return res.status(400).send({
+          ok: 0,
+          reason: "bad draft",
+          msg: `${coll.itemNames.Item} nesukurtas - šitoje vietoje jau yra įrašas, jo ID: ${samePlaceItem.id}`
         });
       }
     } catch (error) {
-      console.log("same place error", error);
-      return res.status(500).send(error);
+      return res.status(500).send({
+        ok: 0,
+        reason: "server error",
+        msg: "Serverio klaida, mėginant patikrinti ar toje pačioje vietoje yra objektas"
+      });
     }    
   }
 
   // same place not found, so attempt to insert
-  draft.regbit = req.user.regbit;
-  draft.v = 0;
-  if (COLLECTIONMAP.autoId) {
-    delete draft.id;
-  }
-
   try {
     const stmtText = SQLStatements.insert(draft, coll.name);
     const info = db.prepare(stmtText).run(draft);
     if (info.changes === 0) {
-      return res.status(200).send({
-        case: "warning",
-        message: `${coll.itemNames.Item} nesukurtas dėl nežinomos priežasties`
+      return res.status(500).send({
+        ok: 0,
+        reason: "unknown",
+        msg: `${coll.itemNames.Item} nesukurtas dėl nežinomos priežasties`
       });
     }
     if (!draft.id) {
       draft.id = info.lastInsertRowid
     };
   } catch (error) {
-    console.log("insert error", error)
-    return res.status(500).send(error);
+      return res.status(500).send({
+        ok: 0,
+        reason: "server error",
+        msg: "Serverio klaida, mėginant įrašyti naują objektą į DB"
+      });
   }
 
   // fetch inserted version
   try {
     const inserted = db.prepare(`SELECT * FROM ${coll.name} WHERE id = ?`).get(draft.id);
     return res.status(200).send({
-      case: "success",
-      message: `${coll.itemNames.Item} sėkmingai sukurtas. Jo ID - ${inserted.id}`,
-      data: inserted
+      ok: 1,
+      msg: `${coll.itemNames.Item} sėkmingai sukurtas. Jo ID - ${inserted.id}`,
+      item: inserted
     });
   } catch (error) {
     console.log("fetch inserted item error", error);
     return res.status(200).send({
-      case: "warning",
-      message:  `${coll.itemNames.Item}, kurio ID ${draft.id}, buvo sukurtas, bet mėginant atsisiųsti atnaujintą įrašo versiją, įvyko duomenų bazės klaida. Siūloma atnaujinti įrašus programoje`,
-      data: {draft}
+      ok: 0,
+      reason: "server error",
+      msg:  `${coll.itemNames.Item}, kurio ID ${draft.id}, buvo sukurtas, bet mėginant atsisiųsti atnaujintą įrašo versiją, įvyko duomenų bazės klaida. Siūloma atnaujinti įrašus programoje`,
+      item: {draft}
     });
   }
 });
@@ -305,32 +326,43 @@ router.put("/insert", (req, res, next) => {
 router.delete("/delete", (req, res, next) => {
   const itype = req.body.itype || req.query.itype;
   const coll = COLLECTIONMAP.find(c => c.itype === itype);
-  if (!coll) return res.status(404).send("no collection");
+  if (!coll) return res.status(400).send({
+    ok: 0,
+    reason: "bad criteria",
+    msg: "no collection " + itype
+  });
 
   // check if sufficient rights to update
   if (!coll.deleteBy.includes(req.user.role)) {
-    return res.status(400).send({
-        case: "warning",
-        message: `tu neturi teisės trinti ${coll.name} įrašų`
-      });
+    return res.status(403).send({
+      ok: 0,
+      reason: "bad criteria",
+      msg: `tu neturi teisės trinti ${coll.name} įrašų`
+    });
   }
 
   const stmtText = `DELETE FROM ${coll.name} WHERE id = ? AND regbit = ? AND v = ?`;
   try {
-    const info = db.prepare(stmtText).run(req.query.id, req.user.regbit, req.query.v);
+    const info = db.prepare(stmtText).run(parseInt(req.query.id), req.user.regbit, parseInt(req.query.v));
     if (info.changes !== 1) {
-      return res.status(200).send({
-            case: "warning",
-            message: `${coll.itemNames.Item} nebuvo pašalintas, nes toks id nerastas arba nesutampa versijos.`
-          });
+      return res.status(500).send({
+        ok: 0,
+        reason: "unknown",
+        msg: `${coll.itemNames.Item} nebuvo pašalintas, nes toks id nerastas arba nesutampa versijos.`
+      });
     } else {
       return res.status(200).send({
-            case: "success",
-            message: `${coll.itemNames.Item}, kurio id ${req.query.id}, pašalintas`
-          }); 
+        ok: 1,
+        msg: `${coll.itemNames.Item}, kurio id ${req.query.id}, pašalintas`,
+        id: parseInt(req.query.id)
+      }); 
     }
   } catch (error) {
-    return res.status(500).send(error);
+      return res.status(500).send({
+        ok: 0,
+        reason: "server error",
+        msg: "Serverio klaida, mėginant panaikinti objekto įrašą DB"
+      });
   }
 });
 

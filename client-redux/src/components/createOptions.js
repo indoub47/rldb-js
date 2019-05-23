@@ -16,8 +16,8 @@ export const createOptions =
         </option>
       );
 
-      if (placeholder) {
-        options.unshift(<option key={"--1"}>{placeholder}</option>)
+      if (placeholder != null) {
+        options.unshift(<option key={"--1"} value=" ">{placeholder}</option>)
       }
       //console.log("option arr", options);
       return options;

@@ -21,7 +21,7 @@ const ItemRow = ({ item, editItem, deleteItem }) => {
       <td className="pavoj">{item.pavoj}</td>
       <td className="kkateg">{item.kkateg}</td>
       <td className="btipas">{item.btipas}</td>
-      <td className="bgamykla">{item.bgamykla}</td>
+      <td className="bgamykl">{item.bgamykl}</td>
       <td className="bmetai">{item.bmetai}</td>
       <td className="oper">{item.oper}</td>
       <td className="apar">{item.apar}</td>
@@ -29,7 +29,7 @@ const ItemRow = ({ item, editItem, deleteItem }) => {
       <td className="dtermin">{item.dtermin}</td>
       <td className="daction">{item.daction}</td>
       <td className="liko">{liko(item)}</td>
-      <td className="pastaba">{item.pastaba}</td>
+      <td className="pastaba">{item.note}</td>
       <td>
         <div className="button-group">
           <button
@@ -82,7 +82,7 @@ const ItemHeadRow = () => {
       <th className="pavoj">pavoj</th>
       <th className="kkateg">kkateg</th>
       <th className="btipas">btipas</th>
-      <th className="bgamykla">bgamykla</th>
+      <th className="bgamykl">bgamykl</th>
       <th className="bmetai">bmetai</th>
       <th className="oper">oper</th>
       <th className="apar">apar</th>
@@ -90,7 +90,7 @@ const ItemHeadRow = () => {
       <th className="dtermin">dtermin</th>
       <th className="daction">daction</th>
       <th className="liko">liko</th>
-      <th className="pastaba">pastaba</th>
+      <th className="note">note</th>
       <th className="controls">controls</th>
     </tr>
   );

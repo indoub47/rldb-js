@@ -2,6 +2,7 @@ const modelProvider = require("./models/modelProvider");
 // parenka kaip konvertuoti duomens į tipą, kuris nurodytas model[prop].type
 const converter = {
   string: { convert: value => value.toString().trim() },
+
   integer: {
     convert: (value, name) => {
       let int = parseInt(value);
@@ -10,6 +11,7 @@ const converter = {
       return int;
     }
   },
+
   number: {
     convert: (value, name) => {
       let nr = Number(value);
@@ -18,16 +20,26 @@ const converter = {
       return nr;
     }
   },
+  
   boolean01: { convert: value => (parseInt(value) === 0 ? 0 : 1) }
 };
 
+// 
 // draft laukus sukonvertuoja į tuos tipus, kurie nurodyti model[prop].type
 // Jeigu konvertuoti nepavyksta, tą lauką įrašo į errors objektą
-function normalize(draft, model) {
+function normalize(draft, model, allErrors) {
   let result = {};
   let errors = {};
+  const keysToSkip = Object.keys(allErrors);
 
   Object.keys(draft).forEach(key => {
+    if (keysToSkip.includes(key)) {
+      // jeigu šitam key jau yra rasta klaida, 
+      // tiesiog perkopijuoja jo reikšmę į result
+      result[key] = draft[key];
+      return;
+    }
+
     try {
       result[key] = converter[model[key].type].convert(draft[key], key);
     } catch (err) {
@@ -35,7 +47,7 @@ function normalize(draft, model) {
       errors[err.prop] = err.msg;
     }
   });
-  return { item: result, errors };
+  return { item: result, normalizationErrors: errors };
 }
 
 // patikrina, ar data yra leistinose ribose - kad nebūtų, pvz. 2019-02-31
@@ -53,7 +65,7 @@ function hasDateOverflow(shortDateString) {
 // klaidos pranešimai, jeigu tikrinant gaunama true
 const validators = {
   isAbsent: {
-    func: value => value == null,
+    func: value => value == null || value === "",
     msg: () => "is required"
   },
 
@@ -107,32 +119,40 @@ const validators = {
   }
 };
 
+function requiredAbsent(draft, model) {
+  let errors = {};
+  Object.keys(model).filter(key => model[key].required).forEach(key => {
+    if(validators.isAbsent.func(draft[key])) {
+      errors[key] = validators.isAbsent.msg();
+    }
+  });
+  return errors;
+}
+
 // Funkcija, kuri atlieka normalizavimą ir tikrinimą.
 // Grąžina kiek įmanoma normalizuoto draft kopiją ir errors
 function validate(draft, itype, insert = true) {
   const model = modelProvider[itype];
   if (!model) throw {msg: `Unrecognized item type ${itype}`};
-  //console.log("before normalization", draft);
-  let { item, errors } = normalize(draft, model);
-  //console.log("after normalization - item and errors", item, errors);
+  
+  let allErrors = {};
 
-  const normalizeErrorKeys = Object.keys(errors);
-
+  // randa tuos laukus, kurie yra required, bet jų reikšmė yra 
+  // null, undefined arba ""
   if (insert) {
-    // patikrina ar visi required laukai yra objekte
-    Object.keys(model)
-      .filter(modelKey => !normalizeErrorKeys.includes(modelKey))
-      .forEach(prop => {
-        if (model[prop].required && validators.isAbsent.func(item[prop])) {
-          errors[prop] = validators.isAbsent.msg(model[prop].params);
-        }
-      });
-  }
+    allErrors = requiredAbsent(draft, model);
+  } 
+  
+  // normalizuoja laukus - sukonvertuoja į tą tipą, koks reikalingas pagal model
+  // laukų, kurie yra required ir neturi reikšmių nenormalizuoja
+  let { item, normalizationErrors } = normalize(draft, model, allErrors);
 
-  // kitus laukus tikrina ar teisingos jų reikšmės
-  //console.log("item", item);
+  allErrors = {...allErrors, ...normalizationErrors};
+  const keysWithErrors = Object.keys(allErrors);
+
+  // likusius laukus tikrina ar teisingos jų reikšmės
   Object.keys(item)
-    .filter(itemKey => !normalizeErrorKeys.includes(itemKey))
+    .filter(itemKey => !keysWithErrors.includes(itemKey))
     .forEach(prop => {
       if (!model[prop]) {
         delete item[prop];
@@ -142,11 +162,14 @@ function validate(draft, itype, insert = true) {
       const validator = validators[model[prop].validator];
       const params = model[prop].params;
       if (validator.func(item[prop], params)) {
-        errors[prop] = validator.msg(params);
+        allErrors[prop] = validator.msg(params);
       }
     });
 
-  return { item, errors, hasErrors: Object.keys(errors).length > 0 };
+  let errorsResult = {};
+  Object.keys(allErrors).forEach(err => errorsResult[err] = {label: model[err].label, msg: allErrors[err]});
+
+  return { item, errors: errorsResult, hasErrors: Object.keys(errorsResult).length > 0 };
 }
 
 module.exports = validate;
