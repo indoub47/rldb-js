@@ -17,7 +17,7 @@ export function getFilterFunc(filterString, fnReplacements) {
 
   const filterFuncString =
     "return " + replaceFieldNames(filterString, fnReplacements);
-  console.log("filterFuncString", filterFuncString);
+  // console.log("filterFuncString", filterFuncString);
   // eslint-disable-next-line
   return new Function("x", filterFuncString);
 }
@@ -50,14 +50,13 @@ function replaceFieldNames(filterString, fnReplacements) {
     .replace(/\|+/g, " || ")
     .replace(/\s+/g, " ");
 
-
   // replaces field names with paths:
   // "fieldName" -> obj["inner_prop"]["fieldName"]
   Object.keys(fnReplacements).forEach(key => {
     const regex = new RegExp("(\\b[\\W]*)(" + key + ")([\\W]*\\b)", "g");
     filterText = filterText.replace(regex, "$1" + fnReplacements[key] + "$3");
   });
-  //console.log("filterText", filterText);
+  // console.log("filterText", filterText);
   return filterText;
 }
 

@@ -12,7 +12,7 @@ class FilterSort extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentQueryId: "",
+      currentQueryId: null,
       filterText: this.props.filterSort.filterText,
       sortText: this.props.filterSort.sortText
     };
@@ -49,7 +49,7 @@ class FilterSort extends Component {
   }
 
   onSelectedQueryChange(e) {
-    const id = e.target.value;
+    const id = parseInt(e.target.value);
     this.setState({ currentQueryId: id });
   }
 

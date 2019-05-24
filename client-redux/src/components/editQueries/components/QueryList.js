@@ -2,6 +2,7 @@ import React from 'react';
 import QueryRow from './QueryRow';
 
 const QueryList = ({queries, remove, setItemForEditing}) => {
+  // console.log("queries", queries);
  
   const queryRows = queries.map(q => 
       <QueryRow 

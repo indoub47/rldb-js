@@ -20,7 +20,8 @@ import {
   toggleFS,
   hideItemListError,
   hideWarning,
-  hideSuccess} from "../../actions/itemsActions";
+  hideSuccess
+} from "../../actions/itemsActions";
 import { fetchQueries } from "../../actions/queriesActions";
 //import * from "../../iTypes";
 
@@ -48,8 +49,7 @@ class Items extends Component {
     this.getItems = this.getItems.bind(this);
   }
 
-  componentDidMount() {   
-    
+  componentDidMount() {
     if (!this.props.fsedItemsAreValid) {
       this.props.fetchItems(this.props.itype);
     }
@@ -60,8 +60,8 @@ class Items extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    //console.log("items.componentDidUpdate props",this.props);
-    if (prevProps.fsedItemsAreValid &&!this.props.fsedItemsAreValid) {
+    // console.log("items.componentDidUpdate props",this.props);
+    if (prevProps.fsedItemsAreValid && !this.props.fsedItemsAreValid) {
       this.props.fetchItems(this.props.itype);
     }
     if (prevProps.queriesAreValid && !this.props.queriesAreValid) {
@@ -73,16 +73,24 @@ class Items extends Component {
     this.props.hideItemListError(this.props.itype);
     this.props.hideWarning(this.props.itype);
     this.props.hideSuccess(this.props.itype);
-    console.log("items component will unmount");
+    // console.log("items component will unmount");
   }
 
   pageChange(pageIndex) {
-    this.props.pageChange(pageIndex, this.props.fsedItems.length, this.props.itype);
+    this.props.pageChange(
+      pageIndex,
+      this.props.fsedItems.length,
+      this.props.itype
+    );
   }
 
   itemsPerPageChange(e) {
     const selectedValue = parseInt(e.target.value, 10);
-    this.props.itemsPerPageChange(selectedValue, this.props.fsedItems.length, this.props.itype);
+    this.props.itemsPerPageChange(
+      selectedValue,
+      this.props.fsedItems.length,
+      this.props.itype
+    );
   }
 
   toggleFilterSort() {
@@ -107,7 +115,11 @@ class Items extends Component {
   }
 
   confirmDelete() {
-    this.props.deleteItem(this.state.idToDelete, this.state.vToDelete,this.props.itype);
+    this.props.deleteItem(
+      this.state.idToDelete,
+      this.state.vToDelete,
+      this.props.itype
+    );
     this.setState({
       showConfirmationDialog: false,
       idToDelete: "",

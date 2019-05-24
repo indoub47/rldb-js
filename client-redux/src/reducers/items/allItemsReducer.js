@@ -35,12 +35,12 @@ export default function(state = initialState, action) {
 
     // edit item
     case ITEM_UPDATE_SUCCESS:
-      console.log("action", action);
+      // console.log("action", action);
       if (!action.payload || !action.payload.item) return state;
       const updatedItem = action.payload.item;
       const itype = action.payload.itype;
       const allItems = state[itype];
-      console.log("itype, allItems", itype, allItems);
+      // console.log("itype, allItems", itype, allItems);
       let ind = allItems.findIndex(x => x.id === updatedItem.id);
       return {
         ...state,
@@ -55,7 +55,7 @@ export default function(state = initialState, action) {
     case ITEM_DELETE_SUCCESS:
       if (action.payload.id == null) return state;
       ind = state[action.payload.itype].findIndex(x => x.id === action.payload.id);
-      console.log("locally found index of id", ind, action.payload.id);
+      // console.log("locally found index of id", ind, action.payload.id);
       if (ind < 0) return state; // jeigu kartais nerastų tokio id...
       return {
         ...state,

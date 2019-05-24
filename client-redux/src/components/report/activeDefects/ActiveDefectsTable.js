@@ -2,7 +2,7 @@ import React from "react";
 
 const ActiveDefectsTable = ({ report }) => {
   if (!report) return null;
-  
+
   const tHead = (
     <thead>
       <tr>
@@ -39,24 +39,22 @@ const ActiveDefectsTable = ({ report }) => {
     );
   };
 
-  //console.log("report right before bodyRows", report);
+  // console.log("report right before bodyRows", report);
   const bodyRows = report.map(meistrija =>
-          meistrija.defects.map(defect => (
-            <DefectRow
-              meistrijaLabel={meistrija.abbr}
-              defect={defect}
-              key={defect.id}
-            />
-          ))
-        );
-  //console.log("bodyRows", bodyRows);
+    meistrija.defects.map(defect => (
+      <DefectRow
+        meistrijaLabel={meistrija.abbr}
+        defect={defect}
+        key={defect.id}
+      />
+    ))
+  );
+  // console.log("bodyRows", bodyRows);
 
   return (
     <table className="table">
       {tHead}
-      <tbody>
-        {bodyRows}
-      </tbody>
+      <tbody>{bodyRows}</tbody>
     </table>
   );
 };

@@ -28,8 +28,8 @@ app.use(bodyParser.json());
 
 // mongoose
 //   .connect(secret.DB_URI, { useNewUrlParser: true })
-//   .then(() => console.log("MongoDB Connected"))
-//   .catch(err => console.log(err));
+//   .then(() => // console.log("MongoDB Connected"))
+//   .catch(err => // console.log(err));
 
 app.use(passport.initialize());
 
@@ -59,5 +59,5 @@ app.use((req, res, next) => {
 
 const PORT = 5000;
 app.listen(PORT, () => {
-  console.log(`Node express server is running on port ${PORT}!`);
+ console.log(`Node express server is running on port ${PORT}!`);
 });

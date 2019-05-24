@@ -6,11 +6,16 @@ import {
   LOGOUT
 } from "../actions/types";
 
-const initialState = {data: {}, rtype: "", params: null, error: null, isLoading: false};
+const initialState = {
+  data: {},
+  rtype: "",
+  params: null,
+  error: null,
+  isLoading: false
+};
 
 export default function(state = initialState, action) {
   switch (action.type) {
-
     // begin report
     case REPORT_BEGIN:
       return {
@@ -33,7 +38,7 @@ export default function(state = initialState, action) {
 
     // report error
     case REPORT_ERROR:
-      //console.log("reducer action.payload.error", action.payload.error);
+      // console.log("reducer action.payload.error", action.payload.error);
       return {
         ...state,
         data: {},
@@ -42,11 +47,11 @@ export default function(state = initialState, action) {
         isLoading: false
       };
 
-    case ERASE_REPORT: 
+    case ERASE_REPORT:
     case LOGOUT:
-      console.log("report reducer erasing report");
+      // console.log("report reducer erasing report");
       return initialState;
-    
+
     default:
       return state;
   }

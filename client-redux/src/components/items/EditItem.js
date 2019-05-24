@@ -9,7 +9,7 @@ import IsLoading from "../common/IsLoading";
 import {
   updateItem,
   insertItem,
-  hideSingleItemError,
+  hideSingleItemError
   //hideWarning,
   //hideSuccess
 } from "../../actions/itemsActions";
@@ -29,10 +29,10 @@ class EditItem extends Component {
   componentDidMount() {
     if (this.props.match.params.id) {
       const id = parseInt(this.props.match.params.id);
-      //console.log("id", id);
-      //console.log("items", this.props.items);
+      // console.log("id", id);
+      // console.log("items", this.props.items);
       const item = this.props.items.find(item => item.id === id);
-      ///console.log("item", item);
+      /// console.log("item", item);
       if (item) {
         this.setState({ item });
       }
@@ -41,7 +41,7 @@ class EditItem extends Component {
 
   componentWillUnmount() {
     this.props.hideSingleItemError(this.props.itype);
-    console.log("edit item component will unmount");
+    // console.log("edit item component will unmount");
   }
 
   // hideSingleItemError() {
@@ -52,8 +52,8 @@ class EditItem extends Component {
     //const numberProps = ["km", "pk", "m", "bmetai", "dl", "dh"];
     const propName = e.target.name;
     let propValue = e.target.value;
-    console.log("e.target", e.target);
-    console.log("propName, propValue", propName, propValue);
+    // console.log("e.target", e.target);
+    // console.log("propName, propValue", propName, propValue);
     //if (numberProps.includes(propName)) {
     //  propValue = Number(e.target.value);
     //}
@@ -129,10 +129,11 @@ const mapStateToProps = (state, ownProps) => ({
 
 export default connect(
   mapStateToProps,
-  { updateItem, 
-  insertItem, 
-  hideSingleItemError, 
-  //hideWarning, 
-  //hideSuccess 
+  {
+    updateItem,
+    insertItem,
+    hideSingleItemError
+    //hideWarning,
+    //hideSuccess
   }
 )(EditItem);

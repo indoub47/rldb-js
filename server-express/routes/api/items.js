@@ -51,7 +51,7 @@ router.use(passport.authenticate("jwt", { session: false }));
 // @desc Get nepanaikinti items
 // @access Public
 router.get("/", (req, res, next) => {
-  console.log("user", req.user);
+  // console.log("user", req.user);
   const itype = req.body.itype || req.query.itype;
   const coll = COLLECTIONMAP.find(c => c.itype === itype);
   if (!coll) return res.status(404).send("no collection");
@@ -62,12 +62,12 @@ router.get("/", (req, res, next) => {
   
   try {    
     const stmtText = "SELECT * FROM " + coll.name + filter;
-    console.log("stmtText:", stmtText);
+    // console.log("stmtText:", stmtText);
     const items = db.prepare(stmtText).all(req.user.regbit);
-    //console.log("items", items);
+    // console.log("items", items);
     return res.status(200).send(items);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(500).send(error);
   }
 });
@@ -94,10 +94,10 @@ router.post("/update", (req, res) => {
   }
 
   // validate draft here
-  //console.log("draft before validation", req.body.draft);
+  // console.log("draft before validation", req.body.draft);
   const result = validate(req.body.draft, itype, false);
   if (result.hasErrors) {
-    console.log("validation result", result);
+    // console.log("validation result", result);
     return res.status(400).send({
         ok: 0,
         reason: "bad draft",
@@ -106,7 +106,7 @@ router.post("/update", (req, res) => {
   }
   
   let draft = result.item;  
-  //console.log("draft after validation", draft);
+  // console.log("draft after validation", draft);
   const draftId = draft.id;
   const draftV = draft.v;
   
@@ -115,7 +115,7 @@ router.post("/update", (req, res) => {
   try {
     const findStmtText = "SELECT * FROM " + coll.name + " WHERE id = ? AND regbit = ?";
     found = db.prepare(findStmtText).get(draftId, req.user.regbit);
-    //console.log("found", found);
+    // console.log("found", found);
     if (!found) {
       return res.status(404).send({
         ok: 0,
@@ -203,7 +203,7 @@ router.post("/update", (req, res) => {
       item: updated
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(200).send({
       ok: 0,
       reason: "server error",
@@ -244,7 +244,7 @@ router.put("/insert", (req, res, next) => {
   }
 
   const result = validate(req.body.draft, itype, true);
-  console.log("insert item validation result", result);
+  // console.log("insert item validation result", result);
   if (result.hasErrors) {
     return res.status(400).send({
         ok: 0,
@@ -310,7 +310,7 @@ router.put("/insert", (req, res, next) => {
       item: inserted
     });
   } catch (error) {
-    console.log("fetch inserted item error", error);
+    // console.log("fetch inserted item error", error);
     return res.status(200).send({
       ok: 0,
       reason: "server error",

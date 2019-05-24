@@ -1,4 +1,5 @@
 import axios from "axios";
+import extractMsg from "./functions/extractMsg";
 import {
   QUERIES_FETCH_BEGIN,
   QUERIES_FETCH_SUCCESS,
@@ -20,24 +21,24 @@ import {
 export const hideWarning = itype => dispatch =>
   dispatch({
     type: HIDE_QUERIES_WARNING,
-    payload: {itype}
+    payload: { itype }
   });
 
 export const hideSuccess = itype => dispatch =>
   dispatch({
     type: HIDE_QUERIES_SUCCESS,
-    payload: {itype}
+    payload: { itype }
   });
 
 export const hideError = itype => dispatch =>
   dispatch({
     type: HIDE_QUERIES_ERROR,
-    payload: {itype}
+    payload: { itype }
   });
 
-const fetchQueriesBegin = (itype) => ({
+const fetchQueriesBegin = itype => ({
   type: QUERIES_FETCH_BEGIN,
-  payload: {itype}
+  payload: { itype }
 });
 
 const fetchQueriesSuccess = (queries, itype) => ({
@@ -45,33 +46,40 @@ const fetchQueriesSuccess = (queries, itype) => ({
   payload: { queries, itype }
 });
 
-const fetchQueriesFailure = (err, itype) => ({
+const fetchQueriesFailure = (errmsg, itype) => ({
   type: QUERIES_FETCH_FAILURE,
-  payload: { err, itype }
+  payload: { errmsg, itype }
 });
 
 // Get fsqueries
-export const fetchQueries = itype => dispatch => {
+export const fetchQueries = itype => (dispatch, getState) => {
   dispatch(fetchQueriesBegin(itype));
   axios
-    .get(`/api/fsqueries/fetch`, {params: {itype}})
-    .then(res => dispatch(fetchQueriesSuccess(res.data, itype)))
-    .catch(err => dispatch(fetchQueriesFailure(err, itype)));
+    .get(`/api/fsqueries/fetch`, { params: { itype } })
+    .then(res => {
+      // console.log("state before", getState().queries);
+      dispatch(fetchQueriesSuccess(res.data, itype));
+      // console.log("state after", getState().queries);
+    })
+    .catch(err => {
+      const errmsg = extractMsg(JSON.parse(JSON.stringify(err)));
+      dispatch(fetchQueriesFailure(errmsg, itype));
+    });
 };
 
-const updateQueryBegin = (itype) => ({
+const updateQueryBegin = itype => ({
   type: QUERY_UPDATE_BEGIN,
-  payload: {itype}
+  payload: { itype }
 });
 
 const updateQuerySuccess = (query, itype) => ({
   type: QUERY_UPDATE_SUCCESS,
-  payload: {query, itype}
+  payload: { query, itype }
 });
 
-const updateQueryFailure = (err, itype) => ({
+const updateQueryFailure = (errmsg, itype) => ({
   type: QUERY_UPDATE_FAILURE,
-  payload: { err: err.errmsg, itype }
+  payload: { errmsg, itype }
 });
 
 // update fsquery
@@ -80,23 +88,26 @@ export const updateQuery = draft => dispatch => {
   dispatch(updateQueryBegin(itype));
   axios
     .post(`/api/fsqueries/update`, draft)
-    .then(res => dispatch(updateQuerySuccess(res.data.data, itype)))
-    .catch(err => dispatch(updateQueryFailure(err, itype)));
+    .then(res => dispatch(updateQuerySuccess(res.data, itype)))
+    .catch(err => {
+      const errmsg = extractMsg(JSON.parse(JSON.stringify(err)));
+      dispatch(updateQueryFailure(errmsg, itype));
+    });
 };
 
-const insertQueryBegin = (itype) => ({
+const insertQueryBegin = itype => ({
   type: QUERY_INSERT_BEGIN,
-  payload: {itype}
+  payload: { itype }
 });
 
 const insertQuerySuccess = (query, itype) => ({
   type: QUERY_INSERT_SUCCESS,
-  payload: {query, itype}
+  payload: { query, itype }
 });
 
-const insertQueryFailure = (err, itype) => ({
+const insertQueryFailure = (errmsg, itype) => ({
   type: QUERY_INSERT_FAILURE,
-  payload: { err, itype }
+  payload: { errmsg, itype }
 });
 
 // insert fsquery
@@ -104,37 +115,46 @@ export const insertQuery = draft => dispatch => {
   const itype = draft.itype;
   dispatch(insertQueryBegin(itype));
   axios
-    .post(`/api/fsqueries/insert`, draft)
-    .then(res => dispatch(insertQuerySuccess(res.data.data, itype)))
-    .catch(err => dispatch(insertQueryFailure(err, itype)));
+    .put(`/api/fsqueries/insert`, draft)
+    .then(res => {
+      // console.log("insertQuery action res.data", res.data);
+      dispatch(insertQuerySuccess(res.data, itype));
+    })
+    .catch(err => {
+      const errmsg = extractMsg(JSON.parse(JSON.stringify(err)));
+      dispatch(insertQueryFailure(errmsg, itype));
+    });
 };
 
-const deleteQueryBegin = (itype) => ({
+const deleteQueryBegin = itype => ({
   type: QUERY_DELETE_BEGIN,
-  payload: {itype}
+  payload: { itype }
 });
 
 const deleteQuerySuccess = (id, itype) => {
-  console.log("success", id, itype);
-  return ({
+  // console.log("success", id, itype);
+  return {
     type: QUERY_DELETE_SUCCESS,
-    payload: {id, itype}
-  });
+    payload: { id, itype }
+  };
 };
 
-const deleteQueryFailure = (err, itype) => {
-  console.log("failure", err, itype); 
-  return ({
+const deleteQueryFailure = (errmsg, itype) => {
+  // console.log("failure", errmsg, itype);
+  return {
     type: QUERY_DELETE_FAILURE,
-    payload: { err, itype }
-  });
+    payload: { errmsg, itype }
+  };
 };
 
 // delete fsquery
 export const deleteQuery = (id, itype) => dispatch => {
   dispatch(deleteQueryBegin(itype));
   axios
-    .delete(`/api/fsqueries/delete`, {params: {id}})
+    .delete(`/api/fsqueries/delete`, { params: { id } })
     .then(res => dispatch(deleteQuerySuccess(res.data.data, itype)))
-    .catch(err => dispatch(deleteQueryFailure(err, itype)));
+    .catch(err => {
+      const errmsg = extractMsg(JSON.parse(JSON.stringify(err)));
+      dispatch(deleteQueryFailure(errmsg, itype));
+    });
 };

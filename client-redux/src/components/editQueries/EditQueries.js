@@ -14,7 +14,7 @@ import {
   hideSuccess,
   hideError
 } from "../../actions/queriesActions";
-import getId from "../../utils/getId";
+//import getId from "../../utils/getId";
 
 class EditQueries extends Component {
   constructor(props) {
@@ -38,20 +38,21 @@ class EditQueries extends Component {
 
   componentDidMount() {
     // no valid query
-    console.log("EditQueries cDM this.props.filterSort", this.props.filterSort);
+    // console.log("EditQueries cDM this.props.filterSort", this.props.filterSort);
 
     if (
       this.props.filterSort.filterText === "" &&
       this.props.filterSort.sortText === ""
     ) {
-      console.log("not empty");
+      // console.log("no current query");
       this.setState({ currentQuery: null });
       return;
     }
 
     // some valid query
     // if found - it's a query from queries list
-    let query = this.props.queries.find(
+    // if not found - it's a new raw query without id yet
+    const query = this.props.queries.find(
       q =>
         q.filter === this.props.filterSort.filterText &&
         q.sort === this.props.filterSort.sortText
@@ -60,53 +61,22 @@ class EditQueries extends Component {
         sort: this.props.filterSort.sortText
       };
 
-    console.log("setting query to state", query);
+    // console.log("setting this query to state currentQuery", query);
     this.setState({ currentQuery: query });
-    console.log("EQs cDMount this.state", this.state);
 
   }
 
   componentDidUpdate(prevProps) {
+    // console.log("EditQueries state", this.state)
+    // console.log("cDU this.state", this.state);
+    // console.log("cDU this.props.queries", this.props.queries);
     // must check if currentQuery is in queries. if not, then currentQuery - null
     if (this.state.currentQuery && this.state.currentQuery.id && 
     !this.props.queries.some(q => q.id === this.state.currentQuery.id)) {
+      // console.log("setting state.currentQuery to null");
       this.setState({currentQuery: null});
     }
   }
-
-  /*
-  moveUp(e) {
-    const id = e.target.dataset.id;
-    const ind = this.state.queries.findIndex(q => q.id === id);
-    if (ind <= 0) return;
-    // reikia mažinti indexą
-    const modifiedQueries = [
-      ...this.state.queries.slice(0, ind - 1),
-      this.state.queries[ind],
-      this.state.queries[ind - 1],
-      ...this.state.queries.slice(ind + 1)
-    ];
-    this.setState({
-      queries: modifiedQueries
-    });
-  }
-
-  moveDown(e) {
-    const id = e.target.dataset.id;
-    const ind = this.state.queries.findIndex(q => q.id === id);
-    if (ind < 0 || ind === this.state.queries.length - 1) return;
-    // reikia didinti indexą
-    const modifiedQueries = [
-      ...this.state.queries.slice(0, ind),
-      this.state.queries[ind + 1],
-      this.state.queries[ind],
-      ...this.state.queries.slice(ind + 2)
-    ];
-    this.setState({
-      queries: modifiedQueries
-    });
-  }
-*/
 
   hideError() {
     this.props.hideError(this.props.match.params.itype);
@@ -154,13 +124,14 @@ class EditQueries extends Component {
     }
   }
 
-  setForEditing(e) {
-    console.log("setForEditing id", e.target.dataset.id);this.setState({ 
-      currentQuery: this.props.queries.find(q => q._id === e.target.dataset.id) || null
+  setForEditing(e) {    
+    this.setState({ 
+      currentQuery: this.props.queries.find(q => q.id === parseInt(e.target.dataset.id)) || null
       });
   }
 
   render() {
+    // console.log("EditQueries render - this.props.queries", this.props.queries);
     return (
       <div className="container thing-edit">
         {this.props.error ? (

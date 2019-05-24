@@ -81,7 +81,7 @@ const validate = (draft, exclude) => {
 // force to authenticate
 router.use(passport.authenticate("jwt", { session: false }));
 
-// @route GET api/sqlite/fsquery/fetch
+// @route GET api/fsquery/fetch
 // @desc Get fsqueries for particular itype and email
 // @params itype string
 // @access Public
@@ -94,12 +94,12 @@ router.get("/fetch", (req, res) => {
     const fsqueries = stmt.all(email, itype);
     return res.status(200).json(fsqueries);
   } catch (err) {
-    console.log("email, itype, err", email, itype, err);
+    // console.log("email, itype, err", email, itype, err);
     return res.status(500).send(err);
   }
 });
 
-// @route DELETE api/sqlite/fsquery/delete
+// @route DELETE api/fsquery/delete
 // @desc Delete fsquery
 // @params id string
 // @access Public
@@ -113,12 +113,12 @@ router.delete("/delete", (req, res) => {
     const info = stmt.run(email, id);
     return res.status(200).json({ ...info, id });
   } catch (err) {
-    console.log("email, id, err", email, id, err);
+    // console.log("email, id, err", email, id, err);
     return res.status(500).send(err);
   }
 });
 
-// @route POST api/sqlite/fsquery/update
+// @route POST api/fsquery/update
 // @desc Delete fsquery
 // @body draft object
 // @access Public
@@ -145,14 +145,14 @@ router.post("/update", (req, res) => {
     const stmtText = SQLStatements.update(draft, collName, filter, ["id", "email"]);
     const stmt = db.prepare(stmtText);
     const info = stmt.run(draft);
-    return res.status(200).json({ ...info, draft });
+    return res.status(200).json(draft);
   } catch (err) {
-    console.log("draft, err", draft, err);
+    // console.log("draft, err", draft, err);
     return res.status(500).send(err);
   }
 });
 
-// @route PUT api/sqlite/fsquery/insert
+// @route PUT api/fsquery/insert
 // @desc Insert fsquery
 // @body draft object
 // @access Public
@@ -160,11 +160,12 @@ router.put("/insert", (req, res) => {
   let draft = req.body;
   draft.email = req.user.email;
   delete draft.id;
-
+  // console.log("mark1");
   const validation = validate(draft, ["email", "id"]);
   if (validation) {
     return res.status(400).send(validation);
   }
+  // console.log("mark2");
   
   try {
     // check if name is unique
@@ -175,12 +176,13 @@ router.put("/insert", (req, res) => {
     if (!unique) return res.status(400).send({ msg: "name must be unique" });
     
     // perform insert
-    const stmtText = SQLStatements.insert(draft, collName);
+    const stmtText = SQLStatements.insert(draft, collName);    
+    // console.log("insert stmt", stmtText);
     const stmt = db.prepare(stmtText);
     const info = stmt.run(draft);
     return res.status(200).json({ ...draft, id: info.lastInsertRowid });
   } catch (err) {
-    console.log("draft, err", draft, err);
+    // console.log("draft, err", draft, err);
     return res.status(500).send(err);
   }
 });

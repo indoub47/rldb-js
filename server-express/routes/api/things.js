@@ -27,10 +27,10 @@ router.get("/register", (req, res) => {
     try {
       const stmt = db.prepare(`SELECT * FROM ${coll}`);
       const collItems = stmt.all();
-      // console.log("coll, collItems", coll, collItems);
+      // // console.log("coll, collItems", coll, collItems);
       resultObject[coll] = collItems;
     } catch (err) {
-      console.log("coll error", coll, err);
+      // console.log("coll error", coll, err);
       return res.status(500).send(err);
     }
   });
@@ -56,7 +56,7 @@ router.get("/", (req, res, next) => {
     const items = stmt.all({ userRegbit: req.user.regbit });
     return res.status(200).json(items);
   } catch (err) {
-    console.log("coll error", coll, err);
+    // console.log("coll error", coll, err);
     return res.status(500).send(err);
   }
 });
@@ -78,7 +78,7 @@ router.get("/all", (req, res) => {
       const collItems = stmt.all({ userRegbit: req.user.regbit });
       resultObject[coll.name] = collItems;
     } catch (err) {
-      console.log("coll error", coll, err);
+      // console.log("coll error", coll, err);
       return res.status(500).send(err);
     }
   });
@@ -149,7 +149,7 @@ router.post("/update", (req, res) => {
     //const info = stmt.run(draft);
     return res.status(200).json({ info, draft });
   } catch (err) {
-    console.log("draft error", draft, err);
+    // console.log("draft error", draft, err);
     return res.status(500).send(err);
   }
 });
@@ -199,11 +199,11 @@ router.put("/create", (req, res) => {
         `SELECT COUNT(*) AS count FROM ${coll.name} WHERE id = ?`
       );
       const result = stmtCount.get(draft.id);
-      //console.log("result", result);
+      // console.log("result", result);
       if (result.count > 0)
         return res.status(400).send({ msg: "id must be unique" });
     } catch (err) {
-      console.log("error", err);
+      // console.log("error", err);
       return res.status(500).send(err);
     }
   }
@@ -225,8 +225,8 @@ router.put("/create", (req, res) => {
 
   // insert new item
   const stmtText = SQLStatements.insert(draft, req.body.ttype);
-  //console.log("text", stmtText);
-  //console.log("draft", draft);
+  // console.log("text", stmtText);
+  // console.log("draft", draft);
   try {
     const stmt = db.prepare(stmtText);
     const info = stmt.run(draft);
@@ -236,7 +236,7 @@ router.put("/create", (req, res) => {
     }
     return res.status(500).send({ msg: "not inserted" });
   } catch (err) {
-    console.log("error", err);
+    // console.log("error", err);
     return res.status(500).send(err);
   }
 });
@@ -281,7 +281,7 @@ router.delete("/delete", (req, res) => {
   }
 
   const stmtText = SQLStatements.delete(req.body.ttype, filter);
-  console.log("text, id", stmtText, req.body.id);
+  // console.log("text, id", stmtText, req.body.id);
 
   try {
     const stmt = db.prepare(stmtText);

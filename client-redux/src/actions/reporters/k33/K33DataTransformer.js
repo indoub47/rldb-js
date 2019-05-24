@@ -67,7 +67,7 @@ export class K33DataTransformer {
   distribute = () => {
     
     let operDefPairs = this.createDistinctOperatDefskop();
-    //console.log("operDefPairs", operDefPairs);
+    // console.log("operDefPairs", operDefPairs);
     // [
     //   {defskop: aaa, operat: bbb},
     //   {defskop: ccc, operat: ddd},
@@ -157,7 +157,7 @@ export class K33DataTransformer {
       //    }
       odPair.counts = [...propGroupPav, ...propGroupVB];
 
-      console.log("current odPair", odPair)
+      // console.log("current odPair", odPair)
       return odPair;
     });
 

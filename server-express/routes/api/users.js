@@ -35,7 +35,7 @@ router.post("/register", (req, res) => {
       return res.status(400).json({ email: "Email already exists" });
     }
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(500).json({error});
   }
 
@@ -57,14 +57,14 @@ router.post("/register", (req, res) => {
       newUser.password = hash; 
 
       const stmtText = insertStmtText(newUser, "users");
-      console.log("stmtText", stmtText);
+      // console.log("stmtText", stmtText);
       try {
         const stmt = db.prepare(stmtText);
         const info = stmt.run(newUser);
         delete newUser.password;
         res.status(200).json(newUser);
       } catch (error) {
-        console.log("error inserting user", error);
+        // console.log("error inserting user", error);
         return res.status(500).json({error});
       }
     });
@@ -98,7 +98,7 @@ router.post("/login", (req, res) => {
       return res.status(404).json(badLoginResponse);
     }    
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(500).json({error});
   }
 
@@ -118,7 +118,7 @@ router.post("/login", (req, res) => {
       jwt.sign(payload, SECRET_KEY, { expiresIn: 36000 }, (err, token) => {
         if (err) {
           // error signing token
-          console.log("token signing error", err)
+          // console.log("token signing error", err)
           return res.status(500).json({ err });
         }
         
@@ -132,7 +132,7 @@ router.post("/login", (req, res) => {
     }
   })
   .catch(error => {
-    console.log("Bcrypt error", error);
+    // console.log("Bcrypt error", error);
     return res.status(500).json({error})
   });
 });

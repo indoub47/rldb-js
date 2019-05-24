@@ -25,7 +25,7 @@ router.get("/defects-undone", (req, res) => {
       return client.db(dbName);
     })
     .then(db => {
-      console.log("req.query", req.query);
+      // console.log("req.query", req.query);
       const byDate = getDate(req.query.byDate);
 
       let defectsFilter = {
@@ -44,7 +44,7 @@ router.get("/defects-undone", (req, res) => {
         ];
       }
 
-      console.log("defectsFilter: ", defectsFilter);
+      // console.log("defectsFilter: ", defectsFilter);
 
       const thingsFilter = {
         $or: [{ region: req.user.region }, { region: { $exists: false } }]
@@ -69,7 +69,7 @@ router.get("/defects-undone", (req, res) => {
       })
     )
     .catch(err => {
-      console.log("error", err);
+      // console.log("error", err);
       return res.status(500).send(err);
     });
 });
@@ -105,7 +105,7 @@ router.get("/defects-undone-count", (req, res) => {
         ];
       }
 
-      console.log("defectsFilter", defectsFilter);
+      // console.log("defectsFilter", defectsFilter);
 
       // defect grouping
       const defectsGroup = {
@@ -134,7 +134,7 @@ router.get("/defects-undone-count", (req, res) => {
       })
     )
     .catch(err => {
-      console.log("error", err);
+      // console.log("error", err);
       return res.status(500).send(err);
     });
 });
@@ -411,7 +411,7 @@ router.get("/to-inspect", (req, res) => {
     .then(cursor => cursor.toArray())
     .then(arr => res.status(200).send(arr))
     .catch(err => {
-      console.log("error", err);
+      // console.log("error", err);
       return res.status(500).send(err);
     });
 });
@@ -619,7 +619,7 @@ router.get("/k33", (req, res) => {
       })
     )
     .catch(err => {
-      console.log("error", err);
+      // console.log("error", err);
       return res.status(500).send(err);
     });
 });

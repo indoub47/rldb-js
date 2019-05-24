@@ -47,12 +47,14 @@ export default function(state = initialState, action) {
           ...state[itype],
           isLoading: true,
           error: null,
-          success: null
+          success: null,
+          valid: false
         }
       };
 
     case QUERIES_FETCH_SUCCESS:
       itype = action.payload.itype;
+      // console.log("queriesReducer queries-fetch-success action.payload.queries", action.payload.queries);
       return {
         ...state,
         [itype]: {
@@ -66,7 +68,7 @@ export default function(state = initialState, action) {
       };
       
     case QUERY_UPDATE_SUCCESS:
-      console.log("Q_U_S action", action);
+      // console.log("Q_U_S action", action);
       query = action.payload.query;
       itype = action.payload.itype;
       ind = state[itype].data.findIndex(q => q.id === query.id);
@@ -104,13 +106,17 @@ export default function(state = initialState, action) {
       
 
     case QUERY_INSERT_SUCCESS:
+      // console.log("query_insert_success action.payload", action.payload);
       query = action.payload.query;
       itype = action.payload.itype;
+
+      // console.log("queriesReducer state", state);
 
       queries = [
         ...state[itype].data,
         query
       ];
+      // console.log("queriesReducer queries", queries);
 
       return {
         ...state,
@@ -126,11 +132,11 @@ export default function(state = initialState, action) {
       
 
     case QUERY_DELETE_SUCCESS:
-      console.log("QUERY_DELETE_SUCCESS action", action);
+      // console.log("QUERY_DELETE_SUCCESS action", action);
       id = action.payload.id;
       itype = action.payload.itype;
       ind = state[itype].data.findIndex(q => q._id === id);
-      console.log("QUERY_DELETE_SUCCESS index", ind);
+      // console.log("QUERY_DELETE_SUCCESS index", ind);
       
       if (ind < 0) { // should not happen
         return {

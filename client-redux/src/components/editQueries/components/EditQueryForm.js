@@ -7,15 +7,13 @@ import TextAreaGroup from "../../common/TextAreaGroup";
 class EditQueryForm extends Component {
   constructor(props) {
     super(props);
-    console.log("EQF constructor this.props.query", this.props.query);
+    // console.log("EQF constructor this.props.query", this.props.query);
     this.state = this.props.query ? {
-      _id: this.props.query._id || "",
       id: this.props.query.id || "",
       filter: this.props.query.filter || "",
       sort: this.props.query.sort || "",
       name: this.props.query.name || ""
     } : {
-      _id: "",
       id: "",
       filter: "",
       sort: "",
@@ -29,7 +27,6 @@ class EditQueryForm extends Component {
   submit(e) {
     e.preventDefault();
     const modifiedQuery = {
-      _id: this.state._id,
       id: this.state.id,
       filter: this.state.filter,
       sort: this.state.sort,
@@ -41,33 +38,29 @@ class EditQueryForm extends Component {
 
   componentDidMount() {
     if (this.props.query) {
-      console.log("EQF cDMount this.props.query", this.props.query);
+      // console.log("EQF cDMount this.props.query", this.props.query);
         this.setState({
-          _id: this.props.query._id || "",
           id: this.props.query.id || "",
           filter: this.props.query.filter || "",
           sort: this.props.query.sort || "",
           name: this.props.query.name || ""
         });
       } else {
-        console.log("EQF cDMount no query", this.props.query);
+        // console.log("EQF cDMount no query", this.props.query);
         this.setState({
-          _id: "",
           id: "",
           filter: "",
           sort: "",
           name: ""
         });
       }
-      console.log("EQF cDMount this.state", this.state);
   }
 
   componentDidUpdate(prevProps) {
     if (this.differentQueries(this.props.query, prevProps.query)) {
-    console.log("EQF cDUpdate differentQueries this.props.query", this.props.query);
+    // console.log("EQF cDUpdate differentQueries this.props.query", this.props.query);
       if (this.props.query) {
         this.setState({
-          _id: this.props.query._id || "",
           id: this.props.query.id || "",
           filter: this.props.query.filter || "",
           sort: this.props.query.sort || "",
@@ -75,14 +68,13 @@ class EditQueryForm extends Component {
         });
       } else {
         this.setState({
-          _id: "",
           id: "",
           filter: "",
           sort: "",
           name: ""
         });
       }      
-      console.log("EQF cDUpdate this.state", this.state);
+      // console.log("EQF cDUpdate this.state", this.state);
     }
   }
 
@@ -90,7 +82,6 @@ class EditQueryForm extends Component {
     return (q1 && !q2) ||
       (!q1 && q2) ||
       (q1 && q2 && (
-        (q1._id !== q2._id) ||
         (q1.id !== q2.id) ||
         (q1.filter !== q2.filter) ||
         (q1.sort !== q2.sort) ||
@@ -105,7 +96,7 @@ class EditQueryForm extends Component {
   }
 
   render() {
-    console.log("EQF render this.state", this.state);
+    // console.log("EQF render this.state", this.state);
     return (
       <div className="row pt-3 mb-2 border border-primary">
         <div className="col-12">

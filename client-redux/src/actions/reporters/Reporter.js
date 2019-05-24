@@ -4,12 +4,12 @@ export default class Reporter {
   reporter;
 
   constructor(rtype) {
-    this.reporter = reporterMap[rtype]; 
+    this.reporter = reporterMap[rtype];
   }
 
   // public
   createReport(data) {
-    //console.log("createReport data params", data, params);
+    // console.log("createReport data params", data, params);
     const transformer = new this.reporter.DataTransformerClass(data);
     return transformer.createReport();
   }

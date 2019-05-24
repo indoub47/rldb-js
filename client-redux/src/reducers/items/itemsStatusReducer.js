@@ -101,7 +101,7 @@ export default function(state = initialState, action) {
     case ITEM_DELETE_FAILURE:
     case ITEM_UPDATE_FAILURE:
     case ITEM_INSERT_FAILURE:
-      console.log("ITEM_..._FAILURE action.payload", action.payload);
+      // console.log("ITEM_..._FAILURE action.payload", action.payload);
       return {
         ...state,
         [action.payload.itype]: {

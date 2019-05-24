@@ -20,8 +20,8 @@ class Report extends Component {
   }
 
   render() {
-    // console.log("report render this.props.report", this.props.report);
-    // console.log("this.props.error", this.props.error);
+    // // console.log("report render this.props.report", this.props.report);
+    // // console.log("this.props.error", this.props.error);
 
     const ParamsCollector = this.reporter.paramsCollector;
     const ReportTable = this.reporter.reportTable;

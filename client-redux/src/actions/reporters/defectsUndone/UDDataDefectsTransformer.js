@@ -4,7 +4,7 @@ export class UDDataDefectsTransformer extends UDDataTransformer {
   constructor(thingsAndData) {
     super(thingsAndData);
     // params reikalingas?
-  }  
+  }
 
   byVietaSorter(a, b) {
     if (a.linija > b.linija) return 1;
@@ -29,18 +29,20 @@ export class UDDataDefectsTransformer extends UDDataTransformer {
   distributeDefects(defs) {
     // gauna filtruotus defektus iš serverio.
     // paskirsto defektus po meistrijas ir tinkamai išrikiuoja
-    return this.things.meistrija.map(meistrija => {
-      return {
-        ...meistrija,
-        defects: defs
-          .filter(d => d.meistrija === meistrija.id)
-          .sort(this.byVietaSorter)
-      };
-    }).sort(this.byIndSorter);
-  }  
+    return this.things.meistrija
+      .map(meistrija => {
+        return {
+          ...meistrija,
+          defects: defs
+            .filter(d => d.meistrija === meistrija.id)
+            .sort(this.byVietaSorter)
+        };
+      })
+      .sort(this.byIndSorter);
+  }
 
   createReport() {
-    //console.log("this.data", this.data);
+    // console.log("this.data", this.data);
     return this.distributeDefects(this.data);
   }
 }
