@@ -9,35 +9,43 @@ import * as employeeMainDataForm from "./components/items/specific/employees/Mai
 import * as defectSingleRow from "./components/items/specific/defects/SingleRow";
 import * as weldingSingleRow from "./components/items/specific/weldings/SingleRow";
 import * as employeeSingleRow from "./components/items/specific/employees/SingleRow";
+
+import * as defectJournalEditForm from "./components/items/specific/defects/JournalEditForm";
+import * as weldingJournalEditForm from "./components/items/specific/weldings/JournalEditForm";
+import * as employeeJournalEditForm from "./components/items/specific/employees/JournalEditForm";
+
+import * as defectJournalRow from "./components/items/specific/defects/JournalRow";
+import * as weldingJournalRow from "./components/items/specific/weldings/JournalRow";
+import * as employeeJournalRow from "./components/items/specific/employees/JournalRow";
 import * as iTypes from "./itypes"
 
 
-export default function itemSpecific(itype) {
-  switch(itype){
-    case iTypes.defect:
-      return {
+export default itemSpecific = {
+  [itypes.defect]: {
         replacements: defectReplacements,
         mainDataForm: defectMainDataForm.MainDataForm,
         singleRow: defectSingleRow,
+        journalEditForm: defectJournalEditForm,
+        journalRow: defectJournalRow,
         listPath: "/defects",
-        panaikinta: item => !!item.daction
-      };
-    case iTypes.welding:
-      return {
+        panaikinta: item => !!item.dstop
+      },
+  [itypes.welding]: {
         replacements: weldingReplacements,
         mainDataForm: weldingMainDataForm.MainDataForm,
         singleRow: weldingSingleRow,
+        journalEditForm: weldingJournalEditForm,
+        journalRow: weldingJournalRow,
         listPath: "/weldings",
-        panaikinta: item => {throw "panaikinta for welding is not implemented"}
-      };
-    case iTypes.employee:
-      return {
+        panaikinta: item => {throw "panaikinta for welding is not implemented";}
+      },
+  [itypes.employee]: {
         replacements: employeeReplacements,
         mainDataForm: employeeMainDataForm.MainDataForm,
         singleRow: employeeSingleRow,
+        journalEditForm: weldingJournalEditForm,
+        journalRow: weldingJournalRow,
         listPath: "/employees",
-        panaikinta: item => {throw "panaikinta for employee is not implemented"}
-      };
-    default: // do nothing so far
-  }
-}
+        panaikinta: item => {throw "panaikinta for employee is not implemented";}
+      }
+};

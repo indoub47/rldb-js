@@ -184,11 +184,11 @@ const itemInsertFailure = (errormsg, itype, target) => ({
   payload: { errormsg, itype, target }
 });
 
-export const insertItem = (draft, history, itype) => (dispatch, getState) => {
+export const insertItem = (main, journal, history, itype) => (dispatch, getState) => {
   // console.log("inserting item");
   dispatch(itemInsertBegin(itype));
   axios
-    .put("/api/items/insert", { draft, itype })
+    .put("/api/items/insert", { main, journal, itype })
     .then(res => {
       // suformuojamas pranešimas apie rezultatą
       // console.log("inserting item response", res.data);
@@ -201,7 +201,7 @@ export const insertItem = (draft, history, itype) => (dispatch, getState) => {
       // pagal rezultatą updateinamas local cache
       if (
         getState().itemsStatus[itype].all ||
-        !itemSpecific(itype).panaikinta(res.data.item)
+        !itemSpecific[itype].panaikinta(res.data.item)
       ) {
         // jeigu rodyti visus (ir panaikintus, ir ne) ARBA
         // jeigu buvo sukurtas nepanaikintas -
@@ -222,7 +222,7 @@ export const insertItem = (draft, history, itype) => (dispatch, getState) => {
       ) {
         // console.log("insert item error path1");
         dispatch(itemInsertFailure(errmsg, itype, "ITEM_LIST"));
-        history.push(itemSpecific(itype).listPath);
+        history.push(itemSpecific[itype].listPath);
       } else {
         // console.log("insert item error path2");
         dispatch(itemInsertFailure(errmsg, itype, "SINGLE_ITEM"));
@@ -246,10 +246,10 @@ const itemUpdateFailure = (errormsg, itype, target) => ({
   payload: { errormsg, itype, target }
 });
 
-export const updateItem = (draft, history, itype) => (dispatch, getState) => {
+export const updateItem = (main, journal, history, itype) => (dispatch, getState) => {
   dispatch(itemUpdateBegin(itype));
   axios
-    .post("/api/items/update", { draft, itype })
+    .post("/api/items/update", { main, journal, itype })
     .then(res => {
       // console.log("res.data", res.data);
 
@@ -267,7 +267,7 @@ export const updateItem = (draft, history, itype) => (dispatch, getState) => {
         dispatch(itemUpdateSuccess(res.data.item, itype));
       } else {
         // jeigu rodyti tik nepanaikintus
-        if (itemSpecific(itype).panaikinta(res.data.item)) {
+        if (itemSpecific[itype].panaikinta(res.data.item)) {
           // console.log("perform local action: 2");
           // jeigu updateinant buvo panaikintas -
           // ištrinamas iš local
@@ -284,7 +284,7 @@ export const updateItem = (draft, history, itype) => (dispatch, getState) => {
       refilter(dispatch, getState, itype);
 
       // return to list
-      history.push(itemSpecific(itype).listPath);
+      history.push(itemSpecific[itype].listPath);
     })
     .catch(err => {
       const error = JSON.parse(JSON.stringify(err));
@@ -297,7 +297,7 @@ export const updateItem = (draft, history, itype) => (dispatch, getState) => {
         err.response.data.reason === "bad criteria"
       ) {
         dispatch(itemUpdateFailure(errmsg, itype, "ITEM_LIST"));
-        history.push(itemSpecific(itype).listPath);
+        history.push(itemSpecific[itype].listPath);
       } else {
         dispatch(itemUpdateFailure(errmsg, itype, "SINGLE_ITEM"));
       }

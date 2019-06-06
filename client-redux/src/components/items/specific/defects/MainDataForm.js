@@ -3,89 +3,32 @@ import PropTypes from "prop-types";
 import TextFieldGroup from "../../../common/TextFieldGroup";
 import SelectInputGroup from "../../../common/SelectInputGroup";
 import TextAreaGroup from "../../../common/TextAreaGroup";
-import { createOptions } from "../../../createOptions";
 import absent from "../../../../utils/absent-props";
 
-const MainDataForm = ({ item, onChange, things }) => {
-  // console.log("item", item);
-  // select controls options
-  // galbūt reikėtų iškelti prieš funciją, kad nekurtų kaskart kai renderina
-  // console.log("things", things);
-  const meistrijaOptions = createOptions(
-    things.meistrija.sort((m1, m2) => m1.ind - m2.ind),
-    "-- nenurodyta --",
-    x => x.abbr + ", " + x.name
-  );
-  const kkategOptions = createOptions(
-    things.kkateg,
-    "-- nenurodyta --",
-    x => x.id
-  );
-  const pavojOptions = createOptions(
-    things.pavoj.sort((p1, p2) => p1.ind - p2.ind),
-    "-- nenurodyta --",
-    x => x.id
-  );
-  const btipasOptions = createOptions(
-    things.btipas,
-    "-- nenurodyta --",
-    x => x.id
-  );
-  const bgamyklOptions = createOptions(
-    things.bgamykl,
-    "-- nenurodyta --",
-    x => x.id
-  );
-  const siuleOptions = createOptions(
-    things.siule,
-    "-- nenurodyta --",
-    x => x.id
-  );
-  const aparOptions = createOptions(
-    things.defskop,
-    "-- nenurodyta --",
-    x => x.id
-  );
-  const operOptions = createOptions(
-    things.operat,
-    "-- nenurodyta --",
-    x => x.id
-  );
-  const actionOptions = createOptions(
-    [
-      { id: 0, name: "" },
-      { id: 1, name: "pakeistas bėgis" },
-      { id: 2, name: "sutvarsliuota" }
-    ],
-    "-- nenurodyta --",
-    x => x.name
-  );
-
+const MainDataForm = ({ item, onChange, options }) => {
   return (
     <div className="container item-info border border-primary text-center">
       <div className="form-group row main-data text-center">
         <TextFieldGroup
-          divClassname="form-group col-2"
+          divClassname="form-group col-3"
           label="ID"
           id="item-id"
           name="id"
           placeholder="Defekto ID"
           readonly={true}
           value={absent(item.id)}
-          onChange={onChange}
         />
         <TextFieldGroup
-          divClassname="form-group col-2"
+          divClassname="form-group col-1"
           label="Regionas"
           id="item-regbit"
           name="regbit"
           placeholder="Regionas"
           readonly={true}
           value={absent(item.regbit)}
-          onChange={onChange}
         />
         <TextFieldGroup
-          divClassname="form-group col-2"
+          divClassname="form-group col-3"
           label="ID1"
           id="item-id1"
           name="id1"
@@ -99,7 +42,7 @@ const MainDataForm = ({ item, onChange, things }) => {
           label="Meistrija"
           divClassname="form-group col-3"
           value={absent(item.meistrija)}
-          options={meistrijaOptions}
+          options={options.meistrija}
           onChange={onChange}
         />
         <SelectInputGroup
@@ -108,7 +51,7 @@ const MainDataForm = ({ item, onChange, things }) => {
           label="Kelio kategorija"
           divClassname="form-group col-2"
           value={absent(item.kkateg)}
-          options={kkategOptions}
+          options={options.kkateg}
           onChange={onChange}
         />
       </div>
@@ -120,7 +63,7 @@ const MainDataForm = ({ item, onChange, things }) => {
           name="btipas"
           label="Bėgio tipas"
           value={absent(item.btipas)}
-          options={btipasOptions}
+          options={options.btipas}
           onChange={onChange}
         />
         <SelectInputGroup
@@ -129,7 +72,7 @@ const MainDataForm = ({ item, onChange, things }) => {
           name="bgamykl"
           label="Bėgio gamykla"
           value={absent(item.bgamykl)}
-          options={bgamyklOptions}
+          options={options.bgamykl}
           onChange={onChange}
         />
         <TextFieldGroup
@@ -195,116 +138,24 @@ const MainDataForm = ({ item, onChange, things }) => {
           name="siule"
           label="Siūlė"
           value={absent(item.siule)}
-          options={siuleOptions}
-          onChange={onChange}
-        />
-      </div>
-
-      <div className="form-group row charakteristikos text-center">
-        <TextFieldGroup
-          label="Kodas"
-          divClassname="form-group col-3"
-          id="item-kodas"
-          name="kodas"
-          placeholder="Kodas"
-          value={absent(item.kodas)}
-          onChange={onChange}
-        />
-        <TextFieldGroup
-          label="L"
-          divClassname="form-group col-3"
-          id="item-dl"
-          name="dl"
-          placeholder="L"
-          value={absent(item.dl)}
-          onChange={onChange}
-        />
-        <TextFieldGroup
-          label="H"
-          divClassname="form-group col-3"
-          id="item-dh"
-          name="dh"
-          placeholder="H"
-          value={absent(item.dh)}
-          onChange={onChange}
-        />
-        <SelectInputGroup
-          id="item-pavoj"
-          name="pavoj"
-          label="Pavojingumo laipsnis"
-          divClassname="form-group col-3"
-          value={absent(item.pavoj)}
-          options={pavojOptions}
-          onChange={onChange}
-        />
-      </div>
-
-      <div className="form-group row aptiko text-center">
-        <SelectInputGroup
-          id="item-oper"
-          name="oper"
-          label="Operatoriaus kodas"
-          divClassname="form-group col-4"
-          value={absent(item.oper)}
-          options={operOptions}
-          onChange={onChange}
-        />
-        <SelectInputGroup
-          id="item-apar"
-          name="apar"
-          label="Defektoskopo kodas"
-          divClassname="form-group col-4"
-          value={absent(item.apar)}
-          options={aparOptions}
+          options={options.siule}
           onChange={onChange}
         />
       </div>
 
       <div className="form-group row datos text-center">
         <TextFieldGroup
-          label="Aptikimo data"
-          divClassname="form-group col-3"
-          type="date"
-          id="item-daptik"
-          name="daptik"
-          placeholder="Aptikimo data"
-          value={absent(item.daptik)}
-          onChange={onChange}
-        />
-        <TextFieldGroup
-          label="Pašalinimo terminas"
-          divClassname="form-group col-3"
-          type="date"
-          id="item-dtermin"
-          name="dtermin"
-          placeholder="Terminas"
-          value={absent(item.dtermin)}
-          onChange={onChange}
-        />
-        <TextFieldGroup
-          label="Panaikinimo (tvarsliavimo) data"
-          divClassname="form-group col-3"
+          label="Galutinio panaikinimo data"
+          divClassname="form-group col-2"
           type="date"
           id="item-daction"
           name="daction"
           placeholder="Panaikinimo data"
-          value={absent(item.daction)}
+          value={absent(item.dstop)}
           onChange={onChange}
         />
-        <SelectInputGroup
-          id="item-action"
-          name="action"
-          label="Atliktas veiksmas"
-          divClassname="form-group col-3"
-          value={absent(item.action)}
-          options={actionOptions}
-          onChange={onChange}
-        />
-      </div>
-
-      <div className="form-group row pastaba text-center">
         <TextAreaGroup
-          divClassname="form-group col-12"
+          divClassname="form-group col-10"
           label="Pastaba"
           id="item-note"
           name="note"
@@ -315,11 +166,6 @@ const MainDataForm = ({ item, onChange, things }) => {
       </div>
     </div>
   );
-};
-
-MainDataForm.propTypes = {
-  item: PropTypes.object,
-  onChange: PropTypes.func.isRequired
 };
 
 export { MainDataForm };

@@ -1,54 +1,26 @@
-const modelProvider = require("./models/modelProvider");
+const modelProvider = require("../models/modelProvider");
 // parenka kaip konvertuoti duomens į tipą, kuris nurodytas model[prop].type
 const converter = {
   string: { convert: value => value.toString().trim() },
 
   integer: {
-    convert: (value, name) => {
+    convert: value => {
       let int = parseInt(value);
       if (isNaN(int))
-        throw { prop: name, msg: "value must be a non-negative integer" };
+        throw { msg: "value must be an integer" };
       return int;
     }
   },
 
   number: {
-    convert: (value, name) => {
+    convert: value => {
       let nr = Number(value);
       if (isNaN(nr))
-        throw { prop: name, msg: "value must be a non-negative number" };
+        throw { name, msg: "value must be a number" };
       return nr;
     }
-  },
-  
-  boolean01: { convert: value => (parseInt(value) === 0 ? 0 : 1) }
+  }
 };
-
-// 
-// draft laukus sukonvertuoja į tuos tipus, kurie nurodyti model[prop].type
-// Jeigu konvertuoti nepavyksta, tą lauką įrašo į errors objektą
-function normalize(draft, model, allErrors) {
-  let result = {};
-  let errors = {};
-  const keysToSkip = Object.keys(allErrors);
-
-  Object.keys(draft).forEach(key => {
-    if (keysToSkip.includes(key)) {
-      // jeigu šitam key jau yra rasta klaida, 
-      // tiesiog perkopijuoja jo reikšmę į result
-      result[key] = draft[key];
-      return;
-    }
-
-    try {
-      result[key] = converter[model[key].type].convert(draft[key], key);
-    } catch (err) {
-      result[key] = draft[key];
-      errors[err.prop] = err.msg;
-    }
-  });
-  return { item: result, normalizationErrors: errors };
-}
 
 // patikrina, ar data yra leistinose ribose - kad nebūtų, pvz. 2019-02-31
 function hasDateOverflow(shortDateString) {
@@ -61,13 +33,13 @@ function hasDateOverflow(shortDateString) {
   );
 }
 
+function isAbsent(prop) {
+  return value == null || value === "";
+}
+
 // funkcijos, kurios atlieka tikrinimą, ir
 // klaidos pranešimai, jeigu tikrinant gaunama true
 const validators = {
-  isAbsent: {
-    func: value => value == null || value === "",
-    msg: () => "is required"
-  },
 
   isEmptyString: {
     func: value => value.length === 0,
@@ -119,57 +91,101 @@ const validators = {
   }
 };
 
-function requiredAbsent(draft, model) {
-  let errors = {};
-  Object.keys(model).filter(key => model[key].required).forEach(key => {
-    if(validators.isAbsent.func(draft[key])) {
-      errors[key] = validators.isAbsent.msg();
+function validateProp(key, draft, model, insert) {
+  // patikrina ar prop/prop reikšmė yra apskritai
+  // jeigu insert, tai required prop reikšmė yra privaloma
+  if (isAbsent(draft[key])) {
+    if (insert && model[key].required) {
+      return {error: "is required"};
     }
-  });
-  return errors;
+    return null;
+  }
+
+  // mėgina konvertuoti
+  // grąžina prop arba error
+  let value;
+  try {
+    value = converter[model[key].type].convert(draft[key]);
+  } catch (err) { 
+    return {error: err.msg};
+  }
+
+  // tikrina pagal modelyje nurodytą validatorių
+  const validator = validators[model[key].validator];
+  const params = model[key].params;
+  if (validator.func(value, params)) {
+    return  {error: validator.msg(params)};
+  }
+
+  return {value};
 }
 
-// Funkcija, kuri atlieka normalizavimą ir tikrinimą.
-// Grąžina kiek įmanoma normalizuoto draft kopiją ir errors
-function validate(draft, itype, insert = true) {
-  const model = modelProvider[itype];
-  if (!model) throw {msg: `Unrecognized item type ${itype}`};
-  
-  let allErrors = {};
-
-  // randa tuos laukus, kurie yra required, bet jų reikšmė yra 
-  // null, undefined arba ""
-  if (insert) {
-    allErrors = requiredAbsent(draft, model);
-  } 
-  
-  // normalizuoja laukus - sukonvertuoja į tą tipą, koks reikalingas pagal model
-  // laukų, kurie yra required ir neturi reikšmių nenormalizuoja
-  let { item, normalizationErrors } = normalize(draft, model, allErrors);
-
-  allErrors = {...allErrors, ...normalizationErrors};
-  const keysWithErrors = Object.keys(allErrors);
-
-  // likusius laukus tikrina ar teisingos jų reikšmės
-  Object.keys(item)
-    .filter(itemKey => !keysWithErrors.includes(itemKey))
-    .forEach(prop => {
-      if (!model[prop]) {
-        delete item[prop];
+function validateObject(draft, model, insert) {
+  let errors = [];
+  let normalized = {};
+  const keys = insert ? Object.keys(model) : Object.keys(draft);
+  keys.forEach(key => {
+    if (!model[key]) return;
+    const result = validateProp(key, draft, model, insert);
+    if (result) {
+      if (result.error) {
+        errors.push({key, id: draft.id, msg: result.error});
         return;
       }
-      if (!model[prop].validator) return;
-      const validator = validators[model[prop].validator];
-      const params = model[prop].params;
-      if (validator.func(item[prop], params)) {
-        allErrors[prop] = validator.msg(params);
-      }
-    });
-
-  let errorsResult = {};
-  Object.keys(allErrors).forEach(err => errorsResult[err] = {label: model[err].label, msg: allErrors[err]});
-
-  return { item, errors: errorsResult, hasErrors: Object.keys(errorsResult).length > 0 };
+      normalized[key] = result.value;
+    }
+  });
+  
+  if (errors.length) return {errors};
+  return {draft: normalized};
 }
+
+function validateItem(main, journal, itype, insert) {
+
+  let allErrors = [];
+  let resultItem = {
+    main: null,
+    journal: {
+      insert: [],
+      update: [],
+      delete: journal.delete
+    }
+  };
+  let result;
+  const mainModel = modelProvider[itype].main;
+  const journalModel = modelProvider[itype].journal;
+
+  result = validateObject(main, mainModel, insert);
+  if (result.errors) {
+    allErrors = result.errors;
+  } else {
+    resultItem.main = result.draft;
+  }
+  
+
+  journal.insert && journal.insert.forEach(journalItem => {
+    result = validateObject(journalItem, journalModel, true);    
+    if (result.errors) {
+      allErrors = allErrors.concat(result.errors);
+    } else {
+      resultItem.journal.insert.push(result.draft);
+    }
+  });
+
+  journal.update && journal.update.forEach(journalItem => {
+    result = validateObject(journalItem, journalModel, insert);   
+    if (result.errors) {
+      allErrors = allErrors.concat(result.errors);
+    } else {
+      resultItem.journal.update.push(result.draft);
+    }
+  });
+  
+  if (allErrors.length) return {errors: allErrors};
+  return {item: resultItem};  
+}
+
+
+
 
 module.exports = validate;

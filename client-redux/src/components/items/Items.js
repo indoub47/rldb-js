@@ -1,7 +1,6 @@
 import React, { Component } from "react";
-import { PropTypes } from "prop-types";
 import { connect } from "react-redux";
-import ItemTable from "./ItemTable";
+import ItemList from "./ItemList";
 import IsLoading from "../common/IsLoading";
 import ErrorAlert from "../common/Alerts/ErrorAlert";
 import WarningAlert from "../common/Alerts/WarningAlert";
@@ -266,7 +265,7 @@ class Items extends Component {
                 </div>
               ) : null}
               <div className="col-12">
-                <ItemTable
+                <ItemList
                   itype={this.props.itype}
                   items={this.props.fsedItems.slice(
                     firstItemIndex,
@@ -298,27 +297,6 @@ class Items extends Component {
     );
   }
 }
-
-Items.propTypes = {
-  itype: PropTypes.string.isRequired,
-  fsedItems: PropTypes.array,
-  fsedItemsAreValid: PropTypes.bool.isRequired,
-  allItemCount: PropTypes.number,
-  filterSort: PropTypes.object,
-  fetchItems: PropTypes.func.isRequired,
-  deleteItem: PropTypes.func.isRequired,
-  invalidateItems: PropTypes.func.isRequired,
-  itemsIsLoading: PropTypes.bool,
-  errormsg: PropTypes.string,
-  pager: PropTypes.object.isRequired,
-  fetchQueries: PropTypes.func.isRequired,
-  queriesIsLoading: PropTypes.bool,
-  queriesFetchError: PropTypes.object,
-  pageChange: PropTypes.func.isRequired,
-  itemsPerPageChange: PropTypes.func.isRequired,
-  toggleFS: PropTypes.func.isRequired,
-  showFS: PropTypes.bool.isRequired
-};
 
 const mapStateToProps = (state, ownProps) => ({
   queriesIsLoading: state.queries[ownProps.itype].isLoading,
