@@ -1,11 +1,10 @@
 import React, { Component } from "react";
-import { PropTypes } from "prop-types";
 import { connect } from "react-redux";
 import Filter from "./components/Filter";
 import Sort from "./components/Sort";
 import QuerySelect from "./components/QuerySelect";
 import Manual from "./components/Manual";
-import ErrorAlert from "../Alerts/ErrorAlert";
+import Alert from "../Alert";
 import {toggleFSManual, filterSortItems,} from "../../../actions/itemsActions";
 
 class FilterSort extends Component {
@@ -113,9 +112,9 @@ class FilterSort extends Component {
               />
             </div>
             {
-              this.props.filterSort.error &&
+              this.props.filterSort.errormsg &&
               <div className="col-12">
-                <ErrorAlert message={this.props.filterSort.error.message} />
+                <Alert message={this.props.filterSort.errormsg} />
               </div>
             }
           </div>
@@ -173,15 +172,6 @@ class FilterSort extends Component {
     );
   }
 }
-
-FilterSort.propTypes = {
-  history: PropTypes.object.isRequired,
-  filterSortError: PropTypes.object,
-  queries: PropTypes.arrayOf(PropTypes.object).isRequired,
-  toggleFSManual: PropTypes.func.isRequired,
-  showFSManual: PropTypes.bool.isRequired,
-  itype: PropTypes.string.isRequired
-};
 
 const mapStateToProps = (state, ownProps) => ({
   queries: state.queries[ownProps.itype].data,

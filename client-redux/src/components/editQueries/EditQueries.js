@@ -1,16 +1,13 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import EditQueryForm from "./components/EditQueryForm";
 import QueryList from "./components/QueryList";
-import ErrorAlert from "../common/Alerts/ErrorAlert";
-import SuccessAlert from "../common/Alerts/SuccessAlert";
+import Alert from "../common/Alert";
 import IsLoading from "../common/IsLoading";
 import {
   updateQuery,
   insertQuery,
   deleteQuery,
-  //hideWarning,
   hideSuccess,
   hideError
 } from "../../actions/queriesActions";
@@ -21,19 +18,16 @@ class EditQueries extends Component {
     super(props);
     this.state = {
       currentQuery: null,
-      error: ""
+      errormsg: ""
     };
 
     //this.submitQueries = this.submitQueries.bind(this);
     this.submitDraft = this.submitDraft.bind(this);
     this.setForEditing = this.setForEditing.bind(this);
     this.submitDelete = this.submitDelete.bind(this);
-    //this.hideWarning = this.hideWarning.bind(this);
     this.hideSuccess = this.hideSuccess.bind(this);
     this.hideError = this.hideError.bind(this);
     this.hideErrorInState = this.hideErrorInState.bind(this);
-    //this.moveUp = this.moveUp.bind(this);
-    //this.moveDown = this.moveDown.bind(this);
   }
 
   componentDidMount() {
@@ -57,13 +51,12 @@ class EditQueries extends Component {
         q.filter === this.props.filterSort.filterText &&
         q.sort === this.props.filterSort.sortText
     ) || {
-        filter: this.props.filterSort.filterText,
-        sort: this.props.filterSort.sortText
-      };
+      filter: this.props.filterSort.filterText,
+      sort: this.props.filterSort.sortText
+    };
 
     // console.log("setting this query to state currentQuery", query);
     this.setState({ currentQuery: query });
-
   }
 
   componentDidUpdate(prevProps) {
@@ -71,10 +64,13 @@ class EditQueries extends Component {
     // console.log("cDU this.state", this.state);
     // console.log("cDU this.props.queries", this.props.queries);
     // must check if currentQuery is in queries. if not, then currentQuery - null
-    if (this.state.currentQuery && this.state.currentQuery.id && 
-    !this.props.queries.some(q => q.id === this.state.currentQuery.id)) {
+    if (
+      this.state.currentQuery &&
+      this.state.currentQuery.id &&
+      !this.props.queries.some(q => q.id === this.state.currentQuery.id)
+    ) {
       // console.log("setting state.currentQuery to null");
-      this.setState({currentQuery: null});
+      this.setState({ currentQuery: null });
     }
   }
 
@@ -82,13 +78,10 @@ class EditQueries extends Component {
     this.props.hideError(this.props.match.params.itype);
   }
   hideErrorInState() {
-    this.state.set({error: ""});
+    this.setState({ errormsg: "" });
   }
   hideSuccess() {
     this.props.hideSuccess(this.props.match.params.itype);
-  }
-  hideWarning() {
-    this.props.hideWarning(this.props.match.params.itype);
   }
   submitDelete(e) {
     const id = e.target.dataset.id;
@@ -96,11 +89,11 @@ class EditQueries extends Component {
     this.props.deleteQuery(id, itype);
   }
 
-  submitDraft(modifiedQuery) {
+  submitDraft(modifiedQuery) {    
     const draft = modifiedQuery;
 
     if (!draft.name || draft.name.trim() === "") {
-      this.setState({ error: "Name must be not empty" });
+      this.setState({ errormsg: "Name must be not empty" });
       return;
     }
 
@@ -109,14 +102,14 @@ class EditQueries extends Component {
     );
     if (sameNameQuery) {
       this.setState({
-        error: `Same name as ${sameNameQuery.id}; name must be unique`
+        errormsg: `Same name as ${sameNameQuery.id}; name must be unique`
       });
       return;
     }
 
     const itype = this.props.match.params.itype;
     draft.itype = itype;
-    
+
     if (draft.id) {
       this.props.updateQuery(draft);
     } else {
@@ -124,23 +117,45 @@ class EditQueries extends Component {
     }
   }
 
-  setForEditing(e) {    
-    this.setState({ 
-      currentQuery: this.props.queries.find(q => q.id === parseInt(e.target.dataset.id)) || null
-      });
+  setForEditing(e) {
+    this.setState({
+      currentQuery:
+        this.props.queries.find(q => q.id === parseInt(e.target.dataset.id)) ||
+        null,
+      errormsg: null
+    });
   }
 
   render() {
     // console.log("EditQueries render - this.props.queries", this.props.queries);
+    // čia reikia susitvarkyti su error
+    const storeError = this.props.storeError; // gali būti string arba Array of strings
+    const stateError = this.state.errormsg;
+    const storeSuccess = this.props.successmsg;
+
     return (
       <div className="container thing-edit">
-        {this.props.error ? (
-          <ErrorAlert message={this.props.error.message} hide={this.hideError} />
-        ) : null}
-        {this.state.error ? <ErrorAlert message={this.state.error} hide={this.hideErrorInState} /> : null}
-        {this.props.success ? (
-          <SuccessAlert message={this.props.success} hide={this.hideSuccess} />
-        ) : null}
+        {storeError && (
+          <Alert
+            message={storeError}
+            type="error"
+            hide={this.hideError}
+          />
+        )}
+        {stateError && (
+          <Alert
+            message={stateError}
+            type="error"
+            hide={this.hideErrorInState}
+          />
+        )}
+        {storeSuccess && (
+          <Alert
+            message={storeSuccess}
+            type="success"
+            hide={this.hideSuccess}
+          />
+        )}
 
         <IsLoading when={this.props.isLoading} />
 
@@ -159,32 +174,25 @@ class EditQueries extends Component {
   }
 }
 
-EditQueries.propTypes = {
-  queries: PropTypes.arrayOf(PropTypes.object),
-  error: PropTypes.object,
-  success: PropTypes.string,
-  isLoading: PropTypes.bool,
-  filterSort: PropTypes.object,
-  updateQuery: PropTypes.func.isRequired,
-  insertQuery: PropTypes.func.isRequired,
-  deleteQuery: PropTypes.func.isRequired
-};
-
 const mapStateToProps = (state, ownProps) => {
   const itype = ownProps.match.params.itype;
   const stateQueries = state.queries[itype];
   return {
     queries: stateQueries.data,
     isLoading: stateQueries.isLoading,
-    error: stateQueries.error,
-    success: stateQueries.success,
+    storeError: stateQueries.error,
+    successmsg: stateQueries.successmsg,
     filterSort: state.itemsFS[itype]
   };
 };
 
 export default connect(
   mapStateToProps,
-  { updateQuery, deleteQuery, insertQuery,
-  //hideWarning, 
-  hideSuccess, hideError }
+  {
+    updateQuery,
+    deleteQuery,
+    insertQuery,
+    hideSuccess,
+    hideError
+  }
 )(EditQueries);

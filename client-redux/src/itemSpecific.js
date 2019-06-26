@@ -20,32 +20,24 @@ import * as employeeJournalRow from "./components/items/specific/employees/Journ
 import * as iTypes from "./itypes"
 
 
-export default itemSpecific = {
-  [itypes.defect]: {
+export default {
+  [iTypes.defect]: {
         replacements: defectReplacements,
         mainDataForm: defectMainDataForm.MainDataForm,
         singleRow: defectSingleRow,
-        journalEditForm: defectJournalEditForm,
-        journalRow: defectJournalRow,
+        journalEditForm: defectJournalEditForm.JournalEditForm,
+        journalRow: defectJournalRow.JournalRow,
+        journalListHead: defectJournalRow.JournalHeadRow,
         listPath: "/defects",
         panaikinta: item => !!item.dstop
       },
-  [itypes.welding]: {
+  [iTypes.welding]: {
         replacements: weldingReplacements,
         mainDataForm: weldingMainDataForm.MainDataForm,
         singleRow: weldingSingleRow,
         journalEditForm: weldingJournalEditForm,
         journalRow: weldingJournalRow,
         listPath: "/weldings",
-        panaikinta: item => {throw "panaikinta for welding is not implemented";}
-      },
-  [itypes.employee]: {
-        replacements: employeeReplacements,
-        mainDataForm: employeeMainDataForm.MainDataForm,
-        singleRow: employeeSingleRow,
-        journalEditForm: weldingJournalEditForm,
-        journalRow: weldingJournalRow,
-        listPath: "/employees",
-        panaikinta: item => {throw "panaikinta for employee is not implemented";}
+        panaikinta: item => {throw {message: "panaikinta for welding is not implemented"}}
       }
 };

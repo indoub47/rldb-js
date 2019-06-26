@@ -1,9 +1,10 @@
 import axios from "axios";
+//import * as extractMsg from "./functions/extractMsg";
 import {
   REPORT_BEGIN,
   REPORT_SUCCESS,
   REPORT_ERROR,
-  ERASE_REPORT
+  REPORT_ERASE
 } from "./types";
 import Reporter from "./reporters/Reporter";
 
@@ -17,15 +18,15 @@ const reportSuccess = (report, rtype) => ({
   payload: { report, rtype }
 });
 
-const reportFailure = error => ({
+const reportFailure = errormsg => ({
   type: REPORT_ERROR,
-  payload: { error }
+  payload: { errormsg }
 });
 
 export const eraseReport = () => dispatch => {
   // console.log("dispatching erase report");
   dispatch({
-    type: ERASE_REPORT
+    type: REPORT_ERASE
   });
 };
 
@@ -34,7 +35,7 @@ export const createReport = (rtype, params) => dispatch => {
   const reporter = new Reporter(rtype);
   // console.log("reporter", reporter);
   if (!reporter) {
-    dispatch(reportFailure({ message: "Unknown report type" }));
+    dispatch(reportFailure({ errormsg: "Unknown report type" }));
     return;
   }
 
@@ -48,7 +49,7 @@ export const createReport = (rtype, params) => dispatch => {
       dispatch(reportSuccess(report, rtype));
     })
     .catch(err => {
-      // console.log("errr", err);
+      // console.log("err", err);
       dispatch(reportFailure(err));
     });
 };

@@ -171,3 +171,9 @@ li.ellipsis {
 label {
   font-weight: bold;
 }
+
+/* current journal row */
+tr.current {
+  color: blue;
+  font-style: oblique;
+}

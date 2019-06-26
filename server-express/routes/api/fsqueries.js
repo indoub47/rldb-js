@@ -8,10 +8,10 @@ const db = new Database("./db/dnbl.sqlite", {
   verbose: console.log,
   fileMustExist: true
 });
-const collName = "fsqueries";
+const tableName = "fsqueries";
 
 const nameIsNotUnique = (name, email, db) => {
-  const stmtText = `SELECT COUNT(*) AS count FROM ${collName} WHERE email = ? AND name = ?`;
+  const stmtText = `SELECT COUNT(*) AS count FROM ${tableName} WHERE email = ? AND name = ?`;
   const stmt = db.prepare(stmtText);
   return stmt.get(email, name).count > 0;
 };
@@ -20,43 +20,27 @@ const validate = (draft, exclude) => {
   let result = [];
   if (!exclude.includes("id")) {
     if (draft.id == null || !(Number.isInteger(draft.id) && draft.id > 0)) {
-      result.push({
-        prop: "id",
-        msg: "id is required and must be a positive integer"
-      });
+      result.push({key: "id", msg: "privalomas ir turi būti teigiamas sveikasis skaičius"});
     }
   }
   if (!exclude.includes("name")) {
-    if (draft.name == null || draft.name.length < 1 || draft.name.length > 25) {
-      result.push({
-        prop: "name",
-        msg:
-          "name is required and its length must be between 1 and 25 characters"
-      });
+    if (draft.name == null || draft.name.length < 1 || draft.name.length > 50) {
+      result.push({key: "name", msg: "privalomas, ilgis turi būti nuo 1 iki 50 simbolių"});
     }
   }
   if (!exclude.includes("filter")) {
     if (draft.filter != null && draft.filter.length > 500) {
-      result.push({
-        prop: "filter",
-        msg: "filter length must up to 500 characters"
-      });
+      result.push({key: "filter", msg: "ilgis turi būti iki 500 simbolių"});
     }
   }
   if (!exclude.includes("sort")) {
     if (draft.sort != null && draft.sort.length > 500) {
-      result.push({
-        prop: "sort",
-        msg: "sort length must up to 500 characters"
-      });
+      result.push({key: "sort", msg: "ilgis turi būti iki 500 simbolių"});
     }
   }
   if (!exclude.includes("itype")) {
     if (draft.itype == null || !["defect", "welding"].includes(draft.itype)) {
-      result.push({
-        prop: "itype",
-        msg: "itype is required and must be chosen from itypes list"
-      });
+      result.push({key: "itype", msg: "privalomas ir turi būti iš patvirtinto sąrašo"}); 
     }
   }
   if (!exclude.includes("email")) {
@@ -65,17 +49,10 @@ const validate = (draft, exclude) => {
       draft.email.length < 5 ||
       draft.name.length > 255
     ) {
-      result.push({
-        prop: "email",
-        msg:
-          "email is required and its length must be between 5 and 255 characters"
-      });
+      result.push({key: "email", msg: "privalomas ir ilgis turi būti 5-25 simbolių"});
     }
   }
-  if (result.length === 0) return null;
-  let obj = {};
-  result.forEach(item => (obj[item.prop] = item.msg));
-  return obj;
+  return result;
 };
 
 // force to authenticate
@@ -88,13 +65,13 @@ router.use(passport.authenticate("jwt", { session: false }));
 router.get("/fetch", (req, res) => {
   const email = req.user.email;
   const itype = req.query.itype;
-  const stmtText = `SELECT * FROM ${collName} WHERE email = ? AND itype = ?`;
+  const stmtText = `SELECT * FROM ${tableName} WHERE email = ? AND itype = ?`;
   try {
     const stmt = db.prepare(stmtText);
     const fsqueries = stmt.all(email, itype);
     return res.status(200).json(fsqueries);
   } catch (err) {
-    // console.log("email, itype, err", email, itype, err);
+    console.error(err);
     return res.status(500).send(err);
   }
 });
@@ -106,14 +83,13 @@ router.get("/fetch", (req, res) => {
 router.delete("/delete", (req, res) => {
   const email = req.user.email;
   const id = req.query.id;
-  const stmtText = SQLStatements.delete(collName, 'email = ? AND id = ?');
+  const stmtText = SQLStatements.simpleDeleteStmt(tableName, 'email = ? AND id = ?');
   // email - kad apsaugoti, kad galėtų ištrinti tik savus
   try {
-    const stmt = db.prepare(stmtText);
-    const info = stmt.run(email, id);
+    const info = db.prepare(stmtText).run(email, id);
     return res.status(200).json({ ...info, id });
   } catch (err) {
-    // console.log("email, id, err", email, id, err);
+    console.error(err);
     return res.status(500).send(err);
   }
 });
@@ -127,26 +103,24 @@ router.post("/update", (req, res) => {
   draft.email = req.user.email;
 
   const validation = validate(draft, ["email"]);
-  if (validation) {
-    return res.status(400).send(validation);
-  }  
+  if (validation.length) {
+    return res.status(400).send({errors: validation});
+  } 
+
 
   try {
     // check if name is unique
-    const stmtUniqueText = `SELECT COUNT(*) AS count FROM ${collName} WHERE email = ? AND name = ? AND itype = ? AND id <> ?`;
-    const stmtUnique = db.prepare(stmtUniqueText);
-    const unique =
-      stmtUnique.get(draft.email, draft.name, draft.itype, draft.id).count ===
-      0;
-    if (!unique) return res.status(400).send({ msg: "name must be unique" });
+    const stmtUniqueText = `SELECT COUNT(*) AS count FROM ${tableName} WHERE email = ? AND name = ? AND itype = ? AND id <> ?`;
+    const result = db.prepare(stmtUniqueText).get(draft.email, draft.name, draft.itype, draft.id);
+    if (result.count !== 0) return res.status(400).send({ msg: "name must be unique" });
 
     // perform update
-    const filter = 'email = @email AND id = @id';
-    const stmtText = SQLStatements.update(draft, collName, filter, ["id", "email"]);
-    const stmt = db.prepare(stmtText);
-    const info = stmt.run(draft);
+    const filter = 'email=@email AND id=@id AND itype=@itype';
+    const stmtText = `${SQLStatements.simpleUpdateStmt(draft, tableName, ["id", "email", "itype"])} WHERE ${filter}`;
+    const info = db.prepare(stmtText).run(draft);
     return res.status(200).json(draft);
   } catch (err) {
+    console.error(err);
     // console.log("draft, err", draft, err);
     return res.status(500).send(err);
   }
@@ -162,27 +136,26 @@ router.put("/insert", (req, res) => {
   delete draft.id;
   // console.log("mark1");
   const validation = validate(draft, ["email", "id"]);
-  if (validation) {
-    return res.status(400).send(validation);
+  if (validation.length) {
+    return res.status(400).send({errors: validation});
   }
   // console.log("mark2");
   
   try {
     // check if name is unique
-    const stmtUniqueText = `SELECT COUNT(*) AS count FROM ${collName} WHERE email = ? AND name = ? AND itype = ?`;
+    const stmtUniqueText = `SELECT COUNT(*) AS count FROM ${tableName} WHERE email = ? AND name = ? AND itype = ?`;
     const stmtUnique = db.prepare(stmtUniqueText);
     const unique =
       stmtUnique.get(draft.email, draft.name, draft.itype).count === 0;
     if (!unique) return res.status(400).send({ msg: "name must be unique" });
     
     // perform insert
-    const stmtText = SQLStatements.insert(draft, collName);    
+    const stmtText = SQLStatements.simpleInsertStmt(tableName, draft);    
     // console.log("insert stmt", stmtText);
-    const stmt = db.prepare(stmtText);
-    const info = stmt.run(draft);
+    const info = db.prepare(stmtText).run(draft);
     return res.status(200).json({ ...draft, id: info.lastInsertRowid });
   } catch (err) {
-    // console.log("draft, err", draft, err);
+    console.error(err);    
     return res.status(500).send(err);
   }
 });

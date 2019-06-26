@@ -16,5 +16,6 @@
   "bugs": {
     "url": "https://github.com/indoub47/rldb-js/issues"
   },
-  "homepage": "https://github.com/indoub47/rldb-js#readme"
+  "homepage": "https://github.com/indoub47/rldb-js#readme",
+  "dependencies": {}
 }

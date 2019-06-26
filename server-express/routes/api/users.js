@@ -5,7 +5,6 @@ const jwt = require("jsonwebtoken");
 const passport = require("passport");
 const validateRegisterInput = require("../../validation/register");
 const validateLoginInput = require("../../validation/login");
-const insertStmtText = require("../SQLStatements").insert;
 const SECRET_KEY = require("../../config/secret.js").SECRET_KEY;
 const REGIONS = require("../../config/settings").REGIONS;
 
@@ -21,8 +20,8 @@ const db = new Database("./db/dnbl.sqlite", {
 // @access Public
 router.post("/register", (req, res) => {
   // field validation
-  const { errors, isValid } = validateRegisterInput(req.body);
-  if (!isValid) {
+  const errors = validateRegisterInput(req.body);
+  if (errors) {
     return res.status(400).json(errors);
   }
 
@@ -32,11 +31,11 @@ router.post("/register", (req, res) => {
     const stmtCheckEmail = db.prepare(stmtCheckEmailText);
     const emailExists = stmtCheckEmail.get(req.body.email).count > 0;
     if (emailExists) {
-      return res.status(400).json({ email: "Email already exists" });
+      return res.status(400).json({email: "Email already exists"});
     }
   } catch (error) {
     // console.log(error);
-    return res.status(500).json({error});
+    return res.status(500).json(error);
   }
 
   // create new user
@@ -50,22 +49,30 @@ router.post("/register", (req, res) => {
 
    // hash user's password and response with a newly created user
   bcrypt.genSalt(10, (error, salt) => {
-    if (error) return res.status(500).json({error});
+    if (error) return res.status(500).json(error);
     bcrypt.hash(req.body.password, salt, (error, hash) => {
-      if (error) return res.status(500).json({error});
+      if (error) return res.status(500).json(error);
       // set user's password with a hash
       newUser.password = hash; 
 
-      const stmtText = insertStmtText(newUser, "users");
+      const keysValues = Object.keys(newUser)
+        .map(key => ({key, value: newUser[key]}));
+      const tableName = "users";
+      const stmtText = `INSERT INTO ${tableName} (${
+        keysValues.map(kv => kv.key).join(', ')
+      }) VALUES (${
+        keysValues.map(kv => "@" + kv.key).join(', ')
+      })`;
       // console.log("stmtText", stmtText);
+
       try {
-        const stmt = db.prepare(stmtText);
-        const info = stmt.run(newUser);
+        const info = db.prepare(stmtText).run(newUser);
+        if (info.changes < 1) return res.status(500).send({message: "insert unsuccessful"});
         delete newUser.password;
         res.status(200).json(newUser);
       } catch (error) {
         // console.log("error inserting user", error);
-        return res.status(500).json({error});
+        return res.status(500).json(error);
       }
     });
   });
@@ -77,13 +84,13 @@ router.post("/register", (req, res) => {
 router.post("/login", (req, res) => {
   // error list won't be shown to the user,
   // just a general 'login unsuccessful' instead
-  const badLoginResponse = { msg: "wrong password or email" };
+  const badLoginResponse = { message: "wrong email or password" };
 
   // validate fields
-  const { errors, isValid } = validateLoginInput(req.body);
-  if (!isValid) {
+  const errors = validateLoginInput(req.body);
+  if (errors) {
     return res.status(400).json(errors);
-  }
+  }  
 
   const email = req.body.email;
   const password = req.body.password;
@@ -92,14 +99,14 @@ router.post("/login", (req, res) => {
   const stmtTxt = 'SELECT * FROM users WHERE email = ? AND active = 1';
   let user = null;
   try {
-    const stmt = db.prepare(stmtTxt);
-    user = stmt.get(email);
+    //throw new Error("test1 error");
+    user = db.prepare(stmtTxt).get(email);
     if (!user) {
       return res.status(404).json(badLoginResponse);
     }    
   } catch (error) {
-    // console.log(error);
-    return res.status(500).json({error});
+    console.log(error);
+    return res.status(500).send(error);
   }
 
   // email found, check if passwords match
@@ -119,7 +126,7 @@ router.post("/login", (req, res) => {
         if (err) {
           // error signing token
           // console.log("token signing error", err)
-          return res.status(500).json({ err });
+          return res.status(500).json(err);
         }
         
         return res.status(200).json(
@@ -133,7 +140,7 @@ router.post("/login", (req, res) => {
   })
   .catch(error => {
     // console.log("Bcrypt error", error);
-    return res.status(500).json({error})
+    return res.status(500).json(error)
   });
 });
 

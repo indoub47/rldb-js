@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import classnames from 'classnames';
 
 
@@ -41,23 +40,6 @@ const SelectInputGroup = ({
       )}
     </div>
   );
-}
-
-SelectInputGroup.propTypes = {
-  options: PropTypes.array,
-  name: PropTypes.string.isRequired,
-  id: PropTypes.string,
-  label: PropTypes.string,
-  value: PropTypes.string,
-  info: PropTypes.string,
-  error: PropTypes.string,
-  onChange: PropTypes.func.isRequired,
-  size: PropTypes.string,
-  multiple: PropTypes.string,
-  disabled: PropTypes.string,
-  classname: PropTypes.string,
-  divClassname: PropTypes.string,
-  style: PropTypes.object
 }
 
 SelectInputGroup.defaultProps = {

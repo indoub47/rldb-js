@@ -3,6 +3,7 @@ import React from "react";
 const Alert = ({ type, message, hide }) => {
   // message - string or array of strings
   if (!message) return null;
+  const alertType = type || "error";
   let displayMsg;
   if (typeof message === 'string') {
     displayMsg = message.trim();
@@ -27,7 +28,7 @@ const Alert = ({ type, message, hide }) => {
     info: "primary"
   }
 
-  const classname = `alert alert-${classOf[type]}${hide == null ? " alert-dismissible fade show" : ""}`;
+  const classname = `alert alert-${classOf[alertType]}${hide == null ? " alert-dismissible fade show" : ""}`;
   return (
     <div className={classname} role="alert">
       {displayMsg}
@@ -40,4 +41,4 @@ const Alert = ({ type, message, hide }) => {
   );
 };
 
-export Alert;
+export default Alert;

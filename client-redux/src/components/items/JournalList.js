@@ -1,7 +1,8 @@
 import React from 'react';
 import itemSpecific from "../../itemSpecific";
+import journalSorter from "../../utils/journalSorter";
 
-const JournalList = ({jItems, setForEdit, deleteJItem, itype}) => {
+const JournalList = ({jItems, setForEdit, deleteJItem, itype, currentId}) => {
 
   if (jItems.length < 1) {
     return (
@@ -13,15 +14,16 @@ const JournalList = ({jItems, setForEdit, deleteJItem, itype}) => {
     );
   }
 
-  const singleRow = itemSpecific[itype].journalRow;
-  const JournalRow = singleRow.ItemRow;
+  const JournalRow = itemSpecific[itype].journalRow;
+  const JournalHeadRow = itemSpecific[itype].journalListHead;
   
-  const jItemRows = jItems.map((jItem, ind) => 
+  const jItemRows = jItems.sort(journalSorter).map((jItem, ind) => 
     <JournalRow
       jItem={jItem} 
       setForEdit={setForEdit}
-      deleteItem={deleteItem}
+      deleteJItem={deleteJItem}
       key={jItem.id}
+      current={jItem.id === currentId}
     />
   );
 
@@ -31,7 +33,7 @@ const JournalList = ({jItems, setForEdit, deleteJItem, itype}) => {
         className="table table-sm table-striped table-bordered jitems" style={{fontSize: ".85rem"}}
       >
         <thead>
-          {singleRow.JournalHeadRow()}
+          {JournalHeadRow()}
         </thead>
         <tbody>
           {jItemRows}

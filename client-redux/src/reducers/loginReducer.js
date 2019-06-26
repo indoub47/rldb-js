@@ -5,7 +5,7 @@ const initialState = {
   isAuthenticated: false,
   user: {},
   isBusy: false,
-  error: {}
+  errors: {}
 };
 
 export default function(state = initialState, action) {
@@ -15,7 +15,7 @@ export default function(state = initialState, action) {
         ...state,
         isBusy: true,
         user: {},
-        error: {},
+        errors: {},
         isAuthenticated: false
       };
 
@@ -25,7 +25,7 @@ export default function(state = initialState, action) {
         isAuthenticated: !isEmpty(action.payload),
         user: action.payload,
         isBusy: false,
-        error: {}
+        errors: {}
       };
 
     case LOGIN_ERROR:
@@ -33,7 +33,7 @@ export default function(state = initialState, action) {
         ...state,
         isBusy: false,
         user: {},
-        error: action.payload,
+        errors: action.payload.errors,
         isAuthenticated: false
       };
 

@@ -2,7 +2,7 @@ import {
   REPORT_BEGIN,
   REPORT_SUCCESS,
   REPORT_ERROR,
-  ERASE_REPORT,
+  REPORT_ERASE,
   LOGOUT
 } from "../actions/types";
 
@@ -10,7 +10,7 @@ const initialState = {
   data: {},
   rtype: "",
   params: null,
-  error: null,
+  errormsg: null,
   isLoading: false
 };
 
@@ -22,7 +22,7 @@ export default function(state = initialState, action) {
         ...state,
         data: {},
         params: action.payload.params,
-        error: null,
+        errormsg: null,
         isLoading: true
       };
 
@@ -32,7 +32,7 @@ export default function(state = initialState, action) {
         ...state,
         data: action.payload.report,
         rtype: action.payload.rtype,
-        error: null,
+        errormsg: null,
         isLoading: false
       };
 
@@ -43,11 +43,11 @@ export default function(state = initialState, action) {
         ...state,
         data: {},
         rtype: "",
-        error: action.payload.error,
+        errormsg: action.payload.errormsg,
         isLoading: false
       };
 
-    case ERASE_REPORT:
+    case REPORT_ERASE:
     case LOGOUT:
       // console.log("report reducer erasing report");
       return initialState;

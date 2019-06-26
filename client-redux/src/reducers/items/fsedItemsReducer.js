@@ -1,6 +1,6 @@
 import { 
   ITEMS_FILTERSORT_APPLIED,
-  INVALIDATE_ITEMS,
+  ITEMS_INVALIDATE,
   LOGOUT 
   } from "../../actions/types";
 import * as iTypes from "../../itypes";
@@ -23,7 +23,7 @@ export default function(state = initialState, action) {
         }
       };
     
-    case INVALIDATE_ITEMS:
+    case ITEMS_INVALIDATE:
       return {
         ...state,
         [action.payload.itype]: {

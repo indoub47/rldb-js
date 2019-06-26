@@ -1,66 +1,63 @@
 import axios from "axios";
-import extractMsg from "./functions/extractMsg";
 import {
-  FETCH_ITEMS_BEGIN,
-  FETCH_ITEMS_SUCCESS,
-  FETCH_ITEMS_FAILURE,
+  ITEMS_FETCH_BEGIN,
+  ITEMS_FETCH_SUCCESS,
+  ITEMS_FETCH_FAILURE,
   ITEM_INSERT_BEGIN,
   ITEM_INSERT_SUCCESS,
   ITEM_INSERT_FAILURE,
+  ITEM_INSERT_FAILURE_NO_RETRY,
   ITEM_UPDATE_BEGIN,
   ITEM_UPDATE_SUCCESS,
   ITEM_UPDATE_FAILURE,
+  ITEM_UPDATE_FAILURE_NO_RETRY,
   ITEM_DELETE_BEGIN,
   ITEM_DELETE_SUCCESS,
   ITEM_DELETE_FAILURE,
-  INVALIDATE_ITEMS,
+  ITEMS_INVALIDATE,
   ITEMS_FILTERSORT_APPLIED,
   ITEMS_FILTERSORT_APPLY_ERROR,
   ITEM_TOGGLE_FS,
   ITEM_TOGGLE_FS_MANUAL,
   ITEMS_PAGE_CHANGE,
   ITEMS_PER_PAGE_CHANGE,
-  HIDE_ITEMS_ERROR,
-  HIDE_ITEMS_WARNING,
-  ITEMS_SET_WARNING,
-  HIDE_ITEMS_SUCCESS,
-  ITEMS_SET_SUCCESS,
-  SET_CURRENT_ITEM_TYPE
+  ITEM_LIST_HIDE_ALERT,
+  ITEM_LIST_SET_ALERT,
+  ITEM_EDIT_HIDE_ALERT,
+  CURRENT_ITEM_SET_TYPE
 } from "./types";
 import funcCreator from "./functions/filterSort/itemFilterSort";
 import itemSpecific from "../itemSpecific";
+import journalSorter from "../utils/journalSorter";
+
+const errors2msgs = errors => {
+  return errors.map(e => `id${e.id}-${e.key}: ${e.msg}`);
+}
 
 export const setCurrentItemType = itype => dispatch =>
   dispatch({
-    type: SET_CURRENT_ITEM_TYPE,
+    type: CURRENT_ITEM_SET_TYPE,
     payload: { itype }
   });
 
-export const hideWarning = itype => dispatch =>
+export const setItemListAlert = (itype, msg, type) => ({
+    type: ITEM_LIST_SET_ALERT,
+    payload: { itype, msg, type }
+  });
+
+export const hideItemListAlert = itype => dispatch =>
   dispatch({
-    type: HIDE_ITEMS_WARNING,
+    type: ITEM_LIST_HIDE_ALERT,
     payload: { itype }
   });
 
-export const hideSuccess = itype => dispatch =>
+export const hideItemEditAlert = itype => dispatch =>
   dispatch({
-    type: HIDE_ITEMS_SUCCESS,
+    type: ITEM_EDIT_HIDE_ALERT,
     payload: { itype }
   });
 
-export const hideSingleItemError = itype => dispatch =>
-  dispatch({
-    type: HIDE_ITEMS_ERROR,
-    payload: { itype, target: "SINGLE_ITEM" }
-  });
-
-export const hideItemListError = itype => dispatch =>
-  dispatch({
-    type: HIDE_ITEMS_ERROR,
-    payload: { itype, target: "ITEM_LIST" }
-  });
-
-export const pageChange = (pageIndex, itemCount, itype) => dispatch =>
+export const pageChange = (pageIndex, itemCount, itype) => dispatch => 
   dispatch({
     type: ITEMS_PAGE_CHANGE,
     payload: { itemCount, pageIndex, itype }
@@ -97,10 +94,11 @@ const applyFilterSort = (items, filterText, sortText, itype) => {
       type: ITEMS_FILTERSORT_APPLIED,
       payload: { items: fsedItems, filterText, sortText, itype }
     };
-  } catch (error) {
+  } catch (err) {
+    console.log(err);
     return {
       type: ITEMS_FILTERSORT_APPLY_ERROR,
-      payload: { error, itype }
+      payload: { errormsg: err.toString(), itype }
     };
   }
 };
@@ -117,18 +115,18 @@ export const filterSortItems = (filterText, sortText, itype) => (
 
 // fetch items
 const fetchItemsBegin = itype => ({
-  type: FETCH_ITEMS_BEGIN,
+  type: ITEMS_FETCH_BEGIN,
   payload: { itype }
 });
 
 const fetchItemsSuccess = (items, itype) => ({
-  type: FETCH_ITEMS_SUCCESS,
+  type: ITEMS_FETCH_SUCCESS,
   payload: { items, itype }
 });
 
-const fetchItemsFailure = (error, itype) => ({
-  type: FETCH_ITEMS_FAILURE,
-  payload: { error, itype }
+const fetchItemsFailure = (errormsg, itype) => ({
+  type: ITEMS_FETCH_FAILURE,
+  payload: { errormsg, itype }
 });
 
 export const fetchItems = itype => (dispatch, getState) => {
@@ -136,17 +134,20 @@ export const fetchItems = itype => (dispatch, getState) => {
   let paramsObj = { params: { itype } };
   if (getState().itemsStatus[itype].all) paramsObj.params.all = 1;
   axios
-    .get("api/items", paramsObj)
+    .get("/api/items", paramsObj)
     .then(res => {
       dispatch(fetchItemsSuccess(res.data, itype));
       refilter(dispatch, getState, itype);
     })
-    .catch(err => dispatch(fetchItemsFailure(err, itype)));
+    .catch(err => {
+      console.log(err);
+      dispatch(fetchItemsFailure(err.toString(), itype))
+    });
 };
 
 export const invalidateItems = (all, itype) => dispatch => {
   dispatch({
-    type: INVALIDATE_ITEMS,
+    type: ITEMS_INVALIDATE,
     payload: { all, itype }
   });
 };
@@ -157,16 +158,6 @@ const refilter = (dispatch, getState, itype) => {
   const sortText = getState().itemsFS[itype].sortText;
   dispatch(applyFilterSort(fetchedItems, filterText, sortText, itype));
 };
-
-const setWarning = (message, itype) => ({
-  type: ITEMS_SET_WARNING,
-  payload: { message, itype }
-});
-
-const setSuccess = (message, itype) => ({
-  type: ITEMS_SET_SUCCESS,
-  payload: { message, itype }
-});
 
 // insert item
 const itemInsertBegin = itype => ({
@@ -179,13 +170,17 @@ const itemInsertSuccess = (item, itype) => ({
   payload: { item, itype }
 });
 
-const itemInsertFailure = (errormsg, itype, target) => ({
+const itemInsertFailure = (errormsg, itype) => ({
   type: ITEM_INSERT_FAILURE,
-  payload: { errormsg, itype, target }
+  payload: { errormsg, itype }
+});
+
+const itemInsertFailureNoRetry = (errormsg, itype) => ({
+  type: ITEM_INSERT_FAILURE_NO_RETRY,
+  payload: { errormsg, itype }
 });
 
 export const insertItem = (main, journal, history, itype) => (dispatch, getState) => {
-  // console.log("inserting item");
   dispatch(itemInsertBegin(itype));
   axios
     .put("/api/items/insert", { main, journal, itype })
@@ -193,39 +188,54 @@ export const insertItem = (main, journal, history, itype) => (dispatch, getState
       // suformuojamas pranešimas apie rezultatą
       // console.log("inserting item response", res.data);
       if (res.data.ok) {
-        dispatch(setSuccess(res.data.msg, itype));
+        dispatch(setItemListAlert(itype, res.data.msg, "success"));
       } else {
-        dispatch(setWarning(res.data.msg, itype));
+        dispatch(setItemListAlert(itype, res.data.msg, "warning"));
       }
 
       // pagal rezultatą updateinamas local cache
       if (
         getState().itemsStatus[itype].all ||
-        !itemSpecific[itype].panaikinta(res.data.item)
+        !itemSpecific[itype].panaikinta(res.data.item.main)
       ) {
         // jeigu rodyti visus (ir panaikintus, ir ne) ARBA
         // jeigu buvo sukurtas nepanaikintas -
         // updateinamas local cache ir refilter
-        dispatch(itemInsertSuccess(res.data.item, itype));
+        const lastJournalRecord = res.data.item.journal.sort(journalSorter)[res.data.item.journal.length - 1];
+        const item = {...lastJournalRecord, ...res.data.item.main};
+        dispatch(itemInsertSuccess(item, itype));
         refilter(dispatch, getState, itype);
+      } else {
+        // jeigu insertintas toks, kurio neturėtų būti local cache,
+        // tuomet su local cache nedaroma nieko - nei insertinama, nei refilter
+        dispatch(itemInsertSuccess(null, itype));
       }
+
+      // return to list
+      history.push(itemSpecific[itype].listPath);
     })
     .catch(err => {
-      const error = JSON.parse(JSON.stringify(err));
-      const errmsg = extractMsg(error);
-      // console.log("error-msg", errmsg);
-
-      if (
-        error.response &&
-        error.response.data &&
-        err.response.data.reason === "bad criteria"
-      ) {
-        // console.log("insert item error path1");
-        dispatch(itemInsertFailure(errmsg, itype, "ITEM_LIST"));
-        history.push(itemSpecific[itype].listPath);
+      console.log(err);
+      if (err.response && err.response.data) {
+        if (err.response.data.reason === "bad criteria") {
+          // "bad criteria" - kartoti nėra prasmės, grįžtama į sąrašą
+          dispatch(itemInsertFailureNoRetry(err.response.data.msg, itype));
+          history.push(itemSpecific[itype].listPath);
+        } else if (err.response.data.reason === "bad draft") {
+          // "bad draft" - reikia paredaguoti draft, pasiliekama item edit'e
+          // gali perduoti vieną string - msg, o gali perduoti objektų array - errors
+          let responseMsg = err.response.data.msg;
+          if (err.response.data.errors) {
+            responseMsg = errors2msgs(err.response.data.errors);
+          }
+          dispatch(itemInsertFailure(responseMsg, itype));
+        } else {
+          // kt. - galbūt serverio klaida ar kažkas, apsimoka pamėginti dar kartą
+          dispatch(itemInsertFailure(err.response.data.msg, itype));
+        }
       } else {
-        // console.log("insert item error path2");
-        dispatch(itemInsertFailure(errmsg, itype, "SINGLE_ITEM"));
+        // galbūt serverio klaida ar kažkas, apsimoka pamėginti dar kartą
+        dispatch(itemInsertFailure(err.toString(), itype));
       }
     });
 };
@@ -241,9 +251,14 @@ const itemUpdateSuccess = (item, itype) => ({
   payload: { item, itype }
 });
 
-const itemUpdateFailure = (errormsg, itype, target) => ({
+const itemUpdateFailure = (errormsg, itype) => ({
   type: ITEM_UPDATE_FAILURE,
-  payload: { errormsg, itype, target }
+  payload: { errormsg, itype }
+});
+
+const itemUpdateFailureNoRetry = (errormsg, itype) => ({
+  type: ITEM_UPDATE_FAILURE_NO_RETRY,
+  payload: { errormsg, itype }
 });
 
 export const updateItem = (main, journal, history, itype) => (dispatch, getState) => {
@@ -251,33 +266,27 @@ export const updateItem = (main, journal, history, itype) => (dispatch, getState
   axios
     .post("/api/items/update", { main, journal, itype })
     .then(res => {
-      // console.log("res.data", res.data);
-
       // suformuojamas pranešimas apie rezultatą
       if (res.data.ok) {
-        dispatch(setSuccess(res.data.msg, itype));
+        dispatch(setItemListAlert(itype, res.data.msg, "success"));
       } else {
-        dispatch(setWarning(res.data.msg, itype));
-      }
+        dispatch(setItemListAlert(itype, res.data.msg, "warning"));
+      }      
 
       // pagal rezultatą updateinamas local cache
-      if (getState().itemsStatus[itype].all) {
-        // jeigu rodyti visus (ir panaikintus, ir ne) - updateinamas local
-        // console.log("perform local action: 1");
-        dispatch(itemUpdateSuccess(res.data.item, itype));
+      if (getState().itemsStatus[itype].all || !itemSpecific[itype].panaikinta(res.data.item.main)) {
+        // jeigu rodyti visus (ir panaikintus, ir nepanaikintus)
+        // ARBA 
+        // jeigu sukurtas nepanaikintas
+        // - updateinamas local
+        const lastJournalRecord = res.data.item.journal.sort(journalSorter)[res.data.item.journal.length - 1];        
+        const item = { ...lastJournalRecord, ...res.data.item.main};
+        dispatch(itemUpdateSuccess(item, itype));
       } else {
         // jeigu rodyti tik nepanaikintus
-        if (itemSpecific[itype].panaikinta(res.data.item)) {
-          // console.log("perform local action: 2");
-          // jeigu updateinant buvo panaikintas -
-          // ištrinamas iš local
-          dispatch(itemDeleteSuccess(res.data.item.id, itype));
-        } else {
-          // console.log("perform local action: 3");
-          // jeigu updateinant nebuvo panaikintas -
-          // updateinamas local
-          dispatch(itemUpdateSuccess(res.data.item, itype));
-        }
+        // o modifikuotas į panaikintą - 
+        // jis ištrinamas iš local
+        dispatch(itemDeleteSuccess(res.data.item.main.id, itype));
       }
 
       // refilter local cache
@@ -287,19 +296,27 @@ export const updateItem = (main, journal, history, itype) => (dispatch, getState
       history.push(itemSpecific[itype].listPath);
     })
     .catch(err => {
-      const error = JSON.parse(JSON.stringify(err));
-      const errmsg = extractMsg(error);
-      // console.log("error-msg", errmsg);
-
-      if (
-        error.response &&
-        error.response.data &&
-        err.response.data.reason === "bad criteria"
-      ) {
-        dispatch(itemUpdateFailure(errmsg, itype, "ITEM_LIST"));
-        history.push(itemSpecific[itype].listPath);
+      console.log("err", err);
+      if (err.response && err.response.data) {
+        if (err.response.data.reason === "bad criteria") {
+          // "bad criteria" - kartoti nėra prasmės, grįžtama į sąrašą
+          dispatch(itemUpdateFailureNoRetry(err.response.data.msg, itype));
+          history.push(itemSpecific[itype].listPath);
+        } else if (err.response.data.reason === "bad draft") {
+          // "bad draft" - reikia paredaguoti draft, pasiliekama item edit'e
+          // gali perduoti vieną string - msg, o gali perduoti objektų array - errors
+          let responseMsg = err.response.data.msg;
+          if (err.response.data.errors) {
+            responseMsg = errors2msgs(err.response.data.errors);
+          }
+          dispatch(itemUpdateFailure(responseMsg, itype));
+        } else {
+          // kt. - galbūt serverio klaida ar kažkas, apsimoka pamėginti dar kartą
+          dispatch(itemUpdateFailure(err.response.data.msg, itype));
+        }
       } else {
-        dispatch(itemUpdateFailure(errmsg, itype, "SINGLE_ITEM"));
+        // galbūt serverio klaida ar kažkas, apsimoka pamėginti dar kartą
+        dispatch(itemUpdateFailure(err.toString(), itype));
       }
     });
 };
@@ -327,17 +344,18 @@ export const deleteItem = (itemId, itemV, itype) => (dispatch, getState) => {
     .delete("/api/items/delete", { params: { id: itemId, v: itemV, itype } })
     .then(res => {
       // console.log("res.data", res.data);
-      dispatch(setSuccess(res.data.msg, itype));
+      dispatch(setItemListAlert(itype, res.data.msg, "success"));
       // console.log("going to dispatch itemDeleteSucces");
       dispatch(itemDeleteSuccess(res.data.id, itype));
       // console.log("going to refilter");
       refilter(dispatch, getState, itype);
     })
     .catch(err => {
-      const error = JSON.parse(JSON.stringify(err));
-      const errmsg = extractMsg(error);
-      // console.log("error-msg", errmsg);
-
-      dispatch(itemDeleteFailure(errmsg, itype, "ITEM_LIST"));
+      console.log(err);
+      if (err.response && err.response.data) {
+        dispatch(itemDeleteFailure(err.response.data.msg, itype));
+      } else {
+        dispatch(itemDeleteFailure(err.toString(), itype));
+      }
     });
 };

@@ -1,11 +1,6 @@
 import UDDataTransformer from "./UDDataTransformer";
 
 export class UDDataDefectsTransformer extends UDDataTransformer {
-  constructor(thingsAndData) {
-    super(thingsAndData);
-    // params reikalingas?
-  }
-
   byVietaSorter(a, b) {
     if (a.linija > b.linija) return 1;
     if (a.linija < b.linija) return -1;

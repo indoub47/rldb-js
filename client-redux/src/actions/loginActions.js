@@ -2,27 +2,21 @@ import axios from "axios";
 import setAuthToken from "../utils/set-auth-token";
 import jwt_decode from "jwt-decode";
 import { LOGIN_BEGIN, SET_CURRENT_USER, LOGIN_ERROR, LOGOUT } from "./types";
+//import * as extractMsg from "./functions/extractMsg";
 
 // Login user
 export const loginBegin = () => ({
   type: LOGIN_BEGIN
 });
 
-export const loginError = err => ({
+export const loginError = errors => ({
   type: LOGIN_ERROR,
-  payload: err.response.data
+  payload: {errors}
 });
 
 export const logout = () => ({
   type: LOGOUT
 });
-
-// export const loginError = err => {
-//   // console.log("loginActions err", err);
-//   return ({
-//   type: LOGIN_ERROR,
-//   payload: err.response.data
-// })};
 
 // Set logged in user
 export const setCurrentUser = decoded => {
@@ -46,7 +40,13 @@ export const loginUser = userData => dispatch => {
       // set current user
       dispatch(setCurrentUser(decoded));
     })
-    .catch(err => dispatch(loginError(err)));
+    .catch(err => {
+      if (err.response) {
+        dispatch(loginError(err.response.data));
+      } else {
+        dispatch(loginError(err));
+      }       
+    });
 };
 
 // Log user out

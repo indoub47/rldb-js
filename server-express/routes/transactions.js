@@ -1,7 +1,7 @@
-const SQLStmts = require("../SQLStatements");
+const SQLStmts = require("./SQLStatements");
 
 
-exports.delete = function (itype, mainData, returnRef, db) {
+module.exports.delete = function (itype, mainData, returnRef, db) {
   const txtDeleteMain = SQLStmts.DELETE_MAIN_stmtText(itype);
   const mainInfo = db.prepare(txtDeleteMain).run(mainData);
   const txtDeleteJournal = SQLStmts.DELETE_WHOLE_JOURNAL_stmtText(itype);
@@ -10,14 +10,14 @@ exports.delete = function (itype, mainData, returnRef, db) {
   returnRef.journalInfo = journalInfo;   
 }
 
-exports.insert = function (itype, main, journal, returnRef, db) {
+module.exports.insert = function (itype, main, journal, returnRef, db) {
   const txtInsertMain = SQLStmts.INSERT_stmtTextFactory(itype, "main")(main);
   const mainInfo = db.prepare(txtInsertMain).run(main);
-  if (mainInfo.changes !== 1) throw "Error during inserting main";
+  if (mainInfo.changes !== 1) throw Error("Error while inserting main");
   const factInsertJournal = SQLStmts.INSERT_stmtTextFactory(itype, "journal");
   let journalInfo = [];
-  journal.forEach(j => {
-    j.id = mainInfo.lastInsertRowid;
+  journal.insert.forEach(j => {
+    j.mainid = mainInfo.lastInsertRowid;
     const txtInsertJournalItem = factInsertJournal(j);
     const jInfo = db.prepare(txtInsertJournalItem).run(j);
     journalInfo.push(jInfo);
@@ -26,11 +26,12 @@ exports.insert = function (itype, main, journal, returnRef, db) {
   returnRef.journalInfo = journalInfo;
 }
 
-exports.update = function (itype, main, journal, returnRef, db) {
-  if ("reikia updateinti main") {
-    const txtUpdateMain = SQLStmts.UPDATE_stmtTextFactory(itype, "main")(main);
-    const mainInfo = db.prepare(txtInsertMain).run(main);
-  }
+module.exports.update = function (itype, main, journal, returnRef, db) {
+  let mainInfo = null;
+
+  // net jeigu main nebuvo redaguotas, keičiasi versija
+  const txtUpdateMain = SQLStmts.UPDATE_stmtTextFactory(itype, "main")(main);
+  mainInfo = db.prepare(txtUpdateMain).run(main);
 
   let journalInfo = {};
 
@@ -55,9 +56,10 @@ exports.update = function (itype, main, journal, returnRef, db) {
   }
 
   if (journal.delete && journal.delete.length) {
-    const txtDeleteJournal = SQLStmts.DELETE_SOME_JOURNAL_stmtText(itype, journal.delete);
-    const jDInfo = db.prepare(txtDeleteJournal).run(main.id, journal.delete);
-    journalInfo.delete = jDInfo;
+    const mainId = main.id;
+    const ids = journal.delete;//.map(idStr => parseInt(idStr));
+    const txtDeleteJournal = SQLStmts.DELETE_SOME_JOURNAL_stmtText(itype, ids);
+    journalInfo.delete = db.prepare(txtDeleteJournal).run(mainId, ids);
   }
 
   returnRef.mainInfo = mainInfo;

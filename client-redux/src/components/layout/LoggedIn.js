@@ -1,19 +1,11 @@
 import React, { Component } from "react";
-import { PropTypes } from "prop-types";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import { fetchAllThings } from "../../actions/thingsActions";
-import ErrorAlert from "../common/Alerts/ErrorAlert";
-import isEmpty from "../../validation/is-empty";
+import Alert from "../common/Alert";
 import IsLoading from "../common/IsLoading";
 
 class LoggedIn extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      error: ""
-    };
-  }
 
   componentDidMount() {
     // čia pradėti krauti things
@@ -21,11 +13,9 @@ class LoggedIn extends Component {
   }
 
   render() {
-    const thingsLoadError = this.props.things.error;
-
     // things load error
-    if (!isEmpty(thingsLoadError)) {
-      return <ErrorAlert message={thingsLoadError.message} />;
+    if (this.props.things.errormsg) {
+      return <Alert message={this.props.things.errormsg} />;
     }
 
     return (
@@ -39,7 +29,7 @@ class LoggedIn extends Component {
                   Rail Defect Data Base
                 </h1>
                 <p className="lead">
-                  Manage your rail defect data
+                  Manage your data with confidence
                 </p>
                 <hr />
                 <p className="lead">
@@ -53,11 +43,6 @@ class LoggedIn extends Component {
     );
   }
 }
-
-LoggedIn.propTypes = {
-  things: PropTypes.object,
-  fetchAllThings: PropTypes.func.isRequired
-};
 
 const mapStateToProps = state => ({
   things: state.things

@@ -2,9 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import ItemList from "./ItemList";
 import IsLoading from "../common/IsLoading";
-import ErrorAlert from "../common/Alerts/ErrorAlert";
-import WarningAlert from "../common/Alerts/WarningAlert";
-import SuccessAlert from "../common/Alerts/SuccessAlert";
+import Alert from "../common/Alert";
 import ItemsCount from "../common/ItemsCount";
 import Pager from "../common/pager/Pager";
 import Confirmation from "../common/Confirmation";
@@ -17,9 +15,7 @@ import {
   pageChange,
   itemsPerPageChange,
   toggleFS,
-  hideItemListError,
-  hideWarning,
-  hideSuccess
+  hideItemListAlert
 } from "../../actions/itemsActions";
 import { fetchQueries } from "../../actions/queriesActions";
 //import * from "../../iTypes";
@@ -42,9 +38,7 @@ class Items extends Component {
     this.unconfirmDelete = this.unconfirmDelete.bind(this);
     this.refreshItems = this.refreshItems.bind(this);
     this.refreshItemsAll = this.refreshItemsAll.bind(this);
-    this.hideSuccess = this.hideSuccess.bind(this);
-    this.hideWarning = this.hideWarning.bind(this);
-    //this.hideError = this.hideError.bind(this);
+    this.hideAlert = this.hideAlert.bind(this);
     this.getItems = this.getItems.bind(this);
   }
 
@@ -69,10 +63,7 @@ class Items extends Component {
   }
 
   componentWillUnmount() {
-    this.props.hideItemListError(this.props.itype);
-    this.props.hideWarning(this.props.itype);
-    this.props.hideSuccess(this.props.itype);
-    // console.log("items component will unmount");
+    this.props.hideItemListAlert(this.props.itype);
   }
 
   pageChange(pageIndex) {
@@ -142,16 +133,8 @@ class Items extends Component {
     this.props.invalidateItems(true, this.props.itype);
   }
 
-  hideSuccess() {
-    this.props.hideSuccess(this.props.itype);
-  }
-
-  hideWarning() {
-    this.props.hideWarning(this.props.itype);
-  }
-
-  hideItemListError() {
-    this.props.hideItemListError(this.props.itype);
+  hideAlert() {
+    this.props.hideItemListAlert(this.props.itype);
   }
 
   getItems() {
@@ -159,15 +142,13 @@ class Items extends Component {
   }
 
   render() {
-    if (this.props.itemsFetchError || this.props.queriesFetchError) {
+    if (this.props.fatalError) {
       return (
         <div className="row">
           <div className="col-12">
-            <ErrorAlert
-              message={
-                this.props.itemsFetchError.message ||
-                this.props.queriesFetchError.message
-              }
+            <Alert
+              message={this.props.fatalError.msg}
+              type={this.props.fatalError.type}
             />
           </div>
         </div>
@@ -220,13 +201,13 @@ class Items extends Component {
               New Item
             </button>
             <button
-              className="btn btn-sm btn-warning"
+              className={"btn btn-sm btn-warning" + (this.props.allItems ? "" : " active")} 
               onClick={this.refreshItems}
             >
-              Refresh
+              Refresh Active
             </button>
             <button
-              className="btn btn-sm btn-warning"
+              className={"btn btn-sm btn-warning" + (this.props.allItems ? " active" : "")}
               onClick={this.refreshItemsAll}
             >
               Refresh All
@@ -240,27 +221,12 @@ class Items extends Component {
               />
             ) : null}
             <div className="row">
-              {this.props.warningmsg ? (
+              {this.props.infoAlert ? (
                 <div className="col-12">
-                  <WarningAlert
-                    message={this.props.warningmsg}
-                    hide={this.hideWarning}
-                  />
-                </div>
-              ) : null}
-              {this.props.errormsg ? (
-                <div className="col-12">
-                  <ErrorAlert
-                    message={this.props.errormsg}
-                    hide={this.hideError}
-                  />
-                </div>
-              ) : null}
-              {this.props.successmsg ? (
-                <div className="col-12">
-                  <SuccessAlert
-                    message={this.props.successmsg}
-                    hide={this.hideSuccess}
+                  <Alert
+                    message={this.props.infoAlert.msg}
+                    type={this.props.infoAlert.type}
+                    hide={this.hideAlert}
                   />
                 </div>
               ) : null}
@@ -300,20 +266,17 @@ class Items extends Component {
 
 const mapStateToProps = (state, ownProps) => ({
   queriesIsLoading: state.queries[ownProps.itype].isLoading,
-  queriesFetchError: state.queries[ownProps.itype].error,
   queriesAreValid: state.queries[ownProps.itype].valid,
 
   allItemCount: state.allItems[ownProps.itype].length,
   fsedItems: state.fsedItems[ownProps.itype].data,
   fsedItemsAreValid: state.fsedItems[ownProps.itype].valid,
   itemsIsLoading: state.itemsStatus[ownProps.itype].isBusy,
-  errormsg: state.itemsStatus[ownProps.itype].itemListErrorMsg,
-  itemsFetchError: state.itemsStatus[ownProps.itype].fetchError,
-  warningmsg: state.itemsStatus[ownProps.itype].warningmsg,
-  successmsg: state.itemsStatus[ownProps.itype].successmsg,
   allItems: state.itemsStatus[ownProps.itype].all,
   pager: state.itemsPager[ownProps.itype],
-  showFS: state.itemsShow[ownProps.itype].fsOn
+  showFS: state.itemsShow[ownProps.itype].fsOn,
+  fatalError: state.itemAlerting[ownProps.itype].itemList.fatal,
+  infoAlert: state.itemAlerting[ownProps.itype].itemList.info,
 });
 
 Items.defaultProps = {
@@ -331,8 +294,6 @@ export default connect(
     pageChange,
     itemsPerPageChange,
     toggleFS,
-    hideItemListError,
-    hideWarning,
-    hideSuccess
+    hideItemListAlert
   }
 )(Items);

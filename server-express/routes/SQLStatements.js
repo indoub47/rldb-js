@@ -1,4 +1,4 @@
-const modelProvider = require("../models/modelProvider");
+//const modelProvider = require("../models/modelProvider");
 const collections = require("../config/collections");
 
 const filters = {
@@ -8,10 +8,10 @@ const filters = {
         }
       };
 
-const exclude: {
+const exclude = {
       update: {
         main: ["id", "regbit"],
-        journal: ["rn"],
+        journal: ["id", "mainid"],
       }, 
       insert: {
         main: ["id"],
@@ -24,18 +24,17 @@ const exclude: {
 // textFactory = INSERT_stmtTextFactory(itype, itemPart);
 // txtStmt = textFactory(obj);
 // Kad tą tekstą įvykdyti, reikia db.prepare(textStmt).run(obj);
-exports.INSERT_stmtTextFactory = (itype, itemPart) => {  
+module.exports.INSERT_stmtTextFactory = (itype, itemPart) => {  
   const tableName = collections[itype].tables[itemPart].name;
   const excludeFields = exclude.insert[itemPart];
   return (obj) => {
-      const keysValues = Object.keys(obj)
-        .filter(key => !excludeFields.includes(key))
-        .map(key => ({key, value: obj[key]}));
+      const keys = Object.keys(obj)
+        .filter(key => !excludeFields.includes(key));
 
       return `INSERT INTO ${tableName} (${
-        keysValues.map(kv => kv.key).join(', ')
+        keys.join(', ')
       }) VALUES (${
-        keysValues.map(kv => "@" + kv.key).join(', ')
+        keys.map(key => "@" + key).join(', ')
       })`;
   }
 };
@@ -45,12 +44,12 @@ exports.INSERT_stmtTextFactory = (itype, itemPart) => {
 // textFactory = UPDATE_stmtTextFactory(itype, itemPart);
 // txtStmt = textFactory(obj);
 // Kad tą tekstą įvykdyti, reikia db.prepare(textStmt).run(obj);
-exports.UPDATE_stmtTextFactory = (itype, itemPart) => {  
+module.exports.UPDATE_stmtTextFactory = (itype, itemPart) => {  
   const tableName = collections[itype].tables[itemPart].name;
-  const excludeFields = exclude.insert[itemPart];
+  const excludeFields = exclude.update[itemPart];
   const filter = filters.update[itemPart];
 
-  return (obj) => {
+  return obj => {
       const updateText = `UPDATE ${tableName} SET ${
         Object.keys(obj)
           .filter(key => !excludeFields.includes(key))
@@ -59,7 +58,7 @@ exports.UPDATE_stmtTextFactory = (itype, itemPart) => {
       }`;
       if (filter) return updateText + ` WHERE ${filter}`;
       return updateText;
-  },
+  }
 };
 
 // eksportuoja funkciją, kuri
@@ -67,7 +66,7 @@ exports.UPDATE_stmtTextFactory = (itype, itemPart) => {
 // txtStmt = DELETEMAIN_stmtText(itype);
 // Kad tą tekstą įvykdyti, reikia db.prepare(textStmt).run(mainData);
 // kur mainData turi id, regbit, v
-exports.DELETEMAIN_stmtText = (itype) => {  
+module.exports.DELETE_MAIN_stmtText = (itype) => {  
   const tableName = collections[itype].tables.main.name;
   return `DELETE FROM ${tableName} WHERE id = @id AND regbit = @regbit AND v = @v`;
 };
@@ -76,7 +75,7 @@ exports.DELETEMAIN_stmtText = (itype) => {
 // pagamina updateinamo item kai kurių journal DELETE SQL statement tekstą:
 // txtStmt = DELETE_SOME_JOURNAL_stmtText(itype, journal.delete);
 // Kad tą tekstą įvykdyti, reikia db.prepare(textStmt).run(main_id, journal.delete);
-exports.DELETE_SOME_JOURNAL_stmtText = (itype, journal_delete) => {  
+module.exports.DELETE_SOME_JOURNAL_stmtText = (itype, journal_delete) => {  
   const tableName = collections[itype].tables.journal.name;
   return `DELETE FROM ${tableName} WHERE mainid = ? AND id IN (${journal_delete.map(j => '?').join(', ')})`;
 };
@@ -85,7 +84,33 @@ exports.DELETE_SOME_JOURNAL_stmtText = (itype, journal_delete) => {
 // pagamina naikinamo item viso journal DELETE SQL statement tekstą:
 // txtStmt = DELETE_WHOLE_JOURNAL_stmtText(itype);
 // Kad tą tekstą įvykdyti, reikia db.prepare(textStmt).run(main_id);
-exports.DELETE_WHOLE_JOURNAL_stmtText = (itype) => {  
+module.exports.DELETE_WHOLE_JOURNAL_stmtText = (itype) => {  
   const tableName = collections[itype].tables.journal.name;
   return `DELETE FROM ${tableName} WHERE mainid = ?`;
 };
+
+module.exports.simpleUpdateStmt = (obj, tableName, excludeFields) => {
+  const exFields = excludeFields || [];
+  return `UPDATE ${tableName} SET ${
+        Object.keys(obj)
+          .filter(key => !exFields.includes(key))
+          .map(key => `${key}=@${key}`)
+          .join(", ")
+      }`;
+}
+
+module.exports.simpleDeleteStmt = (tableName, filter) => {
+  return `DELETE FROM ${tableName} WHERE ${filter}`;
+}
+
+module.exports.simpleInsertStmt = (tableName, draft, excludeFields) => {
+  const exFields = excludeFields || [];
+  const keys = Object.keys(draft)
+        .filter(key => !exFields.includes(key));
+
+  return `INSERT INTO ${tableName} (${
+    keys.join(', ')
+  }) VALUES (${
+    keys.map(key => "@" + key).join(', ')
+  })`;
+}

@@ -7,51 +7,41 @@ import absent from "../../../../utils/absent-props";
 
 const JournalEditForm = ({ jItem, onChange, options, submitJItem, cancelJItem, alert }) => {
   
-
   return (
     <div className="container journal-info border border-primary text-center">
       <div className="form-group row text-center">
         {alert ? (
           <div className="col-12">
-            <Alert alertInfo={alert} />
+            <Alert message={alert.msg} type={alert.type} />
           </div>
         ) : null}
       </div>
       <div className="form-group row text-center">
         <TextFieldGroup
           label="Data"
-          divClassname="form-group col-3"
+          divClassname="form-group col-4"
           type="date"
-          id="jitem-jdata"
-          name="jdata"
-          value={absent(jItem.hdata)}
-          onChange={onChange}
-        />
-        <SelectInputGroup
-          id="jitem-action"
-          name="action"
-          label="Veiksmas"
-          divClassname="form-group col-3"
-          value={absent(jItem.action)}
-          options={actionOptions}
+          id="jitem-data"
+          name="data"
+          value={absent(jItem.data)}
           onChange={onChange}
         />
         <SelectInputGroup
           id="jitem-oper"
           name="oper"
           label="Operatorius"
-          divClassname="form-group col-3"
+          divClassname="form-group col-4"
           value={absent(jItem.oper)}
-          options={operOptions}
+          options={options.oper}
           onChange={onChange}
         />
         <SelectInputGroup
           id="jitem-apar"
           name="apar"
           label="Defektoskopas"
-          divClassname="form-group col-3"
+          divClassname="form-group col-4"
           value={absent(jItem.apar)}
-          options={aparOptions}
+          options={options.apar}
           onChange={onChange}
         />
       </div>
@@ -89,7 +79,7 @@ const JournalEditForm = ({ jItem, onChange, options, submitJItem, cancelJItem, a
           label="Pavojingumas"
           divClassname="form-group col-2"
           value={absent(jItem.pavoj)}
-          options={pavojOptions}
+          options={options.pavoj}
           onChange={onChange}
         />
         <TextFieldGroup
@@ -97,7 +87,7 @@ const JournalEditForm = ({ jItem, onChange, options, submitJItem, cancelJItem, a
           divClassname="form-group col-3"
           type="date"
           id="jitem-termin"
-          name="termin"
+          name="dtermin"
           value={absent(jItem.dtermin)}
           onChange={onChange}
         />
@@ -114,12 +104,12 @@ const JournalEditForm = ({ jItem, onChange, options, submitJItem, cancelJItem, a
       </div> 
       <div className="form-group row pastaba text-center">
         <div className="form-group col-3">
-          <button type="submit" class="btn btn-primary" onClick={submitJItem}>
+          <button type="submit" className="btn btn-primary" onClick={submitJItem}>
             Submit This Journal Record
           </button>
         </div>
         <div className="form-group col-3">
-          <button type="submit" class="btn btn-light" onClick={cancelJItem}>
+          <button type="submit" className="btn btn-light" onClick={cancelJItem}>
             Clear
           </button>
         </div>

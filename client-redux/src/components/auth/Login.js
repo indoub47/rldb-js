@@ -1,17 +1,16 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { loginUser } from "../../actions/loginActions";
 import TextFieldGroup from "../common/TextFieldGroup";
 import IsLoading from "../common/IsLoading";
+import Alert from "../common/Alert";
 
 class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
       email: "",
-      password: "",
-      errors: {}
+      password: ""
     };
 
     this.onChange = this.onChange.bind(this);
@@ -44,7 +43,7 @@ class Login extends Component {
   };
 
   render() {
-    const inputErrors = this.props.login.error || {};
+    const errors = this.props.login.errors;
 
     return (
       <div className="login">
@@ -61,7 +60,7 @@ class Login extends Component {
                   placeholder="Email Address"
                   value={this.state.email}
                   onChange={this.onChange}
-                  error={inputErrors.email}
+                  error={errors.email}
                 />
                 <TextFieldGroup
                   type="password"
@@ -69,11 +68,9 @@ class Login extends Component {
                   placeholder="Password"
                   value={this.state.password}
                   onChange={this.onChange}
-                  error={inputErrors.password}
+                  error={errors.password}
                 />
-                {inputErrors.msg && (
-                  <div className="invalid-fidback">{inputErrors.msg}</div>
-                )}
+                {errors.message && <Alert message={errors.message} />}
                 <input type="submit" className="btn btn-info btn-block mt-4" />
               </form>
             </div>
@@ -83,11 +80,6 @@ class Login extends Component {
     );
   }
 }
-
-Login.propTypes = {
-  loginUser: PropTypes.func.isRequired,
-  login: PropTypes.object.isRequired
-};
 
 const mapStateToProps = state => ({ login: state.login });
 

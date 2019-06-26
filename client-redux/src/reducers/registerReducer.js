@@ -4,7 +4,7 @@ import {
 
 const initialState = {
   isBusy: false,
-  error: {}
+  errors: {}
 };
 
 export default function(state = initialState, action) {
@@ -13,21 +13,21 @@ export default function(state = initialState, action) {
       return {
         ...state,
         isBusy: true,
-        error: {}
+        errors: {}
       };
 
     case REGISTER_SUCCESS:
       return {
         ...state,
         isBusy: false,
-        error: {}
+        errors: {}
       };
 
     case REGISTER_ERROR:
       return {
         ...state,
         isBusy: false,
-        error: action.payload
+        errors: action.payload.errors
       };
     
     case LOGOUT:

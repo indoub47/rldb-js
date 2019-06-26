@@ -1,5 +1,4 @@
 import React from "react";
-import PropTypes from "prop-types";
 import TextFieldGroup from "../../../common/TextFieldGroup";
 import SelectInputGroup from "../../../common/SelectInputGroup";
 import TextAreaGroup from "../../../common/TextAreaGroup";
@@ -146,16 +145,16 @@ const MainDataForm = ({ item, onChange, options }) => {
       <div className="form-group row datos text-center">
         <TextFieldGroup
           label="Galutinio panaikinimo data"
-          divClassname="form-group col-2"
+          divClassname="form-group col-3"
           type="date"
           id="item-daction"
-          name="daction"
+          name="dstop"
           placeholder="Panaikinimo data"
           value={absent(item.dstop)}
           onChange={onChange}
         />
         <TextAreaGroup
-          divClassname="form-group col-10"
+          divClassname="form-group col-9"
           label="Pastaba"
           id="item-note"
           name="note"

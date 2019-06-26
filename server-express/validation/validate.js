@@ -33,10 +33,6 @@ function hasDateOverflow(shortDateString) {
   );
 }
 
-function isAbsent(prop) {
-  return value == null || value === "";
-}
-
 // funkcijos, kurios atlieka tikrinimą, ir
 // klaidos pranešimai, jeigu tikrinant gaunama true
 const validators = {
@@ -91,14 +87,31 @@ const validators = {
   }
 };
 
+function emptyValue(val) {
+  return (
+    val == null || 
+    (typeof val === 'string' && val.trim() === '')
+  );
+}
+
 function validateProp(key, draft, model, insert) {
+  // Garantuotai model turi šitą key.
+  // Jeigu insert, tai key yra iš model.
+  // Jeigu update, tai key yra iš draft.
+
   // patikrina ar prop/prop reikšmė yra apskritai
   // jeigu insert, tai required prop reikšmė yra privaloma
-  if (isAbsent(draft[key])) {
-    if (insert && model[key].required) {
+  if (model[key].required) { // jeigu privalomas
+    if ( // draft neturi (kai insert) arba turi tuščią (ir insert, ir update)
+      (!draft.hasOwnProperty(key) && insert) ||
+      (draft.hasOwnProperty(key) && emptyValue(draft[key]))
+    ) {
       return {error: "is required"};
     }
-    return null;
+  } else { // jeigu nėra privalomas
+    if (!draft.hasOwnProperty(key)) { // ir jeigu draft neturi
+      return null;
+    }
   }
 
   // mėgina konvertuoti
@@ -111,10 +124,14 @@ function validateProp(key, draft, model, insert) {
   }
 
   // tikrina pagal modelyje nurodytą validatorių
-  const validator = validators[model[key].validator];
-  const params = model[key].params;
-  if (validator.func(value, params)) {
-    return  {error: validator.msg(params)};
+  // jeigu validatorius nenurodytas - netikrina
+  //console.log("key, model.key", key, model[key]);
+  if (model[key].validator) {
+    const validator = validators[model[key].validator];
+    const params = model[key].params;
+    if (validator.func(value, params)) {
+      return  {error: validator.msg(params)};
+    }
   }
 
   return {value};
@@ -123,9 +140,14 @@ function validateProp(key, draft, model, insert) {
 function validateObject(draft, model, insert) {
   let errors = [];
   let normalized = {};
+  // Kai insert - visi required laukai turi būti drafte.
+  // Kai update - required laukas negali būti paverstas tuščiu.
+  // Jeigu insert - tikrinama pagal model. Čia tam, kad būtų patikrinti
+  // visi privalomi laukai - ar jie yra drafte.
+  // Jeigu update - tikrinama pagal draft.
   const keys = insert ? Object.keys(model) : Object.keys(draft);
   keys.forEach(key => {
-    if (!model[key]) return;
+    if (!model[key]) return; // išmetami tie laukai, kurių nėra modelyje
     const result = validateProp(key, draft, model, insert);
     if (result) {
       if (result.error) {
@@ -140,8 +162,7 @@ function validateObject(draft, model, insert) {
   return {draft: normalized};
 }
 
-function validateItem(main, journal, itype, insert) {
-
+function validate(main, journal, itype, insert) {
   let allErrors = [];
   let resultItem = {
     main: null,

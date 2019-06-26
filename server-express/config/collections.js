@@ -1,15 +1,23 @@
-exports = {
+module.exports = {
   defect: { 
     tables: {
       main: {name: "defects"}, 
-      journal: {name: "defectj"}
+      journal: {name: "defectj"},
+      viewAllFirstJ: {name: "defects_all_firstj"},
+      viewAllLastJ: {name: "defects_all_lastj"},
     },
     itemNames: {
       item: "defektas", 
       Item: "Defektas"
     },
-    notPanaikinta: "(defects.daction = '')",
-    samePlace: "(linija = @linija AND kelias = @kelias AND km = @km AND pk = @pk AND m = @m AND siule = @siule)",
+    notPanaikinta: "(dstop = '')",
+    samePlace: {
+      query: "(linija = @linija AND kelias = @kelias AND km = @km AND pk = @pk AND m = @m AND siule = @siule)",
+      filter: {
+        insert: " WHERE regbit = ?",
+        update: " WHERE id <> @id AND regbit = ?",
+      }
+    },
     permissions: {
       update: ["adm", "superadm", "dev"],
       insert: ["adm", "superadm", "dev"],
@@ -19,8 +27,8 @@ exports = {
 
   welding: { 
     tables: {
-      main: {name: "weldings", autoId: true}, 
-      journal: {name: "weldingj", autoId: false}
+      main: {name: "weldings"}, 
+      journal: {name: "weldingj"}
     },
     itemNames: {
       item: "suvirinimas", 

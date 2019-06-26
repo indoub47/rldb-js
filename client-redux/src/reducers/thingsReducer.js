@@ -2,16 +2,13 @@ import {
   THINGS_FETCH_BEGIN,
   THINGS_FETCH_SUCCESS,
   THINGS_FETCH_FAILURE,
-  // THINGS_UPDATE_BEGIN,
-  // THINGS_UPDATE_SUCCESS,
-  // THINGS_UPDATE_FAILURE,
   LOGOUT
 } from "../actions/types";
 
 const initialState = {
   data: null,
   isLoading: false,
-  error: null
+  errormsg: null
 };
 
 export default function(state = initialState, action) {
@@ -20,7 +17,7 @@ export default function(state = initialState, action) {
       return {
         ...state,
         isLoading: true,
-        error: null,
+        errormsg: null,
         data: null
       };
 
@@ -28,7 +25,7 @@ export default function(state = initialState, action) {
       return {
         ...state,
         isLoading: false,
-        error: null,
+        errormsg: null,
         data: action.payload.things
       };
 
@@ -36,7 +33,7 @@ export default function(state = initialState, action) {
       return {
         ...state,
         isLoading: false,
-        error: action.payload.error,
+        errormsg: action.payload.errormsg,
         data: null
       };
 

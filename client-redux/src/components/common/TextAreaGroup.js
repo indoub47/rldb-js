@@ -1,6 +1,5 @@
 import React from 'react';
 import classnames from 'classnames';
-import PropTypes from 'prop-types';
 
 const TextAreaGroup = ({
   classname,
@@ -37,19 +36,6 @@ const TextAreaGroup = ({
       )}
     </div>
   )
-}
-
-TextAreaGroup.propTypes = {
-  name: PropTypes.string.isRequired,
-  classname: PropTypes.string,
-  divClassname: PropTypes.string,
-  placeholder: PropTypes.string,
-  value: PropTypes.string,
-  info: PropTypes.string,
-  error: PropTypes.string,
-  onChange: PropTypes.func,
-  style: PropTypes.object,
-  id: PropTypes.string
 }
 
 TextAreaGroup.defaultProps = {

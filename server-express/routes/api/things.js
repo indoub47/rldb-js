@@ -40,26 +40,26 @@ router.get("/register", (req, res) => {
 // visi kiti - reikia autorizuotis
 router.use(passport.authenticate("jwt", { session: false }));
 
-// @route GET api/sqlite/things
-// @desc Get things defined by ttype param
-// @access Public
-router.get("/", (req, res, next) => {
-  const coll = COLLECTIONS.find(c => c.name === req.query.ttype);
-  try {
-    let stmtText = `SELECT * FROM ${coll.name}`;
-    // superadm ir dev gauna visų regionų duomenis, kiti gauna tik tuos,
-    // kurie yra bendri visiems arba bendri ne visiems, bet tinka jų regionui
-    if (!["superadm", "dev"].includes(req.user.role) && coll.hasRegion) {
-      selectStmt += ` WHERE regbits & @userRegbit`;
-    }
-    const stmt = db.prepare(stmtText);
-    const items = stmt.all({ userRegbit: req.user.regbit });
-    return res.status(200).json(items);
-  } catch (err) {
-    // console.log("coll error", coll, err);
-    return res.status(500).send(err);
-  }
-});
+// // @route GET api/sqlite/things
+// // @desc Get things defined by ttype param
+// // @access Public
+// router.get("/", (req, res, next) => {
+//   const coll = COLLECTIONS.find(c => c.name === req.query.ttype);
+//   try {
+//     let stmtText = `SELECT * FROM ${coll.name}`;
+//     // superadm ir dev gauna visų regionų duomenis, kiti gauna tik tuos,
+//     // kurie yra bendri visiems arba bendri ne visiems, bet tinka jų regionui
+//     if (!["superadm", "dev"].includes(req.user.role) && coll.hasRegion) {
+//       selectStmt += ` WHERE regbits & @userRegbit`;
+//     }
+//     const stmt = db.prepare(stmtText);
+//     const items = stmt.all({ userRegbit: req.user.regbit });
+//     return res.status(200).json(items);
+//   } catch (err) {
+//     // console.log("coll error", coll, err);
+//     return res.status(500).send(err);
+//   }
+// });
 
 // @route GET api/sqlite/things/all
 // @desc Get all things as one object

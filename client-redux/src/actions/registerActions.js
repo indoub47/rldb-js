@@ -1,4 +1,5 @@
 import axios from "axios";
+//import * as extractMsg from "./functions/extractMsg";
 import { REGISTER_BEGIN, REGISTER_SUCCESS, REGISTER_ERROR } from "./types";
 
 export const registerBegin = () => ({
@@ -9,9 +10,9 @@ export const registerSuccess = () => ({
   type: REGISTER_SUCCESS
 });
 
-export const registerError = err => ({
+export const registerError = errors => ({
   type: REGISTER_ERROR,
-  payload: err.response.data
+  payload: {errors}
 });
 
 // Register
@@ -23,5 +24,11 @@ export const registerUser = (userData, history) => dispatch => {
       dispatch(registerSuccess());
       history.push("/");
     })
-    .catch(err => dispatch(registerError(err)));
+    .catch(err => {
+      if (err.response) {
+        dispatch(registerError(err.response.data));
+      } else {
+        dispatch(registerError(err));
+      }   
+    });
 };

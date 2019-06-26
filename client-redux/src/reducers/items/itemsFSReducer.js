@@ -11,7 +11,7 @@ import getInitialState from "../functions/getInitialState";
 const stateObj = {
   filterText: "",
   sortText: "",
-  error: null
+  errormsg: null
 };
 
 const initialState = getInitialState(iTypes, stateObj);
@@ -24,14 +24,14 @@ export default function(state = initialState, action) {
         [action.payload.itype]: {
           filterText: action.payload.filterText,
           sortText: action.payload.sortText,
-          error: null
+          errormsg: null
         }
       };
 
     case ITEMS_FILTERSORT_APPLY_ERROR:
       const obj = {
         ...state[action.payload.itype],
-        error: action.payload.error
+        errormsg: action.payload.errormsg
       };
       return {
         ...state,

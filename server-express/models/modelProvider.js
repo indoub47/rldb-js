@@ -1,11 +1,9 @@
-const defectMain = require("./defect/main");
-const defectJournal = require("./defect/journal");
+const defect = require("./defect");
 const loginModel = require("./login");
-const weldingMain = require("./welding/main");
-const weldingJournal = require("./welding/journal");
+const welding = require("./welding");
 
 module.exports = {
-  defect: {journal: defectJournal, main: defectMain},
+  defect: {journal: defect.journal, main: defect.main},
   login: loginModel,
-  welding: {journal: weldingJournal, main: weldingMain},
+  welding: {journal: welding.journal, main: welding.main},
 }

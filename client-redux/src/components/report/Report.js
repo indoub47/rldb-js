@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { eraseReport } from "../../actions/reportActions";
 import rTypeComponentMap from "./rTypeComponentMap";
 import IsLoading from "../common/IsLoading";
-import ErrorAlert from "../common/Alerts/ErrorAlert";
+import Alert from "../common/Alert";
 import ItemsCount from "../common/ItemsCount";
 import ExportItems from "../common/exportItems/ExportItems";
 
@@ -45,8 +45,8 @@ class Report extends Component {
 
         {this.props.isLoading ? (
           <IsLoading />
-        ) : this.props.error ? (
-          <ErrorAlert message={this.props.error.message} />
+        ) : this.props.errormsg ? (
+          <Alert message={this.props.errormsg} />
         ) : (report && Object.keys(report).length !== 0) ? (
           <div>
             <div className="row">
@@ -73,7 +73,7 @@ class Report extends Component {
 
 const mapStateToProps = state => ({
   report: state.report.data,
-  error: state.report.error,
+  errormsg: state.report.errormsg,
   storeReportType: state.report.rtype,
   isLoading: state.report.isLoading
 });

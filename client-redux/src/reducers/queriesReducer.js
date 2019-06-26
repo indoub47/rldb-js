@@ -11,28 +11,28 @@ import {
   QUERY_DELETE_BEGIN,
   QUERY_DELETE_SUCCESS,
   QUERY_DELETE_FAILURE,
-  HIDE_QUERIES_SUCCESS,
-  HIDE_QUERIES_ERROR,
+  QUERIES_HIDE_SUCCESS,
+  QUERIES_HIDE_ERROR,
   LOGOUT
 } from "../actions/types";
 import * as iTypes from "../itypes";
 import getInitialState from "./functions/getInitialState";
 
 const stateObj = {
-    data: [],
-    valid: false,
-    isLoading: false,
-    error: null,
-    success: null
-  };
+  data: [],
+  valid: false,
+  isLoading: false,
+  error: null,
+  successmsg: ""
+};
 
 const initialState = getInitialState(iTypes, stateObj);
 
 export default function(state = initialState, action) {
-  let itype; 
-  let query; 
+  let itype;
+  let query;
   let queries;
-  let id; 
+  let id;
   let ind;
 
   switch (action.type) {
@@ -46,9 +46,9 @@ export default function(state = initialState, action) {
         [itype]: {
           ...state[itype],
           isLoading: true,
+          valid: false,
           error: null,
-          success: null,
-          valid: false
+          successmsg: ""
         }
       };
 
@@ -61,27 +61,28 @@ export default function(state = initialState, action) {
           ...state[itype],
           data: action.payload.queries,
           isLoading: false,
-          error: null,
           valid: true,
-          success: null
+          error: null,
+          successmsg: ""
         }
       };
-      
+
     case QUERY_UPDATE_SUCCESS:
       // console.log("Q_U_S action", action);
       query = action.payload.query;
       itype = action.payload.itype;
       ind = state[itype].data.findIndex(q => q.id === query.id);
-      
-      if (ind < 0) { // should not happen
+
+      if (ind < 0) {
+        // should not happen
         return {
           ...state,
           [itype]: {
             ...state[itype],
-            error: Error("Įvyko nesuprantama klaida"),
-            success: null,
+            error: {message: "Įvyko nesuprantama klaida"},
             valid: false,
-            isLoading: false
+            isLoading: false,
+            successmsg: ""
           }
         };
       }
@@ -100,10 +101,9 @@ export default function(state = initialState, action) {
           isLoading: false,
           error: null,
           valid: true,
-          success: "Užklausa pakeista sėkmingai"
+          successmsg: "atnaujinta sėkmingai"
         }
       };
-      
 
     case QUERY_INSERT_SUCCESS:
       // console.log("query_insert_success action.payload", action.payload);
@@ -112,10 +112,7 @@ export default function(state = initialState, action) {
 
       // console.log("queriesReducer state", state);
 
-      queries = [
-        ...state[itype].data,
-        query
-      ];
+      queries = [...state[itype].data, query];
       // console.log("queriesReducer queries", queries);
 
       return {
@@ -126,27 +123,29 @@ export default function(state = initialState, action) {
           isLoading: false,
           error: null,
           valid: true,
-          success: "Užklausa sukurta sėkmingai"
+          successmsg: "sukurta sėkmingai"
         }
       };
-      
 
     case QUERY_DELETE_SUCCESS:
       // console.log("QUERY_DELETE_SUCCESS action", action);
-      id = action.payload.id;
+      id = action.payload.id.toString();
       itype = action.payload.itype;
-      ind = state[itype].data.findIndex(q => q._id === id);
+      ind = state[itype].data.findIndex(q => q.id.toString() === id);
       // console.log("QUERY_DELETE_SUCCESS index", ind);
-      
-      if (ind < 0) { // should not happen
+
+      if (ind < 0) {
+        // should not happen
+        console.log("index", ind);
+        
         return {
           ...state,
           [itype]: {
             ...state[itype],
-            error: Error("Įvyko nesuprantama klaida"),
-            success: null,
+            error: {message: "Įvyko nesuprantama klaida"},
             valid: false,
-            isLoading: false
+            isLoading: false,
+            successmsg: ""
           }
         };
       }
@@ -164,10 +163,9 @@ export default function(state = initialState, action) {
           isLoading: false,
           error: null,
           valid: true,
-          success: "Užklausa panaikinta sėkmingai"
+          successmsg: `id ${id} panaikinta sėkmingai`
         }
       };
-
 
     case QUERIES_FETCH_FAILURE:
     case QUERY_UPDATE_FAILURE:
@@ -179,11 +177,12 @@ export default function(state = initialState, action) {
         [itype]: {
           ...state[itype],
           isLoading: false,
-          error: action.payload.err
+          error: action.payload.error,
+          successmsg: ""
         }
       };
 
-    case HIDE_QUERIES_ERROR:
+    case QUERIES_HIDE_ERROR:
       itype = action.payload.itype;
       return {
         ...state,
@@ -193,13 +192,13 @@ export default function(state = initialState, action) {
         }
       };
 
-    case HIDE_QUERIES_SUCCESS:
+    case QUERIES_HIDE_SUCCESS:
       itype = action.payload.itype;
       return {
         ...state,
         [itype]: {
           ...state[itype],
-          success: null
+          successmsg: ""
         }
       };
 

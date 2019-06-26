@@ -1,5 +1,4 @@
 import React from "react";
-import PropTypes from "prop-types";
 import {liko} from "./functions";
 
 const ItemRow = ({ item, editItem, deleteItem }) => {
@@ -25,9 +24,9 @@ const ItemRow = ({ item, editItem, deleteItem }) => {
       <td className="bmetai">{item.bmetai}</td>
       <td className="oper">{item.oper}</td>
       <td className="apar">{item.apar}</td>
-      <td className="daptik">{item.daptik}</td>
+      <td className="data">{item.data}</td>
       <td className="dtermin">{item.dtermin}</td>
-      <td className="daction">{item.daction}</td>
+      <td className="dstop">{item.dstop}</td>
       <td className="liko">{liko(item)}</td>
       <td className="pastaba">{item.note}</td>
       <td>
@@ -57,12 +56,6 @@ const ItemRow = ({ item, editItem, deleteItem }) => {
   );
 }
 
-ItemRow.propTypes = {
-  item: PropTypes.object.isRequired,
-  editItem: PropTypes.func,
-  deleteItem: PropTypes.func
-};
-
 const ItemHeadRow = () => {
   return (
     <tr>
@@ -86,9 +79,9 @@ const ItemHeadRow = () => {
       <th className="bmetai">bmetai</th>
       <th className="oper">oper</th>
       <th className="apar">apar</th>
-      <th className="daptik">daptik</th>
+      <th className="data">data</th>
       <th className="dtermin">dtermin</th>
-      <th className="daction">daction</th>
+      <th className="dstop">dstop</th>
       <th className="liko">liko</th>
       <th className="note">note</th>
       <th className="controls">controls</th>

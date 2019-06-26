@@ -1,6 +1,5 @@
 const Validator = require("validator");
 const isNonStringOrEmpty = require('../utilities/is-empty').isNonStringOrEmpty;
-const isEmpty = require('../utilities/is-empty').isEmpty;
 
 module.exports = function validateRegisterInput(data) {
   let errors = {};
@@ -46,5 +45,6 @@ module.exports = function validateRegisterInput(data) {
 	  errors.password2 = 'passwords must match';
   }
 
-  return {errors, isValid: isEmpty(errors)};  
+  if (Object.keys(errors).length) return errors;
+  return null;
 }

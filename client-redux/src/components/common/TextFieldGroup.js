@@ -1,6 +1,5 @@
 import React from 'react';
 import classnames from 'classnames';
-import PropTypes from 'prop-types';
 
 const TextFieldGroup = ({
   type, 
@@ -41,20 +40,6 @@ const TextFieldGroup = ({
       <div className='invalid-feedback'>{error}</div>}
     </div>
   )
-}
-
-TextFieldGroup.propTypes = {
-  type: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  placeholder: PropTypes.string,
-  value: PropTypes.string,
-  info: PropTypes.string,
-  error: PropTypes.string,
-  onChange: PropTypes.func,
-  autoComplete: PropTypes.string.isRequired,
-  disabled: PropTypes.string,
-  classname: PropTypes.string,
-  divClassname: PropTypes.string,
 }
 
 TextFieldGroup.defaultProps = {

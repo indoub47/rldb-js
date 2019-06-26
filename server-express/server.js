@@ -1,17 +1,16 @@
 "use strict";
 
 const express = require("express");
-const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const passport = require("passport");
-//const settings = require("./config/settings");
 const secret = require("./config/secret");
 
 const users = require("./routes/api/users");
 const items = require("./routes/api/items");
+const journal = require("./routes/api/journal");
 const things = require("./routes/api/things");
 const fsqueries = require("./routes/api/fsqueries");
-const reports = require("./routes/api/reports");
+//const reports = require("./routes/api/reports");
 
 const app = express();
 require("./config/passport")(passport);
@@ -35,9 +34,10 @@ app.use(passport.initialize());
 
 app.use("/api/users", users);
 app.use("/api/items", items);
+app.use("/api/journal", journal);
 app.use("/api/things", things);
 app.use("/api/fsqueries", fsqueries);
-app.use("/api/report", reports);
+//app.use("/api/report", reports);
 app.use("/", express.static("../client-redux/"));
 
 // Add a random delay to all requests. Set SHOULD_DELAY to false for a more

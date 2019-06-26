@@ -1,5 +1,5 @@
 import axios from "axios";
-import extractMsg from "./functions/extractMsg";
+//import * as extractMsg from "./functions/extractMsg";
 import {
   QUERIES_FETCH_BEGIN,
   QUERIES_FETCH_SUCCESS,
@@ -13,26 +13,35 @@ import {
   QUERY_DELETE_BEGIN,
   QUERY_DELETE_SUCCESS,
   QUERY_DELETE_FAILURE,
-  HIDE_QUERIES_WARNING,
-  HIDE_QUERIES_SUCCESS,
-  HIDE_QUERIES_ERROR
+  QUERIES_HIDE_SUCCESS,
+  QUERIES_HIDE_ERROR
 } from "./types";
 
-export const hideWarning = itype => dispatch =>
-  dispatch({
-    type: HIDE_QUERIES_WARNING,
-    payload: { itype }
-  });
+const err2msg = err => {
+  if (err.response) {
+      // Request made and server responded
+      if (err.response.data.errors) {
+        return err.response.data.errors.map(e => `${e.key} - ${e.msg}`);
+      }
+      if (err.response.data.msg) {
+        return err.response.data.msg;
+      };
+      return "Kažkokia klaida";
+  }  
+  // Something happened in setting up the request that triggered an Error
+  return 'Error: ' + err.message;
+}
+
 
 export const hideSuccess = itype => dispatch =>
   dispatch({
-    type: HIDE_QUERIES_SUCCESS,
+    type: QUERIES_HIDE_SUCCESS,
     payload: { itype }
   });
 
 export const hideError = itype => dispatch =>
   dispatch({
-    type: HIDE_QUERIES_ERROR,
+    type: QUERIES_HIDE_ERROR,
     payload: { itype }
   });
 
@@ -46,9 +55,9 @@ const fetchQueriesSuccess = (queries, itype) => ({
   payload: { queries, itype }
 });
 
-const fetchQueriesFailure = (errmsg, itype) => ({
+const fetchQueriesFailure = (error, itype) => ({
   type: QUERIES_FETCH_FAILURE,
-  payload: { errmsg, itype }
+  payload: { error, itype }
 });
 
 // Get fsqueries
@@ -62,8 +71,7 @@ export const fetchQueries = itype => (dispatch, getState) => {
       // console.log("state after", getState().queries);
     })
     .catch(err => {
-      const errmsg = extractMsg(JSON.parse(JSON.stringify(err)));
-      dispatch(fetchQueriesFailure(errmsg, itype));
+      dispatch(fetchQueriesFailure(err2msg(err), itype));
     });
 };
 
@@ -77,9 +85,9 @@ const updateQuerySuccess = (query, itype) => ({
   payload: { query, itype }
 });
 
-const updateQueryFailure = (errmsg, itype) => ({
+const updateQueryFailure = (error, itype) => ({
   type: QUERY_UPDATE_FAILURE,
-  payload: { errmsg, itype }
+  payload: { error, itype }
 });
 
 // update fsquery
@@ -90,8 +98,7 @@ export const updateQuery = draft => dispatch => {
     .post(`/api/fsqueries/update`, draft)
     .then(res => dispatch(updateQuerySuccess(res.data, itype)))
     .catch(err => {
-      const errmsg = extractMsg(JSON.parse(JSON.stringify(err)));
-      dispatch(updateQueryFailure(errmsg, itype));
+      dispatch(updateQueryFailure(err2msg(err), itype));
     });
 };
 
@@ -105,9 +112,9 @@ const insertQuerySuccess = (query, itype) => ({
   payload: { query, itype }
 });
 
-const insertQueryFailure = (errmsg, itype) => ({
+const insertQueryFailure = (error, itype) => ({
   type: QUERY_INSERT_FAILURE,
-  payload: { errmsg, itype }
+  payload: { error, itype }
 });
 
 // insert fsquery
@@ -121,8 +128,7 @@ export const insertQuery = draft => dispatch => {
       dispatch(insertQuerySuccess(res.data, itype));
     })
     .catch(err => {
-      const errmsg = extractMsg(JSON.parse(JSON.stringify(err)));
-      dispatch(insertQueryFailure(errmsg, itype));
+      dispatch(insertQueryFailure(err2msg(err), itype));
     });
 };
 
@@ -132,18 +138,18 @@ const deleteQueryBegin = itype => ({
 });
 
 const deleteQuerySuccess = (id, itype) => {
-  // console.log("success", id, itype);
+  console.log("success", id, itype);
   return {
     type: QUERY_DELETE_SUCCESS,
     payload: { id, itype }
   };
 };
 
-const deleteQueryFailure = (errmsg, itype) => {
-  // console.log("failure", errmsg, itype);
+const deleteQueryFailure = (error, itype) => {
+  // console.log("failure", errormsg, itype);
   return {
     type: QUERY_DELETE_FAILURE,
-    payload: { errmsg, itype }
+    payload: { error, itype }
   };
 };
 
@@ -152,9 +158,11 @@ export const deleteQuery = (id, itype) => dispatch => {
   dispatch(deleteQueryBegin(itype));
   axios
     .delete(`/api/fsqueries/delete`, { params: { id } })
-    .then(res => dispatch(deleteQuerySuccess(res.data.data, itype)))
+    .then(res => {
+      console.log("res.data", res.data);      
+      dispatch(deleteQuerySuccess(res.data.id, itype))
+    })
     .catch(err => {
-      const errmsg = extractMsg(JSON.parse(JSON.stringify(err)));
-      dispatch(deleteQueryFailure(errmsg, itype));
+      dispatch(deleteQueryFailure(err2msg(err), itype));
     });
 };

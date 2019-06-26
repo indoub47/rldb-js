@@ -33,7 +33,7 @@ const JournalEditForm = ({ jItem, onChange, options, submitJItem, cancelJItem, a
           label="Veiksmas"
           divClassname="form-group col-3"
           value={absent(jItem.action)}
-          options={actionOptions}
+          options={options.action}
           onChange={onChange}
         />
         <SelectInputGroup
@@ -42,7 +42,7 @@ const JournalEditForm = ({ jItem, onChange, options, submitJItem, cancelJItem, a
           label="Operatorius"
           divClassname="form-group col-3"
           value={absent(jItem.oper)}
-          options={operOptions}
+          options={options.oper}
           onChange={onChange}
         />
         <SelectInputGroup
@@ -51,7 +51,7 @@ const JournalEditForm = ({ jItem, onChange, options, submitJItem, cancelJItem, a
           label="Defektoskopas"
           divClassname="form-group col-3"
           value={absent(jItem.apar)}
-          options={aparOptions}
+          options={options.apar}
           onChange={onChange}
         />
       </div>
@@ -89,7 +89,7 @@ const JournalEditForm = ({ jItem, onChange, options, submitJItem, cancelJItem, a
           label="Pavojingumas"
           divClassname="form-group col-2"
           value={absent(jItem.pavoj)}
-          options={pavojOptions}
+          options={options.pavoj}
           onChange={onChange}
         />
         <TextFieldGroup

@@ -1,5 +1,5 @@
 import {
-  FETCH_ITEMS_SUCCESS,
+  ITEMS_FETCH_SUCCESS,
   ITEM_INSERT_SUCCESS,
   ITEM_UPDATE_SUCCESS,
   ITEM_DELETE_SUCCESS,
@@ -16,7 +16,7 @@ export default function(state = initialState, action) {
   switch (action.type) {
 
     // fetch items
-    case FETCH_ITEMS_SUCCESS:
+    case ITEMS_FETCH_SUCCESS:
       return {
         ...state,
         [action.payload.itype]: action.payload.items
@@ -24,7 +24,7 @@ export default function(state = initialState, action) {
 
     // create item
     case ITEM_INSERT_SUCCESS:
-      if (!action.payload) return state;
+      if (!action.payload.item) return state;
       return {
         ...state,
         [action.payload.itype]: [
@@ -35,12 +35,10 @@ export default function(state = initialState, action) {
 
     // edit item
     case ITEM_UPDATE_SUCCESS:
-      // console.log("action", action);
       if (!action.payload || !action.payload.item) return state;
       const updatedItem = action.payload.item;
       const itype = action.payload.itype;
       const allItems = state[itype];
-      // console.log("itype, allItems", itype, allItems);
       let ind = allItems.findIndex(x => x.id === updatedItem.id);
       return {
         ...state,

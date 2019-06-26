@@ -2,11 +2,6 @@ import UDDataTransformer from "./UDDataTransformer";
 
 export class UDDataNumberTransformer extends UDDataTransformer {
 
-  constructor(thingsAndData) {
-    // data (counts, things(kkateg, pavoj, meistrija));
-    super(thingsAndData);
-  }
-
   createDefectCountGroups(things) {
     const kkateg = [
         { label: "1", ind: 1, ids: ["1"] },

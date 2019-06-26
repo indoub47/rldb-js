@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
 //import { connect } from "react-redux";
 import TextFieldGroup from "../../common/TextFieldGroup";
 import TextAreaGroup from "../../common/TextAreaGroup";
@@ -154,10 +153,5 @@ class EditQueryForm extends Component {
     );
   }
 }
-
-EditQueryForm.propTypes = {
-  query: PropTypes.object,
-  submitQuery: PropTypes.func.isRequired
-};
 
 export default EditQueryForm;

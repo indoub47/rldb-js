@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { registerUser } from "../../actions/registerActions";
 import { withRouter } from "react-router-dom";
@@ -9,7 +8,7 @@ import { fetchRegisterThings } from "../../actions/thingsActions";
 import isEmpty from "../../validation/is-empty";
 import { createOptions } from "../createOptions";
 import IsLoading from "../common/IsLoading";
-import ErrorAlert from "../common/Alerts/ErrorAlert";
+import Alert from "../common/Alert";
 
 class Register extends Component {
   constructor(props) {
@@ -58,11 +57,12 @@ class Register extends Component {
 
   render() {
     // things load error
-    if (!isEmpty(this.props.things.error)) {
-      return <ErrorAlert message={this.props.things.error.message} />;
+    if (this.props.things.errormsg) {
+      return <Alert message={this.props.things.errormsg} />;
     }
 
-    const inputErrors = this.props.register.error || {};
+    const errors = this.props.register.errors;
+
     const noUserRoles =
       isEmpty(this.props.things.data) || isEmpty(this.props.things.data.urole);
     const noRegions =
@@ -76,13 +76,14 @@ class Register extends Component {
             <div className="col-md-8 m-auto">
               <h1 className="display-4 text-center">Sign Up</h1>
               <p className="lead text-center">Create your RLDB account</p>
+              {errors.message && <Alert message={errors.message} />}
               <form noValidate onSubmit={this.onSubmit}>
                 <TextFieldGroup
                   name="name"
                   placeholder="Name"
                   value={this.state.name}
                   onChange={this.onChange}
-                  error={inputErrors.name}
+                  error={errors.name}
                   autoComplete="off"
                 />
                 <TextFieldGroup
@@ -91,7 +92,7 @@ class Register extends Component {
                   placeholder="Email"
                   value={this.state.email}
                   onChange={this.onChange}
-                  error={inputErrors.email}
+                  error={errors.email}
                   autoComplete="off"
                 />
                 {noUserRoles ? (
@@ -110,7 +111,7 @@ class Register extends Component {
                     )}
                     value={this.state.role}
                     onChange={this.onChange}
-                    error={inputErrors.role}
+                    error={errors.role}
                   />
                 )}
                 {noRegions ? (
@@ -129,7 +130,7 @@ class Register extends Component {
                     )}
                     value={this.state.region}
                     onChange={this.onChange}
-                    error={inputErrors.region}
+                    error={errors.region}
                   />
                 )}
                 <TextFieldGroup
@@ -138,7 +139,7 @@ class Register extends Component {
                   placeholder="Password"
                   value={this.state.password}
                   onChange={this.onChange}
-                  error={inputErrors.password}
+                  error={errors.password}
                   autoComplete="off"
                 />
                 <TextFieldGroup
@@ -147,7 +148,7 @@ class Register extends Component {
                   placeholder="Retype Password"
                   value={this.state.password2}
                   onChange={this.onChange}
-                  error={inputErrors.password2}
+                  error={errors.password2}
                   autoComplete="off"
                 />
                 <input type="submit" className="btn btn-info btn-block mt-4" />
@@ -159,14 +160,6 @@ class Register extends Component {
     );
   }
 }
-
-Register.propTypes = {
-  registerUser: PropTypes.func.isRequired,
-  fetchRegisterThings: PropTypes.func.isRequired,
-  register: PropTypes.object.isRequired,
-  things: PropTypes.object.isRequired,
-  isAuthenticated: PropTypes.bool.isRequired
-};
 
 const mapStateToProps = state => ({
   register: state.register,
