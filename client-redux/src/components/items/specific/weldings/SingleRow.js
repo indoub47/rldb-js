@@ -1,39 +1,29 @@
 import React from "react";
-import PropTypes from "prop-types";
-import {nuoIki} from "./functions";
 
 const ItemRow = ({ item, editItem, deleteItem }) => {
-  const nuoiki = nuoIki(item);
   return (
     <tr>
+      <td className="regbit">{item.regbit}</td>
       <td className="id text-right">{item.id}</td>
-      <td className="id text-right">{item.oldid}</td>
-      <td className="region">{item.region}</td>
+      <td className="oldid text-right">{item.oldid}</td>
+      <td className="dt">{item.dt0}</td>
+      <td className="virino">{item.virino}</td>
+      <td className="vbudas">{item.vbudas}</td>
       <td className="linija">{item.linija}</td>
       <td className="kelias">{item.kelias}</td>
       <td className="km text-right">{item.km}</td>
       <td className="pk text-right">{item.pk}</td>
       <td className="m text-right">{item.m}</td>
       <td className="siule">{item.siule}</td>
-      <td className="virino">{item.virino}</td>
-      <td className="vbudas">{item.vbudas}</td>
-      <td className="data" nowrap="nowrap">{item.data0}</td>
-      <td className="data" nowrap="nowrap">{item.data1}</td>
-      <td className="apar">{item.apar1}</td>
-      <td className="oper">{item.oper1}</td>
-      <td className="data" nowrap="nowrap">{item.data2}</td>
-      <td className="apar">{item.apar2}</td>
-      <td className="oper">{item.oper2}</td>
-      <td className="data" nowrap="nowrap">{item.data3}</td>
-      <td className="apar">{item.apar3}</td>
-      <td className="oper">{item.oper3}</td>
-      <td className="data" nowrap="nowrap">{item.data4}</td>
-      <td className="apar">{item.apar4}</td>
-      <td className="oper">{item.oper4}</td>
-      <td className="status">{item.status}</td>
+      <td className="suvnr">{item.suvnr}</td>
+      <td className="nrschema">{item.nrschema}</td>
+      <td className="dt">{item.dt}</td>
+      <td className="pvd">{item.pvd}</td>
+      <td className="oper">{item.oper}</td>
+      <td className="apar">{item.apar}</td>
+      <td className="id text-right">{item.defectid}</td>
+      <td className="dstop">{item.dstop}</td>
       <td className="pastaba">{item.note}</td>
-      <td className="nuo">{nuoiki.nuo}</td>
-      <td className="iki">{nuoiki.iki}</td>
       <td>
         <div className="button-group">
           <button
@@ -49,7 +39,8 @@ const ItemRow = ({ item, editItem, deleteItem }) => {
             data-v={item.v}
             onClick={deleteItem}
           >
-            <i className="fas fa-trash-alt" 
+            <i 
+              className="fas fa-trash-alt" 
               data-id={item.id}
               data-v={item.v} 
             />
@@ -58,45 +49,32 @@ const ItemRow = ({ item, editItem, deleteItem }) => {
       </td>
     </tr>
   );
-};
-
-ItemRow.propTypes = {
-  item: PropTypes.object.isRequired,
-  editItem: PropTypes.func,
-  deleteItem: PropTypes.func
-};
+}
 
 const ItemHeadRow = () => {
   return (
     <tr>
-      <th className="id text-right">id</th>
-      <th className="id text-right">oldid</th>
-      <th className="region">region</th>
-      <th className="linija">linija</th>
-      <th className="kelias">kelias</th>
-      <th className="km text-right">km</th>
-      <th className="pk text-right">pk</th>
-      <th className="m text-right">m</th>
-      <th className="siule">siule</th>
+      <th className="region">regbit</th>
+      <th className="id">id</th>
+      <th className="oldid">oldid</th>
+      <th className="dt">dt</th>
       <th className="virino">virino</th>
       <th className="vbudas">vbudas</th>
-      <th className="data" nowrap="nowrap">data0</th>
-      <th className="data" nowrap="nowrap">data1</th>
-      <th className="apar">apar1</th>
-      <th className="oper">oper1</th>
-      <th className="data" nowrap="nowrap">data2</th>
-      <th className="apar">apar2</th>
-      <th className="oper">oper2</th>
-      <th className="data" nowrap="nowrap">data3</th>
-      <th className="apar">apar3</th>
-      <th className="oper">oper3</th>
-      <th className="data" nowrap="nowrap">data4</th>
-      <th className="apar">apar4</th>
-      <th className="oper">oper4</th>
-      <th className="status">status</th>
+      <th className="linija">linija</th>
+      <th className="kelias">kelias</th>
+      <th className="km">km</th>
+      <th className="pk">pk</th>
+      <th className="m">m</th>
+      <th className="siule">siule</th>
+      <th className="suvnr">suvnr</th>
+      <th className="nrschema">nrschema</th>
+      <th className="dt">dt</th>
+      <th className="pvd">pvd</th>
+      <th className="oper">oper</th>
+      <th className="apar">apar</th>
+      <th className="id">defectid</th>
+      <th className="dstop">dstop</th>
       <th className="note">note</th>
-      <th className="data" nowrap="nowrap">nuo</th>
-      <th className="data" nowrap="nowrap">iki</th>
       <th className="controls">controls</th>
     </tr>
   );

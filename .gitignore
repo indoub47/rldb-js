@@ -1,5 +1,3 @@
 client-redux/node_modules
 server-express/node_modules
 server-express/config/secret.js
-backups
-MDBtoSQL

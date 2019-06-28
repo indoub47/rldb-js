@@ -30,7 +30,7 @@ router.get("/register", (req, res) => {
       // // console.log("coll, collItems", coll, collItems);
       resultObject[coll] = collItems;
     } catch (err) {
-      // console.log("coll error", coll, err);
+      console.log(err);
       return res.status(500).send(err);
     }
   });
@@ -78,7 +78,7 @@ router.get("/all", (req, res) => {
       const collItems = stmt.all({ userRegbit: req.user.regbit });
       resultObject[coll.name] = collItems;
     } catch (err) {
-      // console.log("coll error", coll, err);
+      console.log("error", err);
       return res.status(500).send(err);
     }
   });
@@ -149,7 +149,7 @@ router.post("/update", (req, res) => {
     //const info = stmt.run(draft);
     return res.status(200).json({ info, draft });
   } catch (err) {
-    // console.log("draft error", draft, err);
+    console.error(err);
     return res.status(500).send(err);
   }
 });
@@ -203,7 +203,7 @@ router.put("/create", (req, res) => {
       if (result.count > 0)
         return res.status(400).send({ msg: "id must be unique" });
     } catch (err) {
-      // console.log("error", err);
+      console.error(err);
       return res.status(500).send(err);
     }
   }
@@ -236,7 +236,7 @@ router.put("/create", (req, res) => {
     }
     return res.status(500).send({ msg: "not inserted" });
   } catch (err) {
-    // console.log("error", err);
+    console.error("error", err);
     return res.status(500).send(err);
   }
 });
@@ -288,6 +288,7 @@ router.delete("/delete", (req, res) => {
     const info = stmt.run(req.body.id, { regbits: req.user.regbit });
     return res.status(200).send(info);
   } catch (err) {
+    console.error(err);    
     return res.status(500).send({ ...err, msg: "bbz... :/" });
   }
 });

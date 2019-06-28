@@ -1,96 +1,76 @@
 import React from "react";
-import PropTypes from "prop-types";
 import TextFieldGroup from "../../../common/TextFieldGroup";
+import SelectInputGroup from "../../../common/SelectInputGroup";
 import TextAreaGroup from "../../../common/TextAreaGroup";
-import SelectInputGroup from '../../../common/SelectInputGroup';
-import { createOptions } from "../../../createOptions";
 import absent from "../../../../utils/absent-props";
 
-const MainDataForm = ({ item, onChange, things }) => {
-  // select controls options
-  // galbūt reikėtų iškelti prieš funciją, kad nekurtų kaskart kai renderina
-  const siuleOptions = createOptions(things.siule, "Siūlė", x => x.id);
-  const aparOptions = createOptions(things.apar, "Defektoskopas", x => x.id);
-  const operOptions = createOptions(things.oper, "Operatorius", x => x.id);
-  const statusOptions = createOptions([{id: 0}, {id: 1}, {id: 2}], null, x => x.id);
-  //const virinoOptions = createOptions(things.virino, null, x => x.name);
-  //const vbudasOptions = createOptions(things.vbudas, null, x => x.name);
-
+const MainDataForm = ({ item, onChange, options }) => {
   return (
     <div className="container item-info border border-primary text-center">
       <div className="form-group row main-data text-center">
         <TextFieldGroup
-          divClassname="form-group"
+          divClassname="form-group col-3"
           label="ID"
           id="item-id"
           name="id"
-          placeholder="Suvirinimo ID"
+          placeholder="Defekto ID"
           readonly={true}
           value={absent(item.id)}
-          onChange={onChange}
         />
         <TextFieldGroup
-          divClassname="form-group"
+          divClassname="form-group col-3"
           label="Senasis ID"
           id="item-oldid"
-          name="oldId"
-          placeholder="Suvirinimo senasis ID"
+          name="oldid"
+          placeholder="Senasis ID"
           readonly={true}
           value={absent(item.oldid)}
-          onChange={onChange}
         />
         <TextFieldGroup
-          divClassname="form-group"
-          label="Region bit"
+          divClassname="form-group col-2"
+          label="Regionas"
           id="item-regbit"
           name="regbit"
           placeholder="Regionas"
           readonly={true}
           value={absent(item.regbit)}
+        />
+      </div>
+
+      <div className="form-group row virino text-center">
+        <TextFieldGroup
+          id="item-dt0"
+          divClassname="form-group col-4"
+          type="date"
+          name="dt0"
+          label="Virinimo data"
+          value={absent(item.dt0)}
           onChange={onChange}
         />
-        <TextFieldGroup
-          divClassname="form-group"
-          label="Kas virino"
+        <SelectInputGroup
           id="item-virino"
+          divClassname="form-group col-4"
           name="virino"
-          placeholder="Kas virino"
+          label="Kas virino"
           value={absent(item.virino)}
+          options={options.virino}
           onChange={onChange}
         />
-        <TextFieldGroup
-          divClassname="form-group"
-          label="Virinimo būdas"
+        <SelectInputGroup
           id="item-vbudas"
+          divClassname="form-group col-4"
           name="vbudas"
-          placeholder="Virinimo būdas"
+          label="Virinimo būdas"
           value={absent(item.vbudas)}
-          onChange={onChange}
-        />
-        <TextFieldGroup
-          divClassname="form-group"
-          label="Būsena"
-          id="item-status"
-          name="status"
-          placeholder="Būsena"
-          value={absent(item.status)}
-          onChange={onChange}
-        />
-        <TextFieldGroup
-          divClassname="form-group"
-          label="Defekto ID"
-          id="item-defectid"
-          name="defectid"
-          placeholder="Defekto ID"
-          value={absent(item.defectid)}
+          options={options.vbudas}
           onChange={onChange}
         />
       </div>
 
       <div className="form-group row vieta text-center">
         <TextFieldGroup
-          divClassname="form-group"
           label="Linija"
+          divClassname="form-group col-2"
           id="item-linija"
           name="linija"
           placeholder="Linija"
@@ -98,17 +78,17 @@ const MainDataForm = ({ item, onChange, things }) => {
           onChange={onChange}
         />
         <TextFieldGroup
-          divClassname="form-group"
           label="Kelias"
+          divClassname="form-group col-2"
           id="item-kelias"
           name="kelias"
-          placeholder="Kelias"
+          placeholder="Kelio Nr."
           value={absent(item.kelias)}
           onChange={onChange}
         />
         <TextFieldGroup
-          divClassname="form-group"
           label="km"
+          divClassname="form-group col-2"
           id="item-km"
           name="km"
           placeholder="km"
@@ -116,8 +96,8 @@ const MainDataForm = ({ item, onChange, things }) => {
           onChange={onChange}
         />
         <TextFieldGroup
-          divClassname="form-group"
           label="pk"
+          divClassname="form-group col-2"
           id="item-pk"
           name="pk"
           placeholder="pk"
@@ -125,8 +105,8 @@ const MainDataForm = ({ item, onChange, things }) => {
           onChange={onChange}
         />
         <TextFieldGroup
-          divClassname="form-group"
           label="m"
+          divClassname="form-group col-2"
           id="item-m"
           name="m"
           placeholder="m"
@@ -135,171 +115,46 @@ const MainDataForm = ({ item, onChange, things }) => {
         />
         <SelectInputGroup
           id="item-siule"
+          divClassname="form-group col-2"
           name="siule"
           label="Siūlė"
           value={absent(item.siule)}
-          options={siuleOptions}
+          options={options.siule}
           onChange={onChange}
         />
+
         <TextFieldGroup
-          divClassname="form-group"
-          label="Suvir Nr."
+          label="Suvir. Nr."
+          divClassname="form-group col-2"
           id="item-suvnr"
           name="suvnr"
-          placeholder="suvnr"
+          placeholder="suv nr"
           value={absent(item.suvnr)}
           onChange={onChange}
         />
         <TextFieldGroup
-          divClassname="form-group"
           label="Nr. pagal schemą"
+          divClassname="form-group col-2"
           id="item-nrschema"
           name="nrschema"
-          placeholder="Nr. pagal schemą"
+          placeholder="nrschema"
           value={absent(item.nrschema)}
           onChange={onChange}
         />
       </div>
 
-      <div className="form-group row tikrinimai text-center">
-        <TextFieldGroup
-          divClassname="form-group"
-          type="date"
-          label="Įrengimo data"
-          id="item-data0"
-          name="data0"
-          placeholder="Įrengimo data"
-          value={absent(item.data0)}
+      <div className="form-group row datos text-center">
+        <SelectInputGroup
+          id="item-dstop"
+          divClassname="form-group col-3"
+          name="dstop"
+          label="Būsena"
+          value={absent(item.dstop)}
+          options={options.itemStatus}
           onChange={onChange}
         />
-      </div>
-
-      <div className="form-group row tikrinimai text-center">
-        <TextFieldGroup
-          divClassname="form-group"
-          type="date"
-          label="Data 1"
-          id="item-data1"
-          name="data1"
-          placeholder="Data 1"
-          value={absent(item.data1)}
-          onChange={onChange}
-        /> 
-        <SelectInputGroup
-          id="item-oper1"
-          name="oper1"
-          label="Operatorius 1"
-          divClassname="form-group col-4"
-          value={absent(item.oper1)}
-          options={operOptions}
-          onChange={onChange}
-        />  
-        <SelectInputGroup
-          id="item-apar1"
-          name="apar1"
-          label="Defektoskopas 1"
-          divClassname="form-group col-4"
-          value={absent(item.apar1)}
-          options={aparOptions}
-          onChange={onChange}
-        /> 
-      </div>
-
-      <div className="form-group row tikrinimai text-center">
-        <TextFieldGroup
-          divClassname="form-group"
-          type="date"
-          label="Data 2"
-          id="item-data2"
-          name="data2"
-          placeholder="Data 2"
-          value={absent(item.data2)}
-          onChange={onChange}
-        /> 
-        <SelectInputGroup
-          id="item-oper2"
-          name="oper2"
-          label="Operatorius 2"
-          divClassname="form-group col-4"
-          value={absent(item.oper2)}
-          options={operOptions}
-          onChange={onChange}
-        />  
-        <SelectInputGroup
-          id="item-apar2"
-          name="apar2"
-          label="Defektoskopas 2"
-          divClassname="form-group col-4"
-          value={absent(item.apar2)}
-          options={aparOptions}
-          onChange={onChange}
-        /> 
-      </div>
-
-      <div className="form-group row tikrinimai text-center">
-        <TextFieldGroup
-          divClassname="form-group"
-          type="date"
-          label="Data 3"
-          id="item-data3"
-          name="data3"
-          placeholder="Data 3"
-          value={absent(item.data3)}
-          onChange={onChange}
-        /> 
-        <SelectInputGroup
-          id="item-oper3"
-          name="oper3"
-          label="Operatorius 3"
-          divClassname="form-group col-4"
-          value={absent(item.oper3)}
-          options={operOptions}
-          onChange={onChange}
-        />  
-        <SelectInputGroup
-          id="item-apar3"
-          name="apar3"
-          label="Defektoskopas 3"
-          divClassname="form-group col-4"
-          value={absent(item.apar3)}
-          options={aparOptions}
-          onChange={onChange}
-        /> 
-      </div>
-
-      <div className="form-group row tikrinimai text-center">
-        <TextFieldGroup
-          divClassname="form-group"
-          type="date"
-          label="Data 4"
-          id="item-data4"
-          name="data4"
-          placeholder="Data 4"
-          value={absent(item.data4)}
-          onChange={onChange}
-        /> 
-        <SelectInputGroup
-          id="item-oper4"
-          name="oper4"
-          label="Operatorius 4"
-          divClassname="form-group col-4"
-          value={absent(item.oper4)}
-          options={operOptions}
-          onChange={onChange}
-        />  
-        <SelectInputGroup
-          id="item-apar4"
-          name="apar4"
-          label="Defektoskopas 4"
-          divClassname="form-group col-4"
-          value={absent(item.apar4)}
-          options={aparOptions}
-          onChange={onChange}
-        /> 
-      </div>
-      <div className="form-group row pastaba text-center">
         <TextAreaGroup
-          divClassname="form-group"
+          divClassname="form-group col-9"
           label="Pastaba"
           id="item-note"
           name="note"
@@ -312,9 +167,4 @@ const MainDataForm = ({ item, onChange, things }) => {
   );
 };
 
-MainDataForm.propTypes = {
-  item: PropTypes.object,
-  onChange: PropTypes.func.isRequired
-};
-
-export {MainDataForm};
+export { MainDataForm };

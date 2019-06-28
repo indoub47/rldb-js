@@ -7,40 +7,30 @@ import absent from "../../../../utils/absent-props";
 
 const JournalEditForm = ({ jItem, onChange, options, submitJItem, cancelJItem, alert }) => {
   
-
   return (
     <div className="container journal-info border border-primary text-center">
       <div className="form-group row text-center">
         {alert ? (
           <div className="col-12">
-            <Alert alertInfo={alert} />
+            <Alert message={alert.msg} type={alert.type} />
           </div>
         ) : null}
       </div>
       <div className="form-group row text-center">
         <TextFieldGroup
           label="Data"
-          divClassname="form-group col-3"
+          divClassname="form-group col-4"
           type="date"
-          id="jitem-jdata"
-          name="jdata"
-          value={absent(jItem.jdata)}
-          onChange={onChange}
-        />
-        <SelectInputGroup
-          id="jitem-action"
-          name="action"
-          label="Veiksmas"
-          divClassname="form-group col-3"
-          value={absent(jItem.action)}
-          options={options.action}
+          id="jitem-dt"
+          name="dt"
+          value={absent(jItem.dt)}
           onChange={onChange}
         />
         <SelectInputGroup
           id="jitem-oper"
           name="oper"
           label="Operatorius"
-          divClassname="form-group col-3"
+          divClassname="form-group col-4"
           value={absent(jItem.oper)}
           options={options.oper}
           onChange={onChange}
@@ -49,7 +39,7 @@ const JournalEditForm = ({ jItem, onChange, options, submitJItem, cancelJItem, a
           id="jitem-apar"
           name="apar"
           label="Defektoskopas"
-          divClassname="form-group col-3"
+          divClassname="form-group col-4"
           value={absent(jItem.apar)}
           options={options.apar}
           onChange={onChange}
@@ -57,48 +47,21 @@ const JournalEditForm = ({ jItem, onChange, options, submitJItem, cancelJItem, a
       </div>
       <div className="form-group row text-center">
         <TextFieldGroup
-          label="Kodas"
+          label="Pavadinimas"
           divClassname="form-group col-3"
-          id="jitem-kodas"
-          name="kodas"
-          placeholder="Kodas"
-          value={absent(jItem.kodas)}
+          id="jitem-pvd"
+          name="pvd"
+          placeholder="Pavadinimas"
+          value={absent(jItem.pvd)}
           onChange={onChange}
         />
         <TextFieldGroup
-          label="L"
-          divClassname="form-group col-2"
-          id="jitem-dl"
-          name="dl"
-          placeholder="L"
-          value={absent(jItem.dl)}
-          onChange={onChange}
-        />
-        <TextFieldGroup
-          label="H"
-          divClassname="form-group col-2"
-          id="jitem-dh"
-          name="dh"
-          placeholder="H"
-          value={absent(jItem.dh)}
-          onChange={onChange}
-        />
-        <SelectInputGroup
-          id="jitem-pavoj"
-          name="pavoj"
-          label="Pavojingumas"
-          divClassname="form-group col-2"
-          value={absent(jItem.pavoj)}
-          options={options.pavoj}
-          onChange={onChange}
-        />
-        <TextFieldGroup
-          label="Terminas"
+          label="Defekto ID"
           divClassname="form-group col-3"
-          type="date"
-          id="jitem-termin"
-          name="termin"
-          value={absent(jItem.dtermin)}
+          id="jitem-defectid"
+          name="defectid"
+          placeholder="Defekto ID"
+          value={absent(jItem.defectid)}
           onChange={onChange}
         />
       </div>
@@ -106,20 +69,20 @@ const JournalEditForm = ({ jItem, onChange, options, submitJItem, cancelJItem, a
         <TextAreaGroup
           divClassname="form-group col-12"
           label="Pastaba"
-          id="jitem-note"
-          name="note"
-          value={absent(jItem.note)}
+          id="jitem-jnote"
+          name="jnote"
+          value={absent(jItem.jnote)}
           onChange={onChange}
         />
       </div> 
       <div className="form-group row pastaba text-center">
         <div className="form-group col-3">
-          <button type="submit" class="btn btn-primary" onClick={submitJItem}>
+          <button type="submit" className="btn btn-primary" onClick={submitJItem}>
             Submit This Journal Record
           </button>
         </div>
         <div className="form-group col-3">
-          <button type="submit" class="btn btn-light" onClick={cancelJItem}>
+          <button type="submit" className="btn btn-light" onClick={cancelJItem}>
             Clear
           </button>
         </div>

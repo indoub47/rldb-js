@@ -75,6 +75,21 @@ class EditItem extends Component {
         this.props.things.operat.sort((o1, o2) => o1.name - o2.name),
         "-- nenurodyta --",
         x => x.id + ", " + x.name
+      ),      
+      virino: createOptions(
+        this.props.things.virino.sort((v1, v2) => v1.name - v2.name),
+        "-- nenurodyta --",
+        x => x.id + ", " + x.name
+      ),
+      vbudas: createOptions(
+        this.props.things.vbudas.sort((b1, b2) => b1.id - b2.id),
+        "-- nenurodyta --",
+        x => x.id + ", " + x.name
+      ),
+      itemStatus: createOptions(
+        this.props.things.itemstatus.sort((b1, b2) => b1.id - b2.id),
+        "-- nenurodyta --",
+        x => x.id + ", " + x.name
       )
     }
   }
@@ -243,6 +258,9 @@ class EditItem extends Component {
 
     // select form type
     const mainDataForm = itemSpecific[this.props.itype].mainDataForm;
+    console.log(this.props.itype);
+    console.log(itemSpecific);    
+    
     const journalEditForm = itemSpecific[this.props.itype].journalEditForm;
 
     return (      

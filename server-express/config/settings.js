@@ -9,9 +9,11 @@ exports.COLLECTIONS = [
   {name: "linija", actions: ["all"], hasRegion: true},
   {name: "siule", actions: ["all"], hasRegion: false},
   {name: "vbudas", actions: ["all"], hasRegion: false},
-  //{name: "virino", actions: ["all"], hasRegion: false},
   {name: "meistrija", actions: ["all"], hasRegion: true},
   {name: "pavoj", actions: ["all"], hasRegion: false},
+  {name: "virino", actions: ["all"], hasRegion: true},
+  {name: "vbudas", actions: ["all"], hasRegion: false},
+  {name: "itemstatus", actions: ["all"], hasRegion: false},
   {name: "region", actions: ["register_user"]},
   {name: "urole", actions: ["register_user"]}
 ];

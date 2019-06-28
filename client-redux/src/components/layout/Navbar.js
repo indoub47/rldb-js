@@ -62,10 +62,7 @@ class Navbar extends Component {
                 </li>
                 <li className='nav-item'>
                   <Link className='nav-link' to='/defects'>Defektai</Link>
-                </li>
-                <li className='nav-item'>
-                  <Link className='nav-link' to='/employees'>Darbuotojai</Link>
-                </li>                
+                </li>      
                 <li className='nav-item dropdown'>
                   <Link className="nav-link dropdown-toggle" to="#" id="reportsDropdown" role="button" data-toggle="dropdown">
                     Ataskaitos

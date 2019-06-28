@@ -65,9 +65,6 @@ class App extends Component {
               <PrivateRoute exact path='/weldings' component={Items} itype={iTypes.welding} />
               <PrivateRoute path='/weldings/edit/:id' component={EditItem} itype={iTypes.welding} />
               <PrivateRoute exact path='/weldings/new' component={EditItem} itype={iTypes.welding} />
-              <PrivateRoute exact path='/employees' component={Items} itype={iTypes.employee} />
-              <PrivateRoute path='/employees/edit/:id' component={EditItem} itype={iTypes.employee} />
-              <PrivateRoute exact path='/employees/new' component={EditItem} itype={iTypes.employee} />
               <PrivateRoute exact path='/queries/edit/:itype' component={EditQueries} />
               <PrivateRoute exact path='/report/defects-undone' component={Report} rtype={rTypes.defectsUndone} key={rTypes.defectsUndone} />
               <PrivateRoute exact path='/report/defects-undone-count' component={Report} rtype={rTypes.defectsUndoneCount} key={rTypes.defectsUndoneCount} />

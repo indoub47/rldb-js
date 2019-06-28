@@ -61,9 +61,12 @@ router.get("/", (req, res, next) => {
   SELECT ${mainTable}.*, lastjs.* FROM ${mainTable} INNER JOIN lastjs ON ${mainTable}.id = lastjs.mainid WHERE lastjs.rn = 1 ${mainTable}.regbit = 8;
   */
     const stmtText = `SELECT * FROM ${viewAllLastJ}` + filter;
+    console.log(stmtText);
+    
     const items = db.prepare(stmtText).all(req.user.regbit);
     return res.status(200).send(items);
   } catch (error) {
+    console.error(error);
     return res.status(500).send(error);
   }
 });
@@ -153,7 +156,7 @@ router.post("/update",
   res.locals.db = db;
   next();
 },
-fetchResult("paredaguotas"));
+fetchResult("redaguotas"));
 
 
 

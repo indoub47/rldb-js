@@ -25,21 +25,31 @@ module.exports = {
     }
   },
 
+  
   welding: { 
     tables: {
       main: {name: "weldings"}, 
-      journal: {name: "weldingj"}
+      journal: {name: "weldingj"},
+      viewAllFirstJ: {name: "weldings_all_firstj"},
+      viewAllLastJ: {name: "weldings_all_lastj"},
     },
     itemNames: {
       item: "suvirinimas", 
       Item: "Suvirinimas"
     },
-    notPanaikinta: "(status > 0)",
-    samePlace: "(linija = @linija AND kelias = @kelias AND km = @km AND pk = @pk AND m = @m AND siule = @siule)",
+    notPanaikinta: "(dstop <> 0)",
+    samePlace: {
+      query: "(linija = @linija AND kelias = @kelias AND km = @km AND pk = @pk AND m = @m AND siule = @siule)",
+      filter: {
+        insert: " WHERE regbit = ?",
+        update: " WHERE id <> @id AND regbit = ?",
+      }
+    },
     permissions: {
       update: ["adm", "superadm", "dev"],
       insert: ["adm", "superadm", "dev"],
       delete: ["adm", "superadm", "dev"]
     }
   }
+
 };
