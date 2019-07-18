@@ -34,6 +34,6 @@ export default {
         journalRow: weldingJournalRow.JournalRow,
         journalListHead: weldingJournalRow.JournalHeadRow,
         listPath: "/weldings",
-        panaikinta: item => item.dstop == 0
+        panaikinta: item => item.dstop === 0 || item.dstop === "0"
       }
 };

@@ -22,6 +22,7 @@ export default function(state = initialState, action) {
       };
 
     case THINGS_FETCH_SUCCESS:
+    
       return {
         ...state,
         isLoading: false,

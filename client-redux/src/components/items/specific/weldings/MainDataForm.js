@@ -1,7 +1,6 @@
 import React from "react";
 import TextFieldGroup from "../../../common/TextFieldGroup";
 import SelectInputGroup from "../../../common/SelectInputGroup";
-import TextAreaGroup from "../../../common/TextAreaGroup";
 import absent from "../../../../utils/absent-props";
 
 const MainDataForm = ({ item, onChange, options }) => {
@@ -39,12 +38,12 @@ const MainDataForm = ({ item, onChange, options }) => {
 
       <div className="form-group row virino text-center">
         <TextFieldGroup
-          id="item-dt0"
+          id="item-data0"
           divClassname="form-group col-4"
           type="date"
-          name="dt0"
+          name="data0"
           label="Virinimo data"
-          value={absent(item.dt0)}
+          value={absent(item.data0)}
           onChange={onChange}
         />
         <SelectInputGroup
@@ -151,15 +150,6 @@ const MainDataForm = ({ item, onChange, options }) => {
           label="Būsena"
           value={absent(item.dstop)}
           options={options.itemStatus}
-          onChange={onChange}
-        />
-        <TextAreaGroup
-          divClassname="form-group col-9"
-          label="Pastaba"
-          id="item-note"
-          name="note"
-          placeholder="Pastaba"
-          value={absent(item.note)}
           onChange={onChange}
         />
       </div>

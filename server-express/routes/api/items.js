@@ -7,12 +7,15 @@ const db = new Database("./db/dnbl.sqlite", {
   fileMustExist: true
 });
 //const collectionOptions = require("../../config/collections");
+const SQLStmts = require("../SQLStatements");
 const getCollection = require("../middleware/getCollection");
 const checkPermissions = require("../middleware/checkPermissions");
-const checkSamePlace = require("../middleware/checkSamePlace");
+const checkSamePlace = require("../middleware/checkSamePlace").fullReqRes;
+const checkIfExists = require("../middleware/checkIfExists").fullReqRes;
+const checkIfVMatch = require("../middleware/checkIfVMatch");
 const fetchResult = require("../middleware/fetchResult");
 const transactions = require("../transactions");
-const validate = require("../../validation/validate");
+const validate = require("../../validation/validate").validateItem;
 
 const begin = db.prepare('BEGIN');
 const commit = db.prepare('COMMIT');
@@ -36,6 +39,39 @@ function asTransaction(func) {
 
 // force to authenticate
 router.use(passport.authenticate("jwt", { session: false }));
+
+// @route GET /api/items/search/location
+// @desc Search items by their location data
+// @access Public
+router.get("/search/location", (req, res, next) => {
+  
+  const itype = req.query.itype;
+  let filter = {...req.query};
+  delete filter.itype;
+  const regbit = req.user.regbit;  
+  
+  try {
+    const items = SQLStmts
+      .SEARCH_ITEMS_BY_LOCATION_stmt(itype, filter, db)
+      .all(regbit, filter);
+    if (items.length === 0) {
+      return res.status(400).send({
+        ok: 1,
+        msg: "Rezultatų nerasta."
+      });
+    }
+    if (items.length > 20) {
+      return res.status(400).send({
+        ok: 0,
+        msg: "Per daug rezultatų. Siaurinkite užklausą."
+      });
+    }
+    return res.status(200).send(items);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send(error);
+  }
+});
 
 // get collection
 router.use(getCollection);
@@ -98,39 +134,18 @@ router.post("/update",
   const mainId = main.id;
   
   // just check if still exists
-  let found = null;
-  try {
-    const findStmtText = "SELECT * FROM " + coll.tables.main.name + " WHERE id = ? AND regbit = ?";
-    found = db.prepare(findStmtText).get(mainId, req.user.regbit);
-    if (!found) {
-      return res.status(404).send({
-        ok: 0,
-        reason: "bad criteria",
-        msg: `${coll.itemNames.Item}, kurio ID ${mainId}, nepakeistas, nes yra ištrintas iš serverio`
-      });
-    }
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      ok: 0,
-      reason: "server error",
-      msg: "Serverio klaida, mėginant atsisiųsti originalų objektą"
-    });
-  }
+  let ref = {};
+  checkIfExists(mainId, req, res, db, ref);
+  if (!ref.result) return;
+  const found = ref.result;
 
   // check if draft version equals db version
-  if (found.v !== main.v) {
-    return res.status(409).send({
-      ok: 0,
-      reason: "bad criteria",
-      msg: `${coll.itemNames.Item}, kurio ID ${mainId}, nepakeistas, nes skiriasi versijos; galbūt jis ką tik buvo redaguotas kažkieno kito`
-    });
-  }  
+  checkIfVMatch(found.v, main.v, res, ref);
+  if (!ref.result) return;
 
   // check if there exist some record with the same place
-  const spResult = checkSamePlace(main, "update", "neredaguotas", res, req, db);
-  console.log("same place result", spResult);
-  if (spResult !== "nosameplace") return;
+  checkSamePlace(main, "update", "neredaguotas", res, req, db, ref);
+  if (ref.result) return; // ref.result = true or error
 
   // same place not found, update item
   main.v += 1;
@@ -192,9 +207,9 @@ router.put("/insert",
   delete main.id;
 
   // check if there exist some record with the same place
-  const spResult = checkSamePlace(main, "insert", "nesukurtas", res, req, db);
-  console.log("same place result", spResult);
-  if (spResult !== "nosameplace") return;
+  let ref = {};
+  checkSamePlace(main, "insert", "nesukurtas", res, req, db, ref);
+  if (ref.result) return;
 
   
   const insertItem = asTransaction(transactions.insert);

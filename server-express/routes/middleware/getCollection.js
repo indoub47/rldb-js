@@ -11,6 +11,7 @@ function getCollection(req, res, next) {
   //let locals = res.locals || {};
   res.locals.coll = coll;
   res.locals.itype = itype;
+  
   //res.locals = locals;
   next();
 }

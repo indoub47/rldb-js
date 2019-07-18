@@ -1,22 +1,42 @@
 const modelProvider = require("../models/modelProvider");
 // parenka kaip konvertuoti duomens į tipą, kuris nurodytas model[prop].type
 const converter = {
-  string: { convert: value => value.toString().trim() },
+
+  string: {
+    convert: value => {
+      // null, undefined
+      if (value == null) return "";
+      // object, array, function, class, NaN
+      if (value !== value || Object(value) === value)
+        throw { message: "bad value" };
+      // any primitive
+      return value.toString().trim()
+    } 
+  },
 
   integer: {
     convert: value => {
+      // null, undefined, NaN, object, array, function, class
+      if (value == null || value !== value || Object(value) === value)
+        throw { message: "value must be an integer" };
       let int = parseInt(value);
       if (isNaN(int))
-        throw { msg: "value must be an integer" };
+        throw { message: "value must be an integer" };
       return int;
     }
   },
 
   number: {
     convert: value => {
+      // true, false, '', null, undefined, NaN, object, array, function, class
+      if (
+        (typeof value !== 'string' && typeof value !== 'number') ||
+        (typeof value === 'string' && value.trim() === '')
+      )
+        throw { message: "value must be a number" };
       let nr = Number(value);
       if (isNaN(nr))
-        throw { name, msg: "value must be a number" };
+        throw { message: "value must be a number" };
       return nr;
     }
   }
@@ -25,11 +45,11 @@ const converter = {
 // patikrina, ar data yra leistinose ribose - kad nebūtų, pvz. 2019-02-31
 function hasDateOverflow(shortDateString) {
   const numbers = shortDateString.split("-").map(num => parseInt(num));
-  const dt = new Date(shortDateString);
+  const data = new Date(shortDateString);
   return (
-    numbers[0] !== dt.getFullYear() ||
-    numbers[1] !== dt.getMonth() + 1 ||
-    numbers[2] !== dt.getDate()
+    numbers[0] !== data.getFullYear() ||
+    numbers[1] !== data.getMonth() + 1 ||
+    numbers[2] !== data.getDate()
   );
 }
 
@@ -60,7 +80,7 @@ const validators = {
 
   isNotYear: {
     func: value => value < 1900,
-    msg: () => "must be a four-digit year"
+    msg: () => "must be four-digit year"
   },
 
   isNotShortDate: {
@@ -71,7 +91,7 @@ const validators = {
         hasDateOverflow(value)
       );
     },
-    msg: () => "must be a valid date (yyyy-mm-dd)"
+    msg: () => "must be valid date (yyyy-mm-dd)"
   },
 
   isNeitherEmptyStringNorShortDate: {
@@ -83,14 +103,14 @@ const validators = {
           hasDateOverflow(value))
       );
     },
-    msg: () => "must be a valid short date (yyyy-mm-dd) or empty"
+    msg: () => "must be valid short date (yyyy-mm-dd) or empty"
   }
 };
 
 function emptyValue(val) {
+  // null, undefined or ''
   return (
-    val == null || 
-    (typeof val === 'string' && val.trim() === '')
+    val == null || val === ''
   );
 }
 
@@ -115,7 +135,7 @@ function validateProp(key, draft, model, insert) {
   }
 
   // mėgina konvertuoti
-  // grąžina prop arba error
+  // grąžina {value: dfasdf} arba {error: dfasdfa}
   let value;
   try {
     value = converter[model[key].type].convert(draft[key]);
@@ -137,7 +157,12 @@ function validateProp(key, draft, model, insert) {
   return {value};
 }
 
-function validateObject(draft, model, insert) {
+/**
+  @desc Patikrina item part - main arba journal. 
+  @return Grąžina {draft: normalizuotą objektą} 
+  arba errors - [{key: keyname, id: draftid, msg: error message}]
+ */
+function validateItemPart(draft, model, insert) {
   let errors = [];
   let normalized = {};
   // Kai insert - visi required laukai turi būti drafte.
@@ -151,10 +176,14 @@ function validateObject(draft, model, insert) {
     const result = validateProp(key, draft, model, insert);
     if (result) {
       if (result.error) {
-        errors.push({key, id: draft.id, msg: result.error});
-        return;
-      }
-      normalized[key] = result.value;
+        errors.push({
+          key, 
+          id: draft.id, 
+          msg: result.error
+        });
+      } else {
+        normalized[key] = result.value;
+      }      
     }
   });
   
@@ -162,7 +191,18 @@ function validateObject(draft, model, insert) {
   return {draft: normalized};
 }
 
-function validate(main, journal, itype, insert) {
+/**
+  @desc Patikrina visą objektą, kuriame yra šios dalys:
+  main - {... visos main props}
+  journal - {
+    insert: [{... journal, kuriuos reikia insert}],
+    update: [{... journal, kuriuos reikia update}],
+    delete: [... journal ids, kuriuos reikia delete]
+  }
+  @return Grąžina {item: normalizuotą objektą, tos pačios struktūros, kokį gavo} 
+  arba errors - [{key: keyname, id: draftid, msg: error message}]
+ */
+function validateItem(main, journal, itype, insert) {
   let allErrors = [];
   let resultItem = {
     main: null,
@@ -176,37 +216,92 @@ function validate(main, journal, itype, insert) {
   const mainModel = modelProvider[itype].main;
   const journalModel = modelProvider[itype].journal;
 
-  result = validateObject(main, mainModel, insert);
+  result = validateItemPart(main, mainModel, insert);
   if (result.errors) {
-    allErrors = result.errors;
+    allErrors.push(result.errors);
   } else {
     resultItem.main = result.draft;
   }
   
 
   journal.insert && journal.insert.forEach(journalItem => {
-    result = validateObject(journalItem, journalModel, true);    
+    result = validateItemPart(journalItem, journalModel, true);    
     if (result.errors) {
-      allErrors = allErrors.concat(result.errors);
+      allErrors.push(result.errors);
     } else {
       resultItem.journal.insert.push(result.draft);
     }
   });
 
   journal.update && journal.update.forEach(journalItem => {
-    result = validateObject(journalItem, journalModel, insert);   
+    result = validateItemPart(journalItem, journalModel, insert);   
     if (result.errors) {
-      allErrors = allErrors.concat(result.errors);
+      allErrors.push(result.errors);
     } else {
       resultItem.journal.update.push(result.draft);
     }
   });
   
-  if (allErrors.length) return {errors: allErrors};
+  if (allErrors.length) return {errors: [].concat(...allErrors)};
+  return {item: resultItem};  
+}
+
+/**
+  @desc Patikrina visą objektą, kuriame yra šios dalys:
+  main - {... visos main props},
+  journal - {... visos journal props}
+  @return Grąžina {item: normalizuotą objektą, tos pačios struktūros, kokį gavo} 
+  arba errors - [{key: keyname, id: main.id, msg: error message}]
+ */
+function validateItemPair(main, journal, itype, insert, whichPart="both") {
+  let allErrors = [];
+  let resultItem = {
+    main: null,
+    journal: null
+  };
+  let result; // tmp
+ 
+  // validates main
+  if (whichPart !== "journal") {
+    const mainModel = modelProvider[itype].main;
+    result = validateItemPart(main, mainModel, insert);
+    if (result.errors) {
+      allErrors.push(result.errors);
+    } else {
+      resultItem.main = result.draft;
+    }
+  }
+
+  // validates journal
+  if (whichPart !== "main") {
+    const journalModel = modelProvider[itype].journal;
+    result = validateItemPart(journal, journalModel, insert);
+    if (result.errors) {
+      if (main.id) {
+        result.errors.forEach(err => err.id = main.id);
+      }
+      allErrors.push(result.errors);
+    } else {
+      resultItem.journal = result.draft;
+    }
+  }
+  
+  if (allErrors.length) return {errors: [].concat(...allErrors)}; 
+  // (since Edge doesn't support arr.flat())
+
   return {item: resultItem};  
 }
 
 
 
 
-module.exports = validate;
+
+
+module.exports.converter = converter;
+module.exports.validators = validators;
+module.exports.hasDateOverflow = hasDateOverflow;
+module.exports.emptyValue = emptyValue;
+
+module.exports.validate = validateItem;
+module.exports.validateItemPart = validateItemPart;
+module.exports.validateItemPair = validateItemPair;

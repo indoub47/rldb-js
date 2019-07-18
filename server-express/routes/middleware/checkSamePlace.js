@@ -1,12 +1,18 @@
+function queryIfSamePlace(coll, action, main, regbit, db) {
+  const samePlaceFilter = `${coll.samePlace.filter[action]} AND ${coll.notPanaikinta} AND  ${coll.samePlace.query}`; 
+  const spStmtText = "SELECT * FROM " + coll.tables.main.name + samePlaceFilter;
+  return db.prepare(spStmtText).get(main, regbit);
+}
+
 // check if there exist some record with the same place
-function checkSamePlace(main, action, msgUndone, res, req, db) {
+function checkSamePlace(main, action, msgUndone, res, req, db, ref) {
+  ref.result = false;
   const coll = res.locals.coll;
   if (coll.samePlace) {
-    const samePlaceFilter = `${coll.samePlace.filter[action]} AND ${coll.notPanaikinta} AND  ${coll.samePlace.query}`;
     try {
-      const spStmtText = "SELECT * FROM " + coll.tables.main.name + samePlaceFilter;
-      const samePlaceItem = db.prepare(spStmtText).get(main, req.user.regbit);
+      const samePlaceItem = queryIfSamePlace(coll, action, main, req.user.regbit, db);
       if (samePlaceItem) {
+        ref.result = true;
         return res.status(400).send({
           ok: 0,
           reason: "bad draft",
@@ -14,7 +20,8 @@ function checkSamePlace(main, action, msgUndone, res, req, db) {
         });
       }
     } catch (error) {
-      console.log(error);
+      ref.result = error;
+      console.error(error);
       return res.status(500).send({
         ok: 0,
         reason: "server error",
@@ -22,7 +29,10 @@ function checkSamePlace(main, action, msgUndone, res, req, db) {
       });
     }    
   }
-  return "nosameplace";
 } 
 
-module.exports = checkSamePlace;
+
+module.exports.bareQuery = queryIfSamePlace;
+module.exports.fullReqRes = checkSamePlace;
+
+

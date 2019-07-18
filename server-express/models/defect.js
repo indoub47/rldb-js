@@ -14,12 +14,11 @@ module.exports.main = {
   btipas: {type: 'string', required: true, validator: "isEmptyString", label: "bėgio tipas"},
   bgamykl: {type: 'string', required: true, validator: "isEmptyString", label: "bėgio gamykla"},
   bmetai: {type: 'integer', required: true, validator: "isNotYear", label: "bėgio pagaminimo metai"},
-  dstop: {type: 'string', validator: "isNeitherEmptyStringNorShortDate", label: "pašalinimo data"},
-  note: {type: 'string', validator: "wrongLength", params: {min: 0, max: 255}, label: "pastaba"},
+  dstop: {type: 'string', validator: "isNeitherEmptyStringNorShortDate", label: "pašalinimo data"}
 };
 
 module.exports.journal = {
-  id: {type: 'integer', required: true, validator: "isNegative", label: "id"},
+  id: {type: 'integer', label: "id"},
   data: {type: 'string', required: true, validator: "isNotShortDate", label: "įrašo data"},
   kodas: {type: 'string', required: true, validator: "isEmptyString", label: "defekto kodas"},
   dl: {type: 'number', validator: "isNegative", label: "defekto dydis L"},
@@ -29,4 +28,5 @@ module.exports.journal = {
   apar: {type: 'string', required: true, validator: "isEmptyString", label: "defektoskopo kodas"},
   dtermin: {type: 'string', validator: "isNeitherEmptyStringNorShortDate", label: "pašalinimo terminas"},
   note: {type: 'string', validator: "wrongLength", params: {min: 0, max: 255}, label: "pastaba"},
+  mainid: {type: 'integer', label: 'main id'}
 };

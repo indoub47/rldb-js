@@ -10,6 +10,9 @@ import EditItem from './components/items/EditItem';
 import EditQueries from "./components/editQueries/EditQueries";
 import Report from "./components/report/Report";
 import LoggedIn from "./components/layout/LoggedIn";
+import OperInputSupply from "./components/operInput/OperInputSupply";
+import OperInputApprove from "./components/operInput/OperInputApprove";
+
 
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import jwt_decode from "jwt-decode";
@@ -62,9 +65,13 @@ class App extends Component {
               <PrivateRoute exact path='/defects' component={Items} itype={iTypes.defect} />
               <PrivateRoute path='/defects/edit/:id' component={EditItem} itype={iTypes.defect} />
               <PrivateRoute exact path='/defects/new' component={EditItem} itype={iTypes.defect} />
+              <PrivateRoute exact path='/operinput/supply/defects' component={OperInputSupply} itype={iTypes.defect} />
+              <PrivateRoute exact path='/operinput/approve/defects' component={OperInputApprove} itype={iTypes.defect} />
               <PrivateRoute exact path='/weldings' component={Items} itype={iTypes.welding} />
               <PrivateRoute path='/weldings/edit/:id' component={EditItem} itype={iTypes.welding} />
               <PrivateRoute exact path='/weldings/new' component={EditItem} itype={iTypes.welding} />
+              <PrivateRoute exact path='/operinput/supply/weldings' component={OperInputSupply} itype={iTypes.welding} />
+              <PrivateRoute exact path='/operinput/approve/weldings' component={OperInputApprove} itype={iTypes.welding} />
               <PrivateRoute exact path='/queries/edit/:itype' component={EditQueries} />
               <PrivateRoute exact path='/report/defects-undone' component={Report} rtype={rTypes.defectsUndone} key={rTypes.defectsUndone} />
               <PrivateRoute exact path='/report/defects-undone-count' component={Report} rtype={rTypes.defectsUndoneCount} key={rTypes.defectsUndoneCount} />

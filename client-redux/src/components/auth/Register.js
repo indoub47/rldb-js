@@ -48,6 +48,7 @@ class Register extends Component {
       email: this.state.email,
       role: this.state.role,
       region: this.state.region,
+      code: this.state.code,
       password: this.state.password,
       password2: this.state.password2
     };
@@ -133,6 +134,15 @@ class Register extends Component {
                     error={errors.region}
                   />
                 )}
+                <TextFieldGroup
+                  name="code"
+                  type="text"
+                  placeholder="Code"
+                  value={this.state.code}
+                  onChange={this.onChange}
+                  error={errors.code}
+                  autoComplete="off"
+                />
                 <TextFieldGroup
                   type="password"
                   name="password"

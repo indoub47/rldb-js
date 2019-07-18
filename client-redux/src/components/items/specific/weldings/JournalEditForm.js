@@ -2,7 +2,6 @@ import React from "react";
 import Alert from "../../../common/Alert";
 import TextFieldGroup from "../../../common/TextFieldGroup";
 import SelectInputGroup from "../../../common/SelectInputGroup";
-import TextAreaGroup from "../../../common/TextAreaGroup";
 import absent from "../../../../utils/absent-props";
 
 const JournalEditForm = ({ jItem, onChange, options, submitJItem, cancelJItem, alert }) => {
@@ -21,9 +20,9 @@ const JournalEditForm = ({ jItem, onChange, options, submitJItem, cancelJItem, a
           label="Data"
           divClassname="form-group col-4"
           type="date"
-          id="jitem-dt"
-          name="dt"
-          value={absent(jItem.dt)}
+          id="jitem-data"
+          name="data"
+          value={absent(jItem.data)}
           onChange={onChange}
         />
         <SelectInputGroup
@@ -56,26 +55,16 @@ const JournalEditForm = ({ jItem, onChange, options, submitJItem, cancelJItem, a
           onChange={onChange}
         />
         <TextFieldGroup
-          label="Defekto ID"
-          divClassname="form-group col-3"
-          id="jitem-defectid"
-          name="defectid"
-          placeholder="Defekto ID"
-          value={absent(jItem.defectid)}
-          onChange={onChange}
-        />
-      </div>
-      <div className="form-group row pastaba text-center">
-        <TextAreaGroup
-          divClassname="form-group col-12"
+          divClassname="form-group col-9"
           label="Pastaba"
           id="jitem-jnote"
-          name="jnote"
-          value={absent(jItem.jnote)}
+          name="note"
+          placeholder="Pastaba"
+          value={absent(jItem.note)}
           onChange={onChange}
         />
       </div> 
-      <div className="form-group row pastaba text-center">
+      <div className="form-group row controls text-center">
         <div className="form-group col-3">
           <button type="submit" className="btn btn-primary" onClick={submitJItem}>
             Submit This Journal Record

@@ -11,11 +11,11 @@ export const filterReplacements = {
   vbudas: "x.vbudas",
   suvnr: "x.suvnr",
   nrschema: "x.nrschema",
-  dt0: "x.dt0",
+  data0: "x.data0",
   dstop: "x.stop",
   note: "x.note",
 
-  dt: "x.dt",
+  data: "x.data",
   oper: "x.oper",
   apar: "x.apar",
   name: "x.pvd",
@@ -36,11 +36,11 @@ export function getSortingReplacement(fieldName, x) {
     case "vbudas": return x.vbudas;
     case "suvnr": return x.suvnr;
     case "nrschema": return x.nrschema;
-    case "dt0": return x.dt0;
+    case "data0": return x.data0;
     case "dstop": return x.dstop;
     case "note": return x.note;
     
-    case "dt": return x.dt;
+    case "data": return x.data;
     case "apar": return x.apar;
     case "oper": return x.oper;
     case "pvd": return x.pvd;

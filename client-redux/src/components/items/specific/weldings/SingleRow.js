@@ -6,7 +6,7 @@ const ItemRow = ({ item, editItem, deleteItem }) => {
       <td className="regbit">{item.regbit}</td>
       <td className="id text-right">{item.id}</td>
       <td className="oldid text-right">{item.oldid}</td>
-      <td className="dt">{item.dt0}</td>
+      <td className="data">{item.data0}</td>
       <td className="virino">{item.virino}</td>
       <td className="vbudas">{item.vbudas}</td>
       <td className="linija">{item.linija}</td>
@@ -17,11 +17,10 @@ const ItemRow = ({ item, editItem, deleteItem }) => {
       <td className="siule">{item.siule}</td>
       <td className="suvnr">{item.suvnr}</td>
       <td className="nrschema">{item.nrschema}</td>
-      <td className="dt">{item.dt}</td>
+      <td className="data">{item.data}</td>
       <td className="pvd">{item.pvd}</td>
       <td className="oper">{item.oper}</td>
       <td className="apar">{item.apar}</td>
-      <td className="id text-right">{item.defectid}</td>
       <td className="dstop">{item.dstop}</td>
       <td className="pastaba">{item.note}</td>
       <td>
@@ -57,7 +56,7 @@ const ItemHeadRow = () => {
       <th className="region">regbit</th>
       <th className="id">id</th>
       <th className="oldid">oldid</th>
-      <th className="dt">dt</th>
+      <th className="data">data0</th>
       <th className="virino">virino</th>
       <th className="vbudas">vbudas</th>
       <th className="linija">linija</th>
@@ -68,11 +67,10 @@ const ItemHeadRow = () => {
       <th className="siule">siule</th>
       <th className="suvnr">suvnr</th>
       <th className="nrschema">nrschema</th>
-      <th className="dt">dt</th>
+      <th className="data">data</th>
       <th className="pvd">pvd</th>
       <th className="oper">oper</th>
       <th className="apar">apar</th>
-      <th className="id">defectid</th>
       <th className="dstop">dstop</th>
       <th className="note">note</th>
       <th className="controls">controls</th>

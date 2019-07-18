@@ -1,7 +1,6 @@
 import React from "react";
 import TextFieldGroup from "../../../common/TextFieldGroup";
 import SelectInputGroup from "../../../common/SelectInputGroup";
-import TextAreaGroup from "../../../common/TextAreaGroup";
 import absent from "../../../../utils/absent-props";
 
 const MainDataForm = ({ item, onChange, options }) => {
@@ -151,15 +150,6 @@ const MainDataForm = ({ item, onChange, options }) => {
           name="dstop"
           placeholder="Panaikinimo data"
           value={absent(item.dstop)}
-          onChange={onChange}
-        />
-        <TextAreaGroup
-          divClassname="form-group col-9"
-          label="Pastaba"
-          id="item-note"
-          name="note"
-          placeholder="Pastaba"
-          value={absent(item.note)}
           onChange={onChange}
         />
       </div>

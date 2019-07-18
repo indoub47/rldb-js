@@ -2,7 +2,6 @@ import React from "react";
 import Alert from "../../../common/Alert";
 import TextFieldGroup from "../../../common/TextFieldGroup";
 import SelectInputGroup from "../../../common/SelectInputGroup";
-import TextAreaGroup from "../../../common/TextAreaGroup";
 import absent from "../../../../utils/absent-props";
 
 const JournalEditForm = ({ jItem, onChange, options, submitJItem, cancelJItem, alert }) => {
@@ -93,16 +92,17 @@ const JournalEditForm = ({ jItem, onChange, options, submitJItem, cancelJItem, a
         />
       </div>
       <div className="form-group row pastaba text-center">
-        <TextAreaGroup
-          divClassname="form-group col-12"
+        <TextFieldGroup
           label="Pastaba"
+          divClassname="form-group col-12"
+          placeholder="Pastaba"
           id="jitem-note"
           name="note"
           value={absent(jItem.note)}
           onChange={onChange}
         />
       </div> 
-      <div className="form-group row pastaba text-center">
+      <div className="form-group row controls text-center">
         <div className="form-group col-3">
           <button type="submit" className="btn btn-primary" onClick={submitJItem}>
             Submit This Journal Record

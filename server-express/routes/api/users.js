@@ -43,11 +43,12 @@ router.post("/register", (req, res) => {
     email: req.body.email,
     name: req.body.name,
     role: req.body.role,
+    code: req.body.code,
     regbit: REGIONS[req.body.region].bit,
     active: 0
   };
 
-   // hash user's password and response with a newly created user
+   // hash user's password and respond with a newly created user
   bcrypt.genSalt(10, (error, salt) => {
     if (error) return res.status(500).json(error);
     bcrypt.hash(req.body.password, salt, (error, hash) => {
@@ -119,6 +120,7 @@ router.post("/login", (req, res) => {
         email: user.email,
         name: user.name,
         role: user.role,
+        code: user.code,
         region: Object.keys(REGIONS).find(regionId => REGIONS[regionId].bit === user.regbit)
       };
       // sign the jwt
@@ -155,6 +157,7 @@ router.get(
       email: req.user.email,
       name: req.user.name,
       role: req.user.role,
+      code: user.code,
       region: Object.keys(REGIONS).find(regionId => REGIONS[regionId].bit === req.user.regbit)
     });
   }

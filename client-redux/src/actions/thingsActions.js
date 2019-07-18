@@ -52,8 +52,18 @@ export const fetchRegisterThings = () => dispatch => {
 // Get all things for all apps
 export const fetchAllThings = () => dispatch => {
   dispatch(fetchThingsBegin());
+  const v = localStorage.getItem("allThingsV") || -1;
   axios
-    .get("/api/things/all")
-    .then(res => dispatch(fetchThingsSuccess(res.data)))
+    .get("/api/things/all", {params: {v}} )
+    .then(res => {
+      if (res.data.things) {
+        console.log("res.data", res.data);
+        localStorage.setItem("allThingsV", res.data.v);
+        localStorage.setItem("allThings", JSON.stringify(res.data.things));
+        dispatch(fetchThingsSuccess(res.data.things));
+      } else {
+        dispatch(fetchThingsSuccess(JSON.parse(localStorage.getItem("allThings"))));
+      }
+    })
     .catch(err => dispatch(fetchThingsFailure(err.message)));
 };

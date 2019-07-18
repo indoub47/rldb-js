@@ -51,5 +51,4 @@ module.exports = {
       delete: ["adm", "superadm", "dev"]
     }
   }
-
 };

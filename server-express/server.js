@@ -10,6 +10,7 @@ const items = require("./routes/api/items");
 const journal = require("./routes/api/journal");
 const things = require("./routes/api/things");
 const fsqueries = require("./routes/api/fsqueries");
+const operinput = require("./routes/api/operinput");
 //const reports = require("./routes/api/reports");
 
 const app = express();
@@ -25,11 +26,6 @@ app.use((req, res, next) => {
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// mongoose
-//   .connect(secret.DB_URI, { useNewUrlParser: true })
-//   .then(() => // console.log("MongoDB Connected"))
-//   .catch(err => // console.log(err));
-
 app.use(passport.initialize());
 
 app.use("/api/users", users);
@@ -37,21 +33,9 @@ app.use("/api/items", items);
 app.use("/api/journal", journal);
 app.use("/api/things", things);
 app.use("/api/fsqueries", fsqueries);
+app.use("/api/operinput", operinput);
 //app.use("/api/report", reports);
 app.use("/", express.static("../client-redux/"));
-
-// Add a random delay to all requests. Set SHOULD_DELAY to false for a more
-// responsive server, or play around with the delay RANGE.
-/*
-app.use((req, res, next) => {
-  if (settings.SHOULD_DELAY) {
-    const delay = Math.random() * (settings.DELAY_RANGE[1] - settings.DELAY_RANGE[0]) + settings.DELAY_RANGE[0];
-    const start = Date.now();
-    while (Date.now() - start < delay) {}
-  }
-  next();
-});
-*/
 
 /**
  * Start listening on port 3000

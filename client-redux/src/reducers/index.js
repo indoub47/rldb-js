@@ -5,6 +5,7 @@ import registerReducer from "./registerReducer";
 import queriesReducer from "./queriesReducer";
 import reportReducer from "./reportReducer";
 import journalReducer from "./journalReducer";
+import operInputReducer from "./operInputReducer";
 
 import allItemsReducer from "./items/allItemsReducer";
 import itemAlertingReducer from "./items/itemAlertingReducer";
@@ -22,6 +23,7 @@ export default combineReducers({
   queries: queriesReducer,
   report: reportReducer,
   journal: journalReducer,
+  operInput: operInputReducer,
 
   allItems: allItemsReducer,
   itemAlerting: itemAlertingReducer,

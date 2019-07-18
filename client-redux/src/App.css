@@ -177,3 +177,49 @@ tr.current {
   color: blue;
   font-style: oblique;
 }
+
+/* operinput */
+.search-panel, .oper-input-panel {
+  border: 1px solid gray;
+  padding: 1rem;
+}
+
+.approve-primary-row {
+  font-size: .95rem;
+  border-top: 3px solid black;
+}
+
+.approve-secondary-row {
+  font-size: .85rem;
+  background-color: ghostwhite;
+  color: grey;
+}
+
+.approve-validation-row {
+  font-size: .85rem;
+  color: red;
+}
+
+.btn-light.active {
+  font-weight: bold;
+}
+
+td.controls {
+  font-size: .85rem;
+}
+
+option.none, select.by-option.none {
+  background-color: whitesmoke;
+}
+
+option.ok, select.by-option.ok {
+  background-color: #adebad;
+}
+
+option.return, select.by-option.return {
+  background-color: #b3d1ff;
+}
+
+option.delete, select.by-option.delete {
+  background-color: #ffad99;
+}

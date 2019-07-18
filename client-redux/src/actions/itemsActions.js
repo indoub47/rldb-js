@@ -95,7 +95,7 @@ const applyFilterSort = (items, filterText, sortText, itype) => {
       payload: { items: fsedItems, filterText, sortText, itype }
     };
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return {
       type: ITEMS_FILTERSORT_APPLY_ERROR,
       payload: { errormsg: err.toString(), itype }
@@ -140,7 +140,7 @@ export const fetchItems = itype => (dispatch, getState) => {
       refilter(dispatch, getState, itype);
     })
     .catch(err => {
-      console.log(err);
+      console.error(err);
       dispatch(fetchItemsFailure(err.toString(), itype))
     });
 };
@@ -215,7 +215,6 @@ export const insertItem = (main, journal, history, itype) => (dispatch, getState
       history.push(itemSpecific[itype].listPath);
     })
     .catch(err => {
-      console.log(err);
       if (err.response && err.response.data) {
         if (err.response.data.reason === "bad criteria") {
           // "bad criteria" - kartoti nėra prasmės, grįžtama į sąrašą
@@ -230,10 +229,12 @@ export const insertItem = (main, journal, history, itype) => (dispatch, getState
           }
           dispatch(itemInsertFailure(responseMsg, itype));
         } else {
+          console.error(err);
           // kt. - galbūt serverio klaida ar kažkas, apsimoka pamėginti dar kartą
           dispatch(itemInsertFailure(err.response.data.msg, itype));
         }
       } else {
+        console.error(err);
         // galbūt serverio klaida ar kažkas, apsimoka pamėginti dar kartą
         dispatch(itemInsertFailure(err.toString(), itype));
       }
@@ -296,7 +297,6 @@ export const updateItem = (main, journal, history, itype) => (dispatch, getState
       history.push(itemSpecific[itype].listPath);
     })
     .catch(err => {
-      console.log("err", err);
       if (err.response && err.response.data) {
         if (err.response.data.reason === "bad criteria") {
           // "bad criteria" - kartoti nėra prasmės, grįžtama į sąrašą
@@ -311,10 +311,12 @@ export const updateItem = (main, journal, history, itype) => (dispatch, getState
           }
           dispatch(itemUpdateFailure(responseMsg, itype));
         } else {
+          console.error(err);
           // kt. - galbūt serverio klaida ar kažkas, apsimoka pamėginti dar kartą
           dispatch(itemUpdateFailure(err.response.data.msg, itype));
         }
       } else {
+        console.error(err);
         // galbūt serverio klaida ar kažkas, apsimoka pamėginti dar kartą
         dispatch(itemUpdateFailure(err.toString(), itype));
       }
@@ -351,10 +353,10 @@ export const deleteItem = (itemId, itemV, itype) => (dispatch, getState) => {
       refilter(dispatch, getState, itype);
     })
     .catch(err => {
-      console.log(err);
       if (err.response && err.response.data) {
         dispatch(itemDeleteFailure(err.response.data.msg, itype));
       } else {
+        console.error(err);
         dispatch(itemDeleteFailure(err.toString(), itype));
       }
     });

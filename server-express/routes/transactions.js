@@ -4,8 +4,8 @@ const SQLStmts = require("./SQLStatements");
 module.exports.delete = function (itype, mainData, returnRef, db) {
   const txtDeleteMain = SQLStmts.DELETE_MAIN_stmtText(itype);
   const mainInfo = db.prepare(txtDeleteMain).run(mainData);
-  const txtDeleteJournal = SQLStmts.DELETE_WHOLE_JOURNAL_stmtText(itype);
-  const journalInfo = db.prepare(txtDeleteJournal).run(mainData.id);
+  const deleteJournalStmt = SQLStmts.DELETE_WHOLE_JOURNAL_stmt(itype, db);
+  const journalInfo = deleteJournalStmt.run(mainData.id);
   returnRef.mainInfo = mainInfo;
   returnRef.journalInfo = journalInfo;   
 }
@@ -24,6 +24,81 @@ module.exports.insert = function (itype, main, journal, returnRef, db) {
   });
   returnRef.mainInfo = mainInfo;
   returnRef.journalInfo = journalInfo;
+}
+
+// Adminas parsisiunčia visus operų pateiktus items ir dalį jų approvina, dalį - ne.
+// Tada reikia approvintus užkrauti į atitinkamą lentelę, 
+// neapprovintus grąžinti operui į unapproved lentelę ir
+// ištrinti to itype items'us iš supplied lentelės
+module.exports.insertAfterApproval = function (itype, toCreate, toModify, unapproved, withErrors, regbit, db) {
+  // insert statement factories
+  const factInsertMain = SQLStmts.INSERT_stmtTextFactory(itype, "main");
+  const factInsertJournal = SQLStmts.INSERT_stmtTextFactory(itype, "journal");
+
+  let info;
+
+  // taking each toCreate
+  // inserting its main, 
+  // getting main's id, 
+  // setting main's id as journal mainid, 
+  // inserting journal
+  toCreate.forEach(mj => {
+    info = db.prepare(factInsertMain(mj.main)).run(mj.main);
+    if (info.changes !== 1) {
+      console.error(info);
+      throw Error("Error while inserting main");
+    }
+    mj.journal.mainid = info.lastInsertRowid;
+    info = db.prepare(factInsertJournal(mj.journal)).run(mj.journal);
+    if (info.changes !== 1) {
+      console.error(info);
+      throw Error("Error while inserting journal");
+    }
+  });
+
+  // insert all journal parts
+  // and shift corresponding main version
+  const shiftMainVStmt = SQLStmts.SHIFT_MAIN_V_stmt(itype, db);
+
+  toModify.forEach(mj => {
+    info = db.prepare(factInsertJournal(mj.journal)).run(mj.journal);
+    if (info.changes !== 1) {
+      console.error(info);
+      throw Error("Error while inserting journal");
+    }
+    info = shiftMainVStmt.run(mj.journal.mainid);
+    if (info.changes !== 1) {
+      console.error(info);
+      throw Error("Error while shifting main version");
+    }
+  });
+
+  // insert all unapproved inputs
+  const insertIntoUAStmt = SQLStmts.INSERT_INTO_UNAPPROVED_stmt(db);
+  unapproved.forEach(ua => {
+    info = insertIntoUAStmt.run(ua)
+    if (info.changes !== 1) {
+      console.error(info);
+      throw Error("Error while inserting unapproved");
+    }
+  });
+
+  // insert all withErrors
+  const insertIntoWEStmt = SQLStmts.INSERT_INTO_WITHERRORS_stmt(db);
+  withErrors.forEach(we => {
+    info = insertIntoWEStmt.run(we);
+    if (info.changes !== 1) {
+      console.error(info);
+      throw Error("Error while inserting withErrors");
+    }
+  });
+
+  // delete supplied of this particular itype
+  info = SQLStmts.DELETE_FROM_SUPPLIED_stmt(db).run(regbit, itype);
+  if (info.changes < 1) {
+    console.error(info);
+    throw Error("Error while deleting supplied");
+  };
 }
 
 module.exports.update = function (itype, main, journal, returnRef, db) {

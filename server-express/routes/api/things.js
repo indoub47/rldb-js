@@ -65,6 +65,26 @@ router.use(passport.authenticate("jwt", { session: false }));
 // @desc Get all things as one object
 // @access Public
 router.get("/all", (req, res) => {
+  const clientV = req.query.v;
+  let dbV;
+
+  // check things on the db version
+  try {
+    dbV = db.prepare("SELECT int FROM settings WHERE name = 'allThingsV'").get().int;
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send({message: "Checking version error"});
+  }
+
+  console.log("dbV", dbV);
+  console.log("clientV", clientV);
+
+  // if version the same, don't send things
+  if (clientV && dbV.toString() === clientV.toString()) {
+    return res.status(200).send({things: ""});
+  }
+
+  // if versions not equal, fetch the things and send along with the version
   var resultObject = {};
   COLLECTIONS.filter(c => c.actions.includes("all")).forEach(coll => {
     try {
@@ -78,11 +98,11 @@ router.get("/all", (req, res) => {
       const collItems = stmt.all({ userRegbit: req.user.regbit });
       resultObject[coll.name] = collItems;
     } catch (err) {
-      console.log("error", err);
+      console.error(err);
       return res.status(500).send(err);
     }
   });
-  return res.status(200).json(resultObject);
+  return res.status(200).json({things: resultObject, v: dbV});
 });
 
 // @route POST api/sqlite/things/update

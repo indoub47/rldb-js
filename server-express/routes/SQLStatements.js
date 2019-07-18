@@ -80,13 +80,12 @@ module.exports.DELETE_SOME_JOURNAL_stmtText = (itype, journal_delete) => {
   return `DELETE FROM ${tableName} WHERE mainid = ? AND id IN (${journal_delete.map(j => '?').join(', ')})`;
 };
 
-// eksportuoja funkciją, kuri
-// pagamina naikinamo item viso journal DELETE SQL statement tekstą:
-// txtStmt = DELETE_WHOLE_JOURNAL_stmtText(itype);
-// Kad tą tekstą įvykdyti, reikia db.prepare(textStmt).run(main_id);
-module.exports.DELETE_WHOLE_JOURNAL_stmtText = (itype) => {  
+// eksportuoja prepared statement, kuris
+// naikina item visą journal
+// Kad tą įvykdyti, reikia stmt.run(main_id);
+module.exports.DELETE_WHOLE_JOURNAL_stmt = (itype, db) => {  
   const tableName = collections[itype].tables.journal.name;
-  return `DELETE FROM ${tableName} WHERE mainid = ?`;
+  return db.prepare(`DELETE FROM ${tableName} WHERE mainid = ?`);
 };
 
 module.exports.simpleUpdateStmt = (obj, tableName, excludeFields) => {
@@ -114,3 +113,26 @@ module.exports.simpleInsertStmt = (tableName, draft, excludeFields) => {
     keys.map(key => "@" + key).join(', ')
   })`;
 }
+
+module.exports.DELETE_FROM_SUPPLIED_stmt = db => db.prepare("DELETE FROM supplied WHERE regbit = ? AND itype = ?");
+
+module.exports.INSERT_INTO_UNAPPROVED_stmt = db => db.prepare("INSERT INTO unapproved (input, itype, oper) VALUES (@input, @itype, @oper)");
+
+module.exports.INSERT_INTO_WITHERRORS_stmt = db => db.prepare("INSERT INTO withErrors (input, itype, regbit) VALUES (@input, @itype, @regbit)");
+
+module.exports.SHIFT_MAIN_V_stmt = (itype, db) => {   
+  const tableName = collections[itype].tables.main.name;
+  return db.prepare(`UPDATE ${tableName} SET v = v + 1 WHERE id = ?`);
+}
+
+module.exports.SEARCH_ITEMS_BY_LOCATION_stmt = (itype, filterObj, db) => {
+  const tableName = collections[itype].tables.viewAllLastJ.name;
+  const notPanaikinta = collections[itype].notPanaikinta;
+  const locationFilter = Object.keys(filterObj)
+    .filter(key => filterObj[key] != null && filterObj[key] !== '')
+    .map(key => `${key} = @${key}`)
+    .join(" AND ");
+  const stmtText = `SELECT * FROM ${tableName} WHERE regbit = ? AND ${locationFilter} AND ${notPanaikinta}`;
+  return db.prepare(stmtText); 
+}
+
