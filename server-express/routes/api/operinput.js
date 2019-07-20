@@ -8,11 +8,13 @@ const db = new Database("./db/dnbl.sqlite", {
 });
 const modelProvider = require("../../models/modelProvider");
 const getCollection = require("../middleware/getCollection");
+const processApproved = require("../middleware/processApproved");
 
 const transactions = require("../transactions");
 const validate = require("../../validation/validate").validateItemPair;
-const checkSamePlace = require("../middleware/checkSamePlace").bareQuery;
-const checkIfExists = require("../middleware/checkIfExists").bareQuery;
+const checkSameLocFctr = require("../middleware/checkSamePlace")
+  .queryFactory;
+const checkIfExitsFact = require("../middleware/checkIfExists").queryFactory;
 const splitMainJournal = require("../middleware/splitMainJournal");
 const parseMainJournal = require("../middleware/parseMainJournal");
 const validateSupplied = require("../middleware/validateSupplied");
@@ -36,13 +38,11 @@ function asTransaction(func) {
   };
 }
 
-
-
 // force to authenticate
 router.use(passport.authenticate("jwt", { session: false }));
 
 // @route GET /api/operinput/supplied
-// @desc Get supplied inputs of particular region and particular itype
+// @desc Fetch supplied inputs of particular region and particular itype
 // @access Public
 router.get("/supplied", getCollection, (req, res) => {
   // patikrinti ar turi teisę
@@ -83,7 +83,7 @@ router.get("/supplied", getCollection, (req, res) => {
 });
 
 // @route GET /api/operinput/unapproved
-// @desc Get unapproved inputs of particular region and particular useremail
+// @desc Fetch unapproved inputs of particular region and particular useremail
 // @access Public
 router.get("/unapproved", (req, res) => {
   const itype = req.query.itype;
@@ -101,7 +101,7 @@ router.get("/unapproved", (req, res) => {
 
 // @route POST /api/operinput/supply
 // @desc Sends operinput to the temporary storage on the database
-// @access PUblic
+// @access Public
 router.post("/supply", (req, res) => {
   const itype = req.body.itype;
   const input = req.body.input;
@@ -142,131 +142,101 @@ router.post("/supply", (req, res) => {
   res.status(200).send({ ok: 1 });
 });
 
-router.put("/insert", getCollection, (req, res) => {
+// @route POST /api/operinput/process-approved
+// @desc Depending on the item.action performs different tasks on
+// approved items
+// @access Public
+router.post("/process-approved", getCollection, (req, res) => {
   const itype = req.body.itype;
-  let apprInput = req.body.input.approved;
-  const unapprInput = req.body.input.unapproved;
+  const input = req.body.input;
   const regbit = req.user.regbit;
-
-  // return unapproved inputs
-  // group by oper
-  const groupedByOper = unapprInput.reduce((acc, current) => {
-    const tmp = acc[current.oper] || [];
-    tmp.push(current);
-    acc[current.oper] = tmp;
-    return acc;
-  }, {});
-
-  // array of objects for inserting into unapproved table
-  const unapproved = Object.keys(groupedByOper).map(oper => {
-    const input = JSON.stringify(groupedByOper[oper]);
-    return { input, oper, itype };
-  });
-
-  // insert approved inputs
-  // get model
-  const model = modelProvider[itype];
-
-  // Visus įrašus apprInput padalinti į kuriamus naujus ir modifikuojamus.
-  // Modifikuojamų id teigiamas, kuriamų naujų id neigiamas.
-  // Įrašus perskelti į main ir journal dalis.
-  apprInput = apprInput.map(i => splitToMainJournal(i, model));
-  console.log("apprInput", apprInput);
-  let toCreate = apprInput.filter(i => i.main.id < 0);
-  let toModify = apprInput.filter(i => i.main.id > 0);
-
-  // validate drafts
-  let vResult;
-  // Kuriamų naujų validinti ir main, ir journal
-  toCreate.forEach(item => {
-    vResult = validate(item.main, item.journal, itype, true, "both");
-
-    if (vResult.errors) {
-      item.validation = { reason: "draft", errors: vResult.errors };
-    } else {
-      item.main = vResult.item.main;
-      item.journal = vResult.item.journal;
-    }
-  });
-
-  // Modifikuojamų validinti tik journal
-  toModify.forEach(item => {
-    vResult = validate(item.main, item.journal, itype, true, "journal");
-    if (vResult.errors) {
-      item.validation = { reason: "draft", errors: vResult.errors };
-    } else {
-      item.journal = vResult.item.journal;
-    }
-  });
-
   const coll = res.locals.coll;
 
-  // toCreate - test for samePlace
-  toCreate
-    .filter(item => !item.validation)
+  let result = { total: input.length, actions: {} };
+
+  ///// ACTION - DELETE ////////////
+  // ištrina iš supplied
+  result.actions.delete = { success: 0, fail: 0 };
+  const transDelete = asTransaction(transactions.deleteSuppliedById(db));
+  input
+    .filter(item => item.action === "delete")
     .forEach(item => {
       try {
-        if (checkSamePlace(coll, "insert", item.main, regbit, db)) {
-          item.validation = { reason: "same place" };
-        }
-      } catch (error) {
-        console.error(error);
-        item.validation = { reason: "server error", errors: [error] };
+        transDelete(item.id); // tik ištrina iš supplied
+        result.actions.delete.success++;
+      } catch (err) {
+        console.error(err);
+        result.actions.delete.fail++;
       }
     });
 
-  // toModify - check if exists, check version and test for samePlace
-  toModify
-    .filter(item => !item.validation)
+  ///// ACTION - RETURN ////////////
+  // insertina į unapproved,
+  // ištrina iš supplied
+  result.actions.return = { success: 0, fail: 0 };
+  const returnToOper = asTransaction(transactions.returnToOper(db));
+
+  input
+    .filter(item => item.action === "return")
     .forEach(item => {
       try {
-        const found = checkIfExists(item.main.id, coll, regbit, db);
-        if (!found) {
-          item.validation = { reason: "not found" };
-        } else if (found.v !== item.main.v) {
-          item.validation = { reason: "bad version" };
-        } else if (checkSamePlace(coll, "update", item.main, regbit, db)) {
-          item.validation = { reason: "same place" };
-        }
-      } catch (error) {
-        console.error(error);
-        item.validation = { reason: "server error", errors: [error] };
+        returnToOper(item);
+        result.actions.return.success++;
+      } catch (err) {
+        console.error(err);
+        result.actions.return.fail++;
       }
     });
 
-  // filter out withErrors, pack them together with itype and regbit
-  const withErrors = toCreate
-    .filter(item => !!item.validation)
-    .concat(toModify.filter(item => !!item.validation))
-    .map(item => ({ input: JSON.stringify(item), regbit, itype }));
-
-  toCreate = toCreate.filter(item => !item.validation);
-  toModify = toModify.filter(item => !item.validation);
-
-  // insert
-  //console.log("transactions.insertAfterApproval", transactions.insertAfterApproval);
-  //console.log("typeof transactions.insertAfterApproval", typeof transactions.insertAfterApproval);
-  const transaction = asTransaction(transactions.insertAfterApproval);
-  //console.log("transaction", transaction);
-
-  try {
-    transaction(itype, toCreate, toModify, unapproved, withErrors, regbit, db);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).send({
-      ok: 0,
-      reason: "server error",
-      msg: "operacija nepavyko"
+  ///// ACTION - OK, CREATE NEW RECORD ////////////
+  result.actions.createOK = { success: 0, fail: 0 };
+  const sameLocation = checkSameLocFctr(db, coll, "insert");
+  const createRecord = asTransaction(transactions.createRecord(itype, db));
+  input
+    .filter(item => item.action === "ok" && item.main.id < 0)
+    .forEach(item => {
+      if (
+        processApproved.createNewRecord(
+          item,
+          itype,
+          regbit,
+          validate,
+          sameLocation,
+          createRecord
+        )
+      ) {
+        result.actions.createOK.success++;
+      } else {
+        result.actions.createOK.fail++;
+      }
     });
-  }
 
-  res.status(200).send({
-    ok: 1,
-    withErrors: withErrors.length,
-    unapproved: unapprInput.length,
-    created: toCreate.length,
-    modified: toModify.length
-  });
+  ///// ACTION - OK, MODIFY EXISTING RECORD ////////////
+  result.actions.modifyOK = { success: 0, fail: 0 };
+  const ifExists = checkIfExitsFact(db, coll);
+  const modifyRecord = asTransaction(transactions.modifyRecord(itype, db));
+  input
+    .filter(item => item.action === "ok" && item.main.id > 0)
+    .forEach(item => {
+      if (
+        processApproved.modifyExistingRecord(
+          item,
+          itype,
+          regbit,
+          validate,
+          ifExists,
+          modifyRecord
+        )
+      ) {
+        result.actions.modifyOK.success++;
+      } else {
+        result.actions.modifyOK.fail++;
+      }
+    });
+
+  res.status(200).send(result);
 });
+
+
 
 module.exports = router;

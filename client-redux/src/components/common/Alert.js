@@ -23,9 +23,22 @@ const Alert = ({ type, message, hide }) => {
 
   const classOf = {
     error: "danger",
+    danger: "danger",
+    red: "danger",
     warning: "warning",
+    yellow: "warning",
     success: "success",
-    info: "primary"
+    green: "success",
+    info: "info",
+    lightblue: "info",
+    light: "light",
+    white: "light",
+    primary: "primary",
+    blue: "primary",
+    secondary: "secondary",
+    lightgrey: "secondary",
+    dark: "dark",
+    grey: "dark",
   }
 
   const classname = `alert alert-${classOf[alertType]}${hide == null ? " alert-dismissible fade show" : ""}`;

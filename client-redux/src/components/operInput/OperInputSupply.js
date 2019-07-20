@@ -12,8 +12,8 @@ import {
   searchItems,
   supplyOperInput,
   clearOperInput,
-  dispatchRemoveInfo,
-  dispatchRemoveSearchInfo
+  removeInfo,
+  removeSearchInfo
 } from "../../actions/operInputActions";
 import itemSpecific from "./itemSpecific";
 
@@ -186,15 +186,12 @@ class OperInputSupply extends Component {
       ];
     }
 
-    console.log("setting props1");
     this.props.setItems(items);
-    console.log("setting state1");
     this.setState({
       inputItemErrors: {},
       showInputModal: false,
       currentInput: {}
-    });    
-    console.log("end setting1");
+    }); 
   }
 
   cancelEditRecord() {
@@ -280,14 +277,11 @@ class OperInputSupply extends Component {
     const ind = this.props.items.findIndex(i => i.id.toString() === id.toString());
     if (ind < 0) return;
 
-    console.log("setting props2");
     this.props.setItems([
         ...this.props.items.slice(0, ind),
         ...this.props.items.slice(ind + 1)
       ]);
-    console.log("setting state2");
-    this.setState({currentInput: null})        
-    console.log("end setting2");
+    this.setState({currentInput: null});
   }
 
   setFoundItemEdit(e) {
@@ -392,7 +386,7 @@ export default connect(
     setItems,
     supplyOperInput,
     clearOperInput,
-    dispatchRemoveInfo,
-    dispatchRemoveSearchInfo
+    removeInfo,
+    removeSearchInfo
   }
 )(OperInputSupply);

@@ -4,10 +4,11 @@ import Alert from "../common/Alert";
 import IsLoading from "../common/IsLoading";
 import ModalFormPanel from "./ModalFormPanel";
 import {
-  submitOperInput,
+  submitIApprove,
   fetchSuppliedOperInput,
-  clearOperInput
-} from "../../actions/operInputActions";
+  setAction,
+  setNote
+} from "../../actions/inputApproveActions";
 import itemSpecific from "./itemSpecific";
 
 class OperInputApprove extends Component {
@@ -15,16 +16,14 @@ class OperInputApprove extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      inputs: [],
       currentIndex: null,
       note: "",
-      actions: [],
       showModal: false
     };
     this.#noteInput = ({ note, onChange }) => (
       <input type="text" value={note} onChange={onChange} />
     );
-    this.toggleAction = this.toggleAction.bind(this);
+    this.changeAction = this.changeAction.bind(this);
     this.changeNote = this.changeNote.bind(this);
     this.setEdit = this.setEdit.bind(this);
     this.submitEdit = this.submitEdit.bind(this);
@@ -37,53 +36,26 @@ class OperInputApprove extends Component {
     this.props.fetchSuppliedOperInput(this.props.itype);
   }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.operInput.length < 1 && this.props.operInput.length > 0) {
-      this.setState({
-        inputs: this.props.operInput,
-        actions: Array(this.props.operInput.length).fill("none")
-      });
-    } else if (
-      prevProps.operInput.length > 0 &&
-      this.props.operInput.length < 1
-    ) {
-      this.setState({
-        inputs: [],
-        actions: []
-      });
-    }
-  }
-
-  componentWillUnmount() {
-    // unload operinput from store
-    this.props.clearOperInput();
-  }
-
-  toggleAction(e) {
+  changeAction(e) {
     const ind = e.target.dataset.ind;
-    const value = e.target.value;
-    const actions = [...this.state.actions];
-    actions[ind] = value;
-    this.setState({ actions });
+    const action = e.target.value;
+    this.props.setAction(action, ind);
   }
 
   setEdit(e) {
     const ind = e.target.dataset.ind;
     this.setState({
       currentIndex: ind,
-      note: this.state.inputs[ind].note,
+      note: this.props.inputs[ind].note,
       showModal: true
     });
   }
 
   submitEdit() {
     const ind = this.state.currentIndex;
-    const input = { ...this.state.inputs[ind] };
-    input.journal.note = this.state.note;
-    const inputs = [...this.state.inputs];
-    inputs[ind] = input;
+    const note = this.state.note;
+    this.props.setNote(note, ind);
     this.setState({
-      inputs,
       currentIndex: null,
       note: "",
       showModal: false
@@ -105,11 +77,7 @@ class OperInputApprove extends Component {
   }
 
   submitInputs() {
-    const inputs = this.state.inputs.map((inp, ind) => ({
-      ...inp,
-      action: this.state.actions[ind]
-    }));
-    this.props.submitOperInput(inputs, this.props.itype);
+    this.props.submitIApprove(this.props.inputs, this.props.itype);
   }
 
   render() {
@@ -125,12 +93,11 @@ class OperInputApprove extends Component {
     }
     const SingleRow = itemSpecific[this.props.itype].approveRow.SingleRow;
     const HeadRow = itemSpecific[this.props.itype].approveRow.HeadRow;
-    const rows = this.state.inputs.map((i, ind) => (
+    const rows = this.props.inputs.map((i, ind) => (
       <SingleRow
         item={i}
         ind={ind}
-        action={this.state.actions[ind]}
-        toggleAction={this.toggleAction}
+        changeAction={this.changeAction}
         setEdit={this.setEdit}
         key={i.id}
       />
@@ -174,16 +141,17 @@ class OperInputApprove extends Component {
 }
 
 const mapStateToProps = state => ({
-  operInput: state.operInput.items,
-  info: state.operInput.info,
-  isLoading: state.operInput.isLoading
+  inputs: state.iApprove.items,
+  info: state.iApprove.info,
+  isLoading: state.iApprove.isLoading
 });
 
 export default connect(
   mapStateToProps,
   {
-    submitOperInput,
+    submitIApprove,
     fetchSuppliedOperInput,
-    clearOperInput
+    setAction,
+    setNote
   }
 )(OperInputApprove);

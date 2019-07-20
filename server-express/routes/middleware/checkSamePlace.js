@@ -1,7 +1,7 @@
+const queryFactory = require("./SQLStatements").QUERY_IF_SAME_LOCATION_stmtFactory;
+
 function queryIfSamePlace(coll, action, main, regbit, db) {
-  const samePlaceFilter = `${coll.samePlace.filter[action]} AND ${coll.notPanaikinta} AND  ${coll.samePlace.query}`; 
-  const spStmtText = "SELECT * FROM " + coll.tables.main.name + samePlaceFilter;
-  return db.prepare(spStmtText).get(main, regbit);
+  return queryFactory(db, coll, action).get(main, regbit);
 }
 
 // check if there exist some record with the same place
@@ -31,7 +31,7 @@ function checkSamePlace(main, action, msgUndone, res, req, db, ref) {
   }
 } 
 
-
+module.exports.queryFactory = queryFactory;
 module.exports.bareQuery = queryIfSamePlace;
 module.exports.fullReqRes = checkSamePlace;
 

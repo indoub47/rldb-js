@@ -136,3 +136,23 @@ module.exports.SEARCH_ITEMS_BY_LOCATION_stmt = (itype, filterObj, db) => {
   return db.prepare(stmtText); 
 }
 
+module.exports.DELETE_FROM_SUPPLIED_BY_ID_stmt = db => {
+  return db.prepare('DELETE FROM supplied WHERE id = ?');
+}
+
+module.exports.INSERT_INTO_UNAPPROVED_stmt = db => {
+  return db.prepare('INSERT INTO unapproved (oper, itype, input) VALUES (?, ?, ?)');
+}
+
+module.exports.QUERY_IF_ITEM_EXISTS_stmtFactory = (db, coll) => {
+  return db.prepare(`SELECT * FROM ${coll.tables.main.name} WHERE id = ? AND regbit = ?`);
+}
+
+module.exports.QUERY_IF_SAME_LOCATION_stmtFactory = (db, coll, action) => {
+  const samePlaceFilter = `${coll.samePlace.filter[action]} AND ${coll.notPanaikinta} AND  ${coll.samePlace.query}`; 
+  const spStmtText = "SELECT * FROM " + coll.tables.main.name + samePlaceFilter;
+  return db.prepare(spStmtText);
+}
+
+
+

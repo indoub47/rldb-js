@@ -9,7 +9,7 @@ import {
   getBegis
 } from "../functions";
 
-const PrimaryRow = ({ item, ind, action, toggleAction, setEdit }) => {
+const PrimaryRow = ({ item, ind, changeAction, setEdit }) => {
   const main = item.main;
   const journal = item.journal;
   return (
@@ -32,9 +32,9 @@ const PrimaryRow = ({ item, ind, action, toggleAction, setEdit }) => {
           <i className="fas fa-edit" data-ind={ind} />
         </button>
         <ActionSelector 
-          action={action}
+          action={item.action}
           ind={ind}
-          toggleAction={toggleAction}
+          changeAction={changeAction}
         />
       </td>
     </tr>
@@ -71,8 +71,7 @@ const ValidationRow = ({ item }) => {
 const SingleRow = ({
   item,
   ind,
-  action,
-  toggleAction,
+  changeAction,
   setEdit
 }) => {
   return (
@@ -80,8 +79,7 @@ const SingleRow = ({
       <PrimaryRow
         item={item}
         ind={ind}
-        action={action}
-        toggleAction={toggleAction}
+        changeAction={changeAction}
         setEdit={setEdit}
       />
       <SecondaryRow item={item} />
