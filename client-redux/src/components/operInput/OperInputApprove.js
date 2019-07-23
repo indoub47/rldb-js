@@ -6,29 +6,26 @@ import ModalFormPanel from "./ModalFormPanel";
 import {
   submitIApprove,
   fetchSuppliedOperInput,
-  setAction,
-  setNote
+  setItems
 } from "../../actions/inputApproveActions";
 import itemSpecific from "./itemSpecific";
 
 class OperInputApprove extends Component {
-  #noteInput;
   constructor(props) {
     super(props);
     this.state = {
       currentIndex: null,
-      note: "",
-      showModal: false
+      currentItem: null,
+      showModal: false,
+      localValidationErrors: null
     };
-    this.#noteInput = ({ note, onChange }) => (
-      <input type="text" value={note} onChange={onChange} />
-    );
+
     this.changeAction = this.changeAction.bind(this);
-    this.changeNote = this.changeNote.bind(this);
+    this.changeItem = this.changeItem.bind(this);
     this.setEdit = this.setEdit.bind(this);
     this.submitEdit = this.submitEdit.bind(this);
     this.cancelEdit = this.cancelEdit.bind(this);
-    this.submitInputs = this.submitInputs.bind(this);
+    this.submitItems = this.submitItems.bind(this);
   }
 
   componentDidMount() {
@@ -36,28 +33,48 @@ class OperInputApprove extends Component {
     this.props.fetchSuppliedOperInput(this.props.itype);
   }
 
+  replaceItem(item, ind, items) {
+    return [
+      ...items.slice(0, ind),
+      item,
+      ...items.slice(ind + 1)
+    ];
+  }
+
   changeAction(e) {
-    const ind = e.target.dataset.ind;
+    const ind = parseInt(e.target.dataset.ind);
     const action = e.target.value;
-    this.props.setAction(action, ind);
+    const item = {...this.props.items[ind], action};
+    const newItems = this.replaceItem(item, ind, this.props.items);
+    this.props.setItems(newItems);    
   }
 
   setEdit(e) {
-    const ind = e.target.dataset.ind;
+    const ind = parseInt(e.target.dataset.ind);    
     this.setState({
       currentIndex: ind,
-      note: this.props.inputs[ind].note,
+      currentItem: this.props.items[ind],
       showModal: true
     });
   }
 
+  changeItem(e)  {
+    const nameParts = e.target.name.split(".");
+    let modified = {...this.state.currentInput};
+    modified[nameParts[0]][nameParts[1]] = e.target.value;
+    this.setState({currentInput: modified});
+  }
+
   submitEdit() {
+    // validate locally here
     const ind = this.state.currentIndex;
-    const note = this.state.note;
-    this.props.setNote(note, ind);
+    const item = this.state.currentItem;
+    const newItems = this.replaceItem(item, ind, this.props.items);
+    this.props.setItems(newItems);
+    
     this.setState({
       currentIndex: null,
-      note: "",
+      currentItem: null,
       showModal: false
     });
   }
@@ -70,30 +87,26 @@ class OperInputApprove extends Component {
     });
   }
 
-  changeNote(e) {
-    const note = e.target.value;
-    if (note.length > 50) return;
-    this.setState({ note });
-  }
-
-  submitInputs() {
-    this.props.submitIApprove(this.props.inputs, this.props.itype);
+  submitItems() {
+    this.props.submitIApprove(this.props.items, this.props.itype);
   }
 
   render() {
     // select row type
-    if (this.state.inputs.length === 0) {
+    if (this.state.items.length === 0) {
       return (
         <div className="container">
           <div className="row">
-            <div className="col">No inputs to approve or disapprove yet.</div>
+            <div className="col">No items to approve or disapprove yet.</div>
           </div>
         </div>
       );
     }
+    
+    const EditForm = itemSpecific[this.props.itype].iApproveEditForm.default;
     const SingleRow = itemSpecific[this.props.itype].approveRow.SingleRow;
     const HeadRow = itemSpecific[this.props.itype].approveRow.HeadRow;
-    const rows = this.props.inputs.map((i, ind) => (
+    const rows = this.props.items.map((i, ind) => (
       <SingleRow
         item={i}
         ind={ind}
@@ -112,12 +125,14 @@ class OperInputApprove extends Component {
             type={this.props.info.type}
           />
         ) : null}
-        <ModalFormPanel
-          body={this.#noteInput({
-            note: this.state.note,
-            onChange: this.changeNote
+        <ModalFormPanel 
+          body={EditForm({
+            item: this.state.currentItem,
+            onChange: this.changeItem,
+            options: itemSpecific[this.props.itype].options(this.props.things),
+            errors: this.state.localValidationErrors
           })}
-          title={"Pastaba"}
+          title={"Įrašo redagavimas"}
           submitHandler={this.submitEdit}
           cancelHandler={this.cancelEdit}
           show={this.state.showModal}
@@ -130,7 +145,7 @@ class OperInputApprove extends Component {
             </table>
           </div>
           <div className="row">
-            <button className="btn btn-warning" onClick={this.submitInputs}>
+            <button className="btn btn-warning" onClick={this.submitItems}>
               Submit
             </button>
           </div>
@@ -141,7 +156,8 @@ class OperInputApprove extends Component {
 }
 
 const mapStateToProps = state => ({
-  inputs: state.iApprove.items,
+  things: state.things.data,
+  items: state.iApprove.items,
   info: state.iApprove.info,
   isLoading: state.iApprove.isLoading
 });
@@ -151,7 +167,6 @@ export default connect(
   {
     submitIApprove,
     fetchSuppliedOperInput,
-    setAction,
-    setNote
+    setItems
   }
 )(OperInputApprove);

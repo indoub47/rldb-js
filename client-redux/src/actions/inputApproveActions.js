@@ -7,8 +7,7 @@ import {
   IAPPROVE_PROCESS_SUCCESS,
   IAPPROVE_PROCESS_FAILURE,
   IAPPROVE_INFO_REMOVE,
-  IAPPROVE_SET_NOTE,
-  IAPPROVE_SET_ACTION
+  IAPPROVE_SET_ITEMS
 } from "./types";
 
 export const dispatchRemoveInfo = () => dispatch => {
@@ -79,10 +78,6 @@ export const submitIApprove = (input, itype) => dispatch => {
     });
 };
 
-export const setAction = (value, index) => dispatch => {
-  dispatch({ type: IAPPROVE_SET_ACTION, payload: { value, index } });
-};
-
-export const setNote = (value, index) => dispatch => {
-  dispatch({ type: IAPPROVE_SET_NOTE, payload: { value, index } });
+export const setItems = items => dispatch => {
+  dispatch({ type: IAPPROVE_SET_ITEMS, payload: { items } });
 };

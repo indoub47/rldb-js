@@ -92,7 +92,7 @@ module.exports.returnToOper = db => {
     db
   );
   return input => {
-    const jsonstr = JSON.stringify(input);
+    const jsonstr = JSON.stringify({main: input.main, journal: input.journal});
     insertUnapprovedStmt.run(input.oper, input.itype, jsonstr);
     deleteFromSuppliedStmt.run(input.id);
   };

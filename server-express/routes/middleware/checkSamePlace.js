@@ -1,4 +1,4 @@
-const queryFactory = require("./SQLStatements").QUERY_IF_SAME_LOCATION_stmtFactory;
+const queryFactory = require("../SQLStatements").QUERY_IF_SAME_LOCATION_stmtFactory;
 
 function queryIfSamePlace(coll, action, main, regbit, db) {
   return queryFactory(db, coll, action).get(main, regbit);

@@ -1,6 +1,6 @@
 import React from "react";
 
-const FoundItemRow = ({ foundItem, setItemEdit }) => {
+const FoundItemRow = ({ ind, foundItem, setItemEdit }) => {
   return (
     <tr>
       <td className="id">{foundItem.id}</td>
@@ -26,10 +26,10 @@ const FoundItemRow = ({ foundItem, setItemEdit }) => {
         <div className="button-group">
           <button
             className="btn btn-xs btn-warning"
-            data-id={foundItem.id}
+            data-ind={ind}
             onClick={setItemEdit}
           >
-            <i className="fas fa-edit" data-id={foundItem.id} />
+            <i className="fas fa-edit" data-ind={ind} />
           </button>
         </div>
       </td>

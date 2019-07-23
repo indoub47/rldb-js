@@ -1,4 +1,4 @@
-const queryFactory = require("./SQLStatements").QUERY_IF_ITEM_EXISTS_stmtFactory;
+const queryFactory = require("../SQLStatements").QUERY_IF_ITEM_EXISTS_stmtFactory;
 
 function queryIfItemExists(mainId, coll, regbit, db) {
   return queryFactory(db, coll).get(mainId, regbit);

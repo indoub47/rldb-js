@@ -16,7 +16,7 @@ const PrimaryRow = ({ item, ind, changeAction, setEdit }) => {
     <tr className="approve-primary-row">
       <td className="meistrija vieta">{main.meistrija}</td>
       <td className="vk vieta">{getVietosKodas(main)}</td>      
-      <td className="vk vieta">{getOperApar(journal)}</td>
+      <td className="oper-apar">{getOperApar(journal)}</td>
       <td className="data def">{journal.data}</td>
       <td className="kodas def">{journal.kodas}</td>
       <td className="hl">{getHL(journal)}</td>

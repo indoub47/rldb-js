@@ -7,8 +7,9 @@ const SearchPanel = ({foundItems, itype, setItemEditHandler, newSearchHandler, i
   const SearchHeadRow = itemSpecific[itype].searchResultRow.SearchHeadRow;
   const FoundItemRow = itemSpecific[itype].searchResultRow.FoundItemRow;
   
-  const foundItemRows = foundItems.map((fItem) => 
+  const foundItemRows = foundItems.map((fItem, ind) => 
     <FoundItemRow
+      ind={ind}
       foundItem={fItem} 
       setItemEdit={setItemEditHandler}
       key={fItem.id}

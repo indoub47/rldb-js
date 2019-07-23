@@ -6,8 +6,7 @@ import {
   IAPPROVE_PROCESS_SUCCESS,
   IAPPROVE_PROCESS_FAILURE,
   IAPPROVE_INFO_REMOVE,
-  IAPPROVE_SET_ACTION,
-  IAPPROVE_SET_NOTE,
+  IAPPROVE_SET_ITEMS,
   LOGOUT
 } from "../actions/types";
 
@@ -58,39 +57,11 @@ export default function(state = initialState, action) {
         info: null
       };
 
-    case IAPPROVE_SET_NOTE: {
-      const ind = action.payload.index;
-      const item = {
-        ...state.items[ind]
-      };
-      item.journal.note = action.payload.value;
-      const items = [
-        ...state.items.slice(0, ind),
-        item,
-        ...state.items.slice(ind + 1)
-      ];
+    case IAPPROVE_SET_ITEMS:
       return {
         ...state,
-        items
+        items: action.payload.items
       };
-    }
-
-    case IAPPROVE_SET_ACTION: {
-      const ind = action.payload.index;
-      const item = {
-        ...state.items[ind],
-        action: action.payload.value
-      };
-      const items = [
-        ...state.items.slice(0, ind),
-        item,
-        ...state.items.slice(ind + 1)
-      ];
-      return {
-        ...state,
-        items
-      };
-    }
 
     case LOGOUT:
       return initialState;

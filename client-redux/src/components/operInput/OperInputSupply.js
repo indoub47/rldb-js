@@ -1,11 +1,9 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { createOptions } from "../createOptions";
 import IsLoading from "../common/IsLoading";
 import InputPanel from "./InputPanel";
 import SearchPanel from "./SearchPanel";
 import ModalFormPanel from "./ModalFormPanel";
-import {dropFields} from "./functions";
 import {
   fetchUnapprovedOperInput,
   setItems,
@@ -16,6 +14,7 @@ import {
   removeSearchInfo
 } from "../../actions/operInputActions";
 import itemSpecific from "./itemSpecific";
+import { splitMainJournalClear, samePlace } from "./specific/functions";
 
 class OperInputSupply extends Component {
   #options;
@@ -29,7 +28,6 @@ class OperInputSupply extends Component {
       searchInputErrors: {},
       showSearchModal: false
     };
-
 
     this.changeInputItem = this.changeInputItem.bind(this);
     this.startNewInput = this.startNewInput.bind(this);
@@ -50,64 +48,7 @@ class OperInputSupply extends Component {
     this.hideSearchInfo = this.hideSearchInfo.bind(this);
     this.copyInput = this.copyInput.bind(this);
 
-
-    this.#options = {
-      meistrija: createOptions(
-        this.props.things.meistrija.sort((m1, m2) => m1.ind - m2.ind),
-        "-- nenurodyta --",
-        x => x.abbr + ", " + x.name
-      ),
-      kkateg: createOptions(
-        this.props.things.kkateg,
-        "-- nenurodyta --",
-        x => x.id
-      ),
-      btipas: createOptions(
-        this.props.things.btipas,
-        "-- nenurodyta --",
-        x => x.id
-      ),
-      bgamykl: createOptions(
-        this.props.things.bgamykl,
-        "-- nenurodyta --",
-        x => x.id
-      ),
-      siule: createOptions(
-        this.props.things.siule,
-        "-- nenurodyta --",
-        x => x.id
-      ),
-      pavoj: createOptions(
-        this.props.things.pavoj.sort((p1, p2) => p1.ind - p2.ind),
-        "-- nenurodyta --",
-        x => x.id
-      ),
-      apar: createOptions(
-        this.props.things.defskop.sort((d1, d2) => d1.id - d2.id),
-        "-- nenurodyta --",
-        x => x.id
-      ),
-      oper: createOptions(
-        this.props.things.operat.sort((o1, o2) => o1.name - o2.name),
-        "-- nenurodyta --",
-        x => x.id + ", " + x.name
-      ),      
-      virino: createOptions(
-        this.props.things.virino.sort((v1, v2) => v1.name - v2.name),
-        "-- nenurodyta --",
-        x => x.id + ", " + x.name
-      ),
-      vbudas: createOptions(
-        this.props.things.vbudas.sort((b1, b2) => b1.id - b2.id),
-        "-- nenurodyta --",
-        x => x.id + ", " + x.name
-      ),
-      itemStatus: createOptions(
-        this.props.things.itemstatus.sort((b1, b2) => b1.id - b2.id),
-        "-- nenurodyta --",
-        x => x.id + ", " + x.name
-      )
-    }
+    this.#options = itemSpecific[this.props.itype].options(this.props.things);
   }
 
   componentDidMount() {
@@ -126,12 +67,17 @@ class OperInputSupply extends Component {
     this.props.clearOperInput();
   }
 
+  findIndexById(id, items) {
+    return items.findIndex(i => i.main.id.toString() === id.toString());
+  }
+
   copyInput(e) {
-    const id = e.target.dataset.id;
-    const item = this.props.items.find(i => i.id.toString() === id.toString());
-    if (!item) return;
-    const newItem = {...item, id: -Date.now()};
-    delete newItem.mainid;
+    const ind = parseInt(e.target.dataset.ind);
+    const newItem = {
+      main: { ...this.props.items[ind].main, id: -Date.now() },
+      journal: { ...this.props.items[ind].journal }
+    };
+    delete newItem.journal.mainid;
     this.setState({
       currentInput: newItem,
       inputItemErrors: {},
@@ -141,44 +87,68 @@ class OperInputSupply extends Component {
   }
 
   changeInputItem(e) {
-    const currentInput = {
-      ...this.state.currentInput,
-      [e.target.name]: e.target.value
+    //console.log("name, value", e.target.name, e.target.value);
+    const nameParts = e.target.name.split(".");
+    //console.log("parts", nameParts[0], nameParts[1]);
+
+    let modified = {
+      main: { ...this.state.currentInput.main },
+      journal: { ...this.state.currentInput.journal }
     };
-    this.setState({currentInput});
+    modified[nameParts[0]][nameParts[1]] = e.target.value;
+    //console.log("modified", modified);
+    this.setState({ currentInput: modified });
   }
 
   startNewInput() {
     this.setState({
-      currentInput: {id: -Date.now()},
+      currentInput: { main: { id: -Date.now() }, journal: {} },
       inputItemErrors: {},
       showInputModal: true,
-      showSearchModal: false,
+      showSearchModal: false
     });
   }
 
   // as for now - just mocking
   validateRecord(draft, itype) {
     const item = draft;
-    return item;
+    return { item };
   }
 
   submitRecord() {
     // local validation
-    // if (!Object.keys(this.state.currentInput).length) return;
-    const item = this.validateRecord(this.state.currentInput, this.props.itype);
-    if (item.errors) {
+    const vResult = this.validateRecord(
+      this.state.currentInput,
+      this.props.itype
+    );
+    if (vResult.errors) {
       this.setState({
-        inputItemErrors: item.errors
+        inputItemErrors: vResult.errors
       });
+      console.log("returning because of validation errors");
+      return;
+    }
+
+    const item = vResult.item;
+    // tikrinti ar nėra to paties id ir tos pačios vietos
+    const rep = this.props.items.some(
+      i => samePlace(i.main, item.main) && i.main.id !== item.main.id
+    );
+
+    if (rep) {
+      console.log("setting inputItemErrors");
+      this.setState({ inputItemErrors: { common: "same place" } });
+      console.log("returning because of same place");
       return;
     }
 
     let items;
-    const ind = this.props.items.findIndex(i => i.id === this.state.currentInput.id);
+    const ind = this.findIndexById(item.main.id, this.props.items);
     if (ind < 0) {
+      // reiškia, sukurtas naujai, reikia pridėti
       items = [...this.props.items, item];
     } else {
+      // reiškia, editintas, reikia replaceinti
       items = [
         ...this.props.items.slice(0, ind),
         item,
@@ -191,7 +161,7 @@ class OperInputSupply extends Component {
       inputItemErrors: {},
       showInputModal: false,
       currentInput: {}
-    }); 
+    });
   }
 
   cancelEditRecord() {
@@ -214,7 +184,7 @@ class OperInputSupply extends Component {
       ...this.state.searchInput,
       [e.target.name]: e.target.value
     };
-    this.setState({searchInput});
+    this.setState({ searchInput });
   }
 
   // as for now - just mocking
@@ -224,14 +194,17 @@ class OperInputSupply extends Component {
   }
 
   submitSearch() {
-    const data = this.validateSearchInput(this.props.itype, this.state.searchInput);
+    const data = this.validateSearchInput(
+      this.props.itype,
+      this.state.searchInput
+    );
     if (data.errors) {
       this.setState({
         searchInputErrors: data.errors
       });
       return;
     }
-    this.setState({showSearchModal: false});
+    this.setState({ showSearchModal: false });
     this.props.searchItems(this.props.itype, data);
   }
 
@@ -246,26 +219,26 @@ class OperInputSupply extends Component {
   clearCurrentSearch() {
     this.setState({
       searchInputErrors: {},
-      searchInput: {},
-    })
+      searchInput: {}
+    });
   }
 
   sendItems() {
-    // atrodo čia teks pakartoti visą litaniją su update, insert, delete, bliad
     if (this.props.items.length < 1) return;
     this.props.supplyOperInput(this.props.items, this.props.itype);
   }
 
-  clearInputItems() {    
+  clearInputItems() {
     this.props.clearOperInput();
   }
 
   setItemEdit(e) {
-    const id = e.target.dataset.id;
-    const item = this.props.items.find(i => i.id.toString() === id.toString());
-    if (!item) return;
+    const ind = parseInt(e.target.dataset.ind);
     this.setState({
-      currentInput: {...item},
+      currentInput: {
+        main: { ...this.props.items[ind].main },
+        journal: { ...this.props.items[ind].journal }
+      },
       inputItemErrors: {},
       showInputModal: true,
       showSearchModal: false
@@ -273,28 +246,29 @@ class OperInputSupply extends Component {
   }
 
   deleteItem(e) {
-    const id = e.target.dataset.id;
-    const ind = this.props.items.findIndex(i => i.id.toString() === id.toString());
-    if (ind < 0) return;
+    const ind = parseInt(e.target.dataset.ind);
 
     this.props.setItems([
-        ...this.props.items.slice(0, ind),
-        ...this.props.items.slice(ind + 1)
-      ]);
-    this.setState({currentInput: null});
+      ...this.props.items.slice(0, ind),
+      ...this.props.items.slice(ind + 1)
+    ]);
+    this.setState({ currentInput: {} });
   }
 
   setFoundItemEdit(e) {
-    const id = e.target.dataset.id;
-    const item = this.props.foundItems.find(i => i.id.toString() === id.toString());
-    if (!item) return;
+    const ind = parseInt(e.target.dataset.ind);
+    const item = {...this.props.foundItems[ind]};
+    const fissedItem = splitMainJournalClear(
+      item,
+      itemSpecific[this.props.itype].model
+    );
     this.setState({
       showSearchModal: false,
       showInputModal: true,
-      currentInput: dropFields(item, this.props.itype),
+      currentInput: fissedItem,
       inputItemErrors: {},
       searchInputErrors: {},
-      searchInput: {},
+      searchInput: {}
     });
   }
 
@@ -303,33 +277,32 @@ class OperInputSupply extends Component {
       showSearchModal: true,
       showInputModal: false,
       searchInputErrors: {},
-      searchInput: {},
+      searchInput: {}
     });
   }
 
   render() {
-    // select form type
     const InputForm = itemSpecific[this.props.itype].inputForm.default;
-    const SearchForm = itemSpecific[this.props.itype].searchForm.default;    
-    //console.log("foundItems", this.props.foundItems);
-    
+    const SearchForm = itemSpecific[this.props.itype].searchForm.default;
+
     return (
-      <React.Fragment>    
-        <IsLoading when={this.props.isLoading} /> 
+      <React.Fragment>
+        <IsLoading when={this.props.isLoading} />
         <div className="container-fluid">
-          <ModalFormPanel 
+          <ModalFormPanel
             body={InputForm({
               item: this.state.currentInput,
               onChange: this.changeInputItem,
               options: this.#options,
-              errors: this.state.inputItemErrors,
+              errors: this.state.inputItemErrors
             })}
-            title={"Įrašo sukūrimas"}
+            title={"Įrašo sukūrimas/redagavimas"}
             submitHandler={this.submitRecord}
             cancelHandler={this.cancelEditRecord}
+            purpose="input"
             show={this.state.showInputModal}
           />
-          <ModalFormPanel 
+          <ModalFormPanel
             body={SearchForm({
               searchInput: this.state.searchInput,
               onChange: this.changeSearchInput,
@@ -339,7 +312,8 @@ class OperInputSupply extends Component {
             title={"Įrašų paieška"}
             submitHandler={this.submitSearch}
             cancelHandler={this.cancelSearch}
-            clearHandler={this.clearCurrentSearch} // ???
+            clearHandler={this.clearCurrentSearch}
+            purpose="search"
             show={this.state.showSearchModal}
           />
           <InputPanel
@@ -351,7 +325,11 @@ class OperInputSupply extends Component {
             setItemEditHandler={this.setItemEdit}
             deleteItemHandler={this.deleteItem}
             copyInputHandler={this.copyInput}
-            currentId={this.state.currentInput.id}
+            currentId={
+              this.state.currentInput.main
+                ? this.state.currentInput.main.id
+                : null
+            }
             info={this.props.info}
             hideInfo={this.hideInfo}
           />
@@ -369,13 +347,13 @@ class OperInputSupply extends Component {
   }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   things: state.things.data,
   items: state.operInput.items,
   foundItems: state.operInput.foundItems,
   isLoading: state.operInput.isLoading,
   info: state.operInput.info,
-  searchInfo: state.operInput.searchInfo,
+  searchInfo: state.operInput.searchInfo
 });
 
 export default connect(

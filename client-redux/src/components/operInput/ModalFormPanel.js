@@ -1,10 +1,10 @@
 import React from 'react';
 
-const ModalFormPanel = ({body, title, submitHandler, cancelHandler, show}) => {
+const ModalFormPanel = ({body, title, submitHandler, cancelHandler, purpose, show}) => {
 
   return (
     <div 
-      className="my-modal" 
+      className={"operinput my-modal " + purpose} 
       style={show ? {display: "block"} : {display: "none"}} 
       id="form-panel" tabIndex="-1">
         <div className="modal-content">

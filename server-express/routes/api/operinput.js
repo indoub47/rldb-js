@@ -116,17 +116,16 @@ router.post("/supply", (req, res) => {
   );
 
   const transFunc = (input, itype, oper, regbit) => {
-    const model = modelProvider[itype];
     input.forEach(inp => {
-      const split = splitMainJournal(inp, model);
+      console.log("inp", inp);
       insertStmt.run(
-        JSON.stringify(split.main),
-        JSON.stringify(split.journal),
+        JSON.stringify(inp.main),
+        JSON.stringify(inp.journal),
         itype,
         oper,
         regbit,
         Date.now()
-      );
+      )
     });
     deleteStmt.run(itype, oper);
   };

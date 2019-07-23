@@ -6,15 +6,16 @@ const InputPanel = ({inputItems, itype, newInputHandler, sendHandler, clearHandl
   
   const InputRow = itemSpecific[itype].inputRow.InputRow;
   const InputHeadRow = itemSpecific[itype].inputRow.InputHeadRow;
-  
+    
   const inputRows = inputItems.map((iItem, ind) => 
     <InputRow
+      ind={ind}
       inputItem={iItem} 
       setItemEdit={setItemEditHandler}
       deleteItem={deleteItemHandler}
       copyItem={copyInputHandler}
-      key={iItem.id}
-      isCurrent={iItem.id === currentId}
+      key={iItem.main.id}
+      isCurrent={currentId && iItem.main.id === currentId}
     />
   );
 
