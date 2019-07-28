@@ -17,7 +17,7 @@ class OperInputApprove extends Component {
       currentIndex: null,
       currentItem: null,
       showModal: false,
-      localValidationErrors: null
+      localValidationErrors: {}
     };
 
     this.changeAction = this.changeAction.bind(this);
@@ -34,35 +34,36 @@ class OperInputApprove extends Component {
   }
 
   replaceItem(item, ind, items) {
-    return [
-      ...items.slice(0, ind),
-      item,
-      ...items.slice(ind + 1)
-    ];
+    return [...items.slice(0, ind), item, ...items.slice(ind + 1)];
   }
 
   changeAction(e) {
     const ind = parseInt(e.target.dataset.ind);
     const action = e.target.value;
-    const item = {...this.props.items[ind], action};
+    const item = { ...this.props.items[ind], action };
     const newItems = this.replaceItem(item, ind, this.props.items);
-    this.props.setItems(newItems);    
+    this.props.setItems(newItems);
   }
 
   setEdit(e) {
-    const ind = parseInt(e.target.dataset.ind);    
+    const ind = parseInt(e.target.dataset.ind);
+    const propsItem = this.props.items[ind];
     this.setState({
       currentIndex: ind,
-      currentItem: this.props.items[ind],
+      currentItem: {
+        ...propsItem,
+        main: { ...propsItem.main },
+        journal: { ...propsItem.journal }
+      },
       showModal: true
     });
   }
 
-  changeItem(e)  {
+  changeItem(e) {
     const nameParts = e.target.name.split(".");
-    let modified = {...this.state.currentInput};
+    let modified = { ...this.state.currentItem };
     modified[nameParts[0]][nameParts[1]] = e.target.value;
-    this.setState({currentInput: modified});
+    this.setState({ currentItem: modified });
   }
 
   submitEdit() {
@@ -71,7 +72,7 @@ class OperInputApprove extends Component {
     const item = this.state.currentItem;
     const newItems = this.replaceItem(item, ind, this.props.items);
     this.props.setItems(newItems);
-    
+
     this.setState({
       currentIndex: null,
       currentItem: null,
@@ -93,7 +94,7 @@ class OperInputApprove extends Component {
 
   render() {
     // select row type
-    if (this.state.items.length === 0) {
+    if (this.props.items.length === 0) {
       return (
         <div className="container">
           <div className="row">
@@ -102,7 +103,7 @@ class OperInputApprove extends Component {
         </div>
       );
     }
-    
+
     const EditForm = itemSpecific[this.props.itype].iApproveEditForm.default;
     const SingleRow = itemSpecific[this.props.itype].approveRow.SingleRow;
     const HeadRow = itemSpecific[this.props.itype].approveRow.HeadRow;
@@ -125,7 +126,7 @@ class OperInputApprove extends Component {
             type={this.props.info.type}
           />
         ) : null}
-        <ModalFormPanel 
+        <ModalFormPanel
           body={EditForm({
             item: this.state.currentItem,
             onChange: this.changeItem,

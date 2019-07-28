@@ -9,10 +9,7 @@ import {
   insertItem,
   hideItemEditAlert
 } from "../../actions/itemsActions";
-import {
-  fetchJournal,
-  removeJournal
-} from "../../actions/journalActions";
+import { fetchJournal, removeJournal } from "../../actions/journalActions";
 import itemSpecific from "../../itemSpecific";
 
 class EditItem extends Component {
@@ -40,6 +37,13 @@ class EditItem extends Component {
         this.props.things.meistrija.sort((m1, m2) => m1.ind - m2.ind),
         "-- nenurodyta --",
         x => x.abbr + ", " + x.name
+      ),
+      vpvd: createOptions(
+        this.props.things.vpvd,
+        "-- nenurodyta --",        
+        x => x.pvdname,
+        x => x.pvdid,
+        x => x.pvdid
       ),
       kkateg: createOptions(
         this.props.things.kkateg,
@@ -75,11 +79,11 @@ class EditItem extends Component {
         this.props.things.operat.sort((o1, o2) => o1.name - o2.name),
         "-- nenurodyta --",
         x => x.id + ", " + x.name
-      ),      
+      ),
       virino: createOptions(
         this.props.things.virino.sort((v1, v2) => v1.name - v2.name),
         "-- nenurodyta --",
-        x => x.id + ", " + x.name
+        x => x.name
       ),
       vbudas: createOptions(
         this.props.things.vbudas.sort((b1, b2) => b1.id - b2.id),
@@ -91,7 +95,7 @@ class EditItem extends Component {
         "-- nenurodyta --",
         x => x.id + ", " + x.name
       )
-    }
+    };
   }
 
   componentDidMount() {
@@ -109,7 +113,7 @@ class EditItem extends Component {
   componentDidUpdate(prevProps) {
     // journal has been fetched
     if (prevProps.journal.length < 1 && this.props.journal.length > 0) {
-      this.setState({journal: this.props.journal});
+      this.setState({ journal: this.props.journal });
     }
   }
 
@@ -120,74 +124,88 @@ class EditItem extends Component {
 
   submitJItem() {
     // Duodamas JournalEdit formai
-    
+
     if (!this.state.jItem) return;
     const jItem = this.state.jItem;
-    
+
     let journal;
-    if (jItem.id) {
+    if (jItem.jid) {
       if (!jItem.status) {
-         jItem.status = "edit";
+        jItem.status = "edit";
       }
       // replacing
-      const ind = this.state.journal.findIndex(item => item.id.toString() === jItem.id.toString());
+      const ind = this.state.journal.findIndex(
+        item => item.jid.toString() === jItem.jid.toString()
+      );
       journal = [
         ...this.state.journal.slice(0, ind),
-        {...jItem},
+        { ...jItem },
         ...this.state.journal.slice(ind + 1)
-      ]; 
+      ];
     } else {
-      // no id, so there must be no status as well -
+      // no jid, so there must be no status as well -
       // it's being created
-      jItem.id = Date.now() - 10000000;
+      jItem.jid = Date.now() - 10000000;
       jItem.status = "add";
 
       // pushing
-      journal = [
-        ...this.state.journal,
-        {...jItem}
-      ];
+      journal = [...this.state.journal, { ...jItem }];
     }
-        
+
     //journal.sort((a, b) => a.hdata - b.hdata);
-    this.setState({journal, jItem: {}, jAlert: {msg: "įrašas sėkmingai pakeistas/pridėtas", type: "success"}});
+    this.setState({
+      journal,
+      jItem: {},
+      jAlert: { msg: "įrašas sėkmingai pakeistas/pridėtas", type: "success" }
+    });
   }
 
   cancelJItem() {
     // Duodamas JournalEdit formai
-    this.setState({jItem: {}});
+    this.setState({ jItem: {} });
   }
 
   deleteJItem(e) {
     // Duodamas JournalListui
 
-    // get id from e-data, 
-    const id = e.target.dataset.id;
+    // get id from e-data,
+    const jid = e.target.dataset.jid;
 
     // find jitem index in state.journal;
-    const index = this.state.journal.findIndex(j => j.id.toString() === id.toString());
+    const index = this.state.journal.findIndex(
+      j => j.jid.toString() === jid.toString()
+    );
     if (index < 0) return;
 
     let journal = [...this.state.journal];
     let jToDelete = [...this.state.jToDelete];
-    
-    if (!this.state.journal[index].status ||
-    this.state.journal[index].status === "edit") {
-      jToDelete.push(id);
+
+    if (
+      !this.state.journal[index].status ||
+      this.state.journal[index].status === "edit"
+    ) {
+      jToDelete.push(jid);
     }
 
     journal.splice(index, 1);
 
-    this.setState({journal, jToDelete, jItem: {}, jAlert: {msg: "įrašas ištrintas", type: "success"}});
+    this.setState({
+      journal,
+      jToDelete,
+      jItem: {},
+      jAlert: { msg: "įrašas ištrintas", type: "success" }
+    });
   }
 
   setJItemForEdit(e) {
     // Duodamas JournalListui
     // state.journal[index] kopijuojamas į state.jItem
-    const id = e.target.dataset.id;
-    const jItem = this.state.journal.find(j => j.id.toString() === id.toString());
-    if (!jItem) return
-    this.setState({jItem: {...jItem}, jAlert: null});
+    const jid = e.target.dataset.jid;
+    const jItem = this.state.journal.find(
+      j => j.jid.toString() === jid.toString()
+    );
+    if (!jItem) return;
+    this.setState({ jItem: { ...jItem }, jAlert: null });
   }
 
   onChangeMain(e) {
@@ -216,29 +234,39 @@ class EditItem extends Component {
     // journal items are already validated.
     // validate main data here
     // if bad - set stateError and return
-    
+
     if (main.id) {
       let journal = {};
       journal.insert = this.state.journal
         .filter(jItem => jItem.status === "add")
         .map(jItem => {
-          let j = {...jItem};
+          let j = { ...jItem };
           delete j.status;
           return j;
         });
       journal.update = this.state.journal
         .filter(jItem => jItem.status === "edit")
         .map(jItem => {
-          let j = {...jItem};
+          let j = { ...jItem };
           delete j.status;
           return j;
         });
       journal.delete = [...this.state.jToDelete];
-      this.props.updateItem(main, journal, this.props.history, this.props.itype);
+      this.props.updateItem(
+        main,
+        journal,
+        this.props.history,
+        this.props.itype
+      );
     } else {
       // jeigu nėra id, reiškia, kuriamas naujas
       // todėl visa jo journal - state.journal
-      this.props.insertItem(main, {insert: [...this.state.journal]}, this.props.history, this.props.itype);
+      this.props.insertItem(
+        main,
+        { insert: [...this.state.journal] },
+        this.props.history,
+        this.props.itype
+      );
     }
   }
 
@@ -259,11 +287,11 @@ class EditItem extends Component {
     // select form type
     const mainDataForm = itemSpecific[this.props.itype].mainDataForm;
     console.log(this.props.itype);
-    console.log(itemSpecific);    
-    
+    console.log(itemSpecific);
+
     const journalEditForm = itemSpecific[this.props.itype].journalEditForm;
 
-    return (      
+    return (
       <div className="container">
         <div className="row">
           {this.props.infoAlert ? (
@@ -285,24 +313,21 @@ class EditItem extends Component {
           })}
         </div>
         <div className="row">
-          {
-            this.props.journalFetchErrorMsg ? (
-              <Alert
-                message={this.props.journalFetchErrorMsg}
-              />
-            ) : (
-              <JournalList
-                jItems={this.state.journal}
-                setForEdit={this.setJItemForEdit}
-                deleteJItem={this.deleteJItem}
-                itype={this.props.itype}
-                currentId={this.state.jItem && this.state.jItem.id}
-              />
-            )
-          }          
+          {this.props.journalFetchErrorMsg ? (
+            <Alert message={this.props.journalFetchErrorMsg} />
+          ) : (
+            <JournalList
+              jItems={this.state.journal}
+              setForEdit={this.setJItemForEdit}
+              deleteJItem={this.deleteJItem}
+              itype={this.props.itype}
+              currentJid={this.state.jItem && this.state.jItem.jid}
+              things={this.props.things}
+            />
+          )}
         </div>
         <div className="row">
-          {journalEditForm({ 
+          {journalEditForm({
             jItem: this.state.jItem,
             onChange: this.onChangeJItem,
             options: this.#options,
@@ -338,7 +363,7 @@ export default connect(
     updateItem,
     insertItem,
     hideItemEditAlert,
-    fetchJournal, 
+    fetchJournal,
     removeJournal
   }
 )(EditItem);

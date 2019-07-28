@@ -4,14 +4,14 @@ const collections = require("../config/collections");
 const filters = {
         update: {
           main: "id = @id AND regbit = @regbit", 
-          journal: "id = @id AND mainid = @mainid"
+          journal: "jid = @jid AND mainid = @mainid"
         }
       };
 
 const exclude = {
       update: {
         main: ["id", "regbit"],
-        journal: ["id", "mainid"],
+        journal: ["jid", "mainid"],
       }, 
       insert: {
         main: ["id"],
@@ -77,7 +77,7 @@ module.exports.DELETE_MAIN_stmtText = (itype) => {
 // Kad tą tekstą įvykdyti, reikia db.prepare(textStmt).run(main_id, journal.delete);
 module.exports.DELETE_SOME_JOURNAL_stmtText = (itype, journal_delete) => {  
   const tableName = collections[itype].tables.journal.name;
-  return `DELETE FROM ${tableName} WHERE mainid = ? AND id IN (${journal_delete.map(j => '?').join(', ')})`;
+  return `DELETE FROM ${tableName} WHERE mainid = ? AND jid IN (${journal_delete.map(j => '?').join(', ')})`;
 };
 
 // eksportuoja prepared statement, kuris
@@ -118,8 +118,6 @@ module.exports.DELETE_FROM_SUPPLIED_stmt = db => db.prepare("DELETE FROM supplie
 
 module.exports.INSERT_INTO_UNAPPROVED_stmt = db => db.prepare("INSERT INTO unapproved (input, itype, oper) VALUES (@input, @itype, @oper)");
 
-module.exports.INSERT_INTO_WITHERRORS_stmt = db => db.prepare("INSERT INTO withErrors (input, itype, regbit) VALUES (@input, @itype, @regbit)");
-
 module.exports.SHIFT_MAIN_V_stmt = (itype, db) => {   
   const tableName = collections[itype].tables.main.name;
   return db.prepare(`UPDATE ${tableName} SET v = v + 1 WHERE id = ?`);
@@ -151,6 +149,8 @@ module.exports.QUERY_IF_ITEM_EXISTS_stmtFactory = (db, coll) => {
 module.exports.QUERY_IF_SAME_LOCATION_stmtFactory = (db, coll, action) => {
   const samePlaceFilter = `${coll.samePlace.filter[action]} AND ${coll.notPanaikinta} AND  ${coll.samePlace.query}`; 
   const spStmtText = "SELECT * FROM " + coll.tables.main.name + samePlaceFilter;
+  console.log("sameLocation stmt", spStmtText);
+  
   return db.prepare(spStmtText);
 }
 

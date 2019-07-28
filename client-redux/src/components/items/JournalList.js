@@ -2,7 +2,7 @@ import React from 'react';
 import itemSpecific from "../../itemSpecific";
 import journalSorter from "../../utils/journalSorter";
 
-const JournalList = ({jItems, setForEdit, deleteJItem, itype, currentId}) => {
+const JournalList = ({jItems, setForEdit, deleteJItem, itype, currentJid, things}) => {
 
   if (jItems.length < 1) {
     return (
@@ -22,8 +22,9 @@ const JournalList = ({jItems, setForEdit, deleteJItem, itype, currentId}) => {
       jItem={jItem} 
       setForEdit={setForEdit}
       deleteJItem={deleteJItem}
-      key={jItem.id}
-      current={jItem.id === currentId}
+      key={jItem.jid}
+      current={jItem.jid === currentJid}
+      things={things}
     />
   );
 

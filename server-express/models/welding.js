@@ -18,11 +18,11 @@ module.exports.main = {
 };
 
 module.exports.journal = {
-  id: {type: 'integer', required: true, validator: "isNegative", label: "id"},
+  jid: {type: 'integer', required: true, validator: "isNegative", label: "id"},
   data: {type: 'string', required: true, validator: "isNotShortDate", label: "įrašo data"},
   oper: {type: 'string', required: true, validator: "isEmptyString", label: "operatoriaus kodas"},
   apar: {type: 'string', required: true, validator: "isEmptyString", label: "defektoskopo kodas"},
-  pvd: {type: 'string', validator: "wrongLength", params: {min: 1, max: 50}, label: "pavadinimas"},
+  pvd: {type: 'string', required: true, validator: "isNotInSet", params: ["1", "2", "3", "4", "npl", "ctrl"], label: "pavadinimas"},
   note: {type: 'string', validator: "wrongLength", params: {min: 0, max: 255}, label: "pastaba"},
   mainid: {type: 'integer', label: 'main id'}
 }

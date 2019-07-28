@@ -50,7 +50,7 @@ module.exports.createRecord = (itype, db) => {
       console.error(journalInfo);
       throw Error("Error while inserting journal");
     }
-    deleteFromSupplied(item.id);
+    deleteFromSupplied.run(item.id);
   };
 };
 
@@ -77,18 +77,21 @@ module.exports.modifyRecord = (itype, db) => {
       console.error(versionInfo);
       throw Error("Error while shifting main version");
     }
-    deleteFromSupplied(item.id);
+    deleteFromSupplied.run(item.id);
   };
 };
 
+// grąžina funkciją, kuri ištrina iš lentelės supplied įrašą, kurio id yra id
 module.exports.deleteSuppliedById = db => {
-  const preparedStmt = SQLStatements.DELETE_FROM_SUPPLIED_BY_ID_stmt(db);
+  const preparedStmt = SQLStmts.DELETE_FROM_SUPPLIED_BY_ID_stmt(db);
   return id => preparedStmt.run(id);
 };
 
+// grąžina funciją, kuri įrašo input į lentelę unapproved ir ištrina tą įrašą
+// iš lentelės supplied
 module.exports.returnToOper = db => {
-  const insertUnapprovedStmt = SQLStatements.INSERT_INTO_UNAPPROVED_stmt(db);
-  const deleteFromSuppliedStmt = SQLStatements.DELETE_FROM_SUPPLIED_BY_ID_stmt(
+  const insertUnapprovedStmt = SQLStmts.INSERT_INTO_UNAPPROVED_stmt(db);
+  const deleteFromSuppliedStmt = SQLStmts.DELETE_FROM_SUPPLIED_BY_ID_stmt(
     db
   );
   return input => {
@@ -97,6 +100,8 @@ module.exports.returnToOper = db => {
     deleteFromSuppliedStmt.run(input.id);
   };
 };
+
+
 
 module.exports.update = function(itype, main, journal, returnRef, db) {
   let mainInfo = null;
@@ -113,7 +118,7 @@ module.exports.update = function(itype, main, journal, returnRef, db) {
     journal.update.forEach(j => {
       const txtUpdateJournal = factUpdateJournal(j);
       const jUInfo = db.prepare(txtUpdateJournal).run(j);
-      journalInfo.update.push({ [j.id]: jUInfo });
+      journalInfo.update.push({ [j.jid]: jUInfo });
     });
   }
 
@@ -123,15 +128,15 @@ module.exports.update = function(itype, main, journal, returnRef, db) {
     journal.insert.forEach(j => {
       const txtInsertJournal = factInsertJournal(j);
       const jIInfo = db.prepare(txtInsertJournal).run(j);
-      journalInfo.insert.push({ [j.id]: jIInfo });
+      journalInfo.insert.push({ [j.jid]: jIInfo });
     });
   }
 
   if (journal.delete && journal.delete.length) {
     const mainId = main.id;
-    const ids = journal.delete; //.map(idStr => parseInt(idStr));
-    const txtDeleteJournal = SQLStmts.DELETE_SOME_JOURNAL_stmtText(itype, ids);
-    journalInfo.delete = db.prepare(txtDeleteJournal).run(mainId, ids);
+    const jids = journal.delete; //.map(idStr => parseInt(idStr));
+    const txtDeleteJournal = SQLStmts.DELETE_SOME_JOURNAL_stmtText(itype, jids);
+    journalInfo.delete = db.prepare(txtDeleteJournal).run(mainId, jids);
   }
 
   returnRef.mainInfo = mainInfo;

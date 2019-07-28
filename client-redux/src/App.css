@@ -103,7 +103,7 @@ li.ellipsis {
 }
 
 .modal-header {
-  background-color: #d42929;
+  background-color: #7c4949;
   color: whitesmoke;
 }
 
@@ -116,7 +116,7 @@ li.ellipsis {
 }
 
 .reject-button {
-  background-color: #d42929; /* Green */
+  background-color: #7c4949;
   border: 2px solid whitesmoke;
   border-radius: 5px;
   color: whitesmoke;
@@ -125,6 +125,14 @@ li.ellipsis {
   font-weight: bold;
   display: inline-block;
   font-size: 1em;
+}
+
+.my-modal.operinput.input .modal-header, .my-modal.operinput.input .reject-button {
+  background-color: rgb(83, 121, 76);
+}
+
+.my-modal.operinput.search .modal-header, .my-modal.operinput.search .reject-button {
+  background-color: rgb(80, 106, 141);
 }
 
 /* End of Modal */

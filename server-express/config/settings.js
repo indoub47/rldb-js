@@ -13,6 +13,7 @@ exports.COLLECTIONS = [
   {name: "pavoj", actions: ["all"], hasRegion: false},
   {name: "virino", actions: ["all"], hasRegion: true},
   {name: "vbudas", actions: ["all"], hasRegion: false},
+  {name: "vpvd", actions: ["all"], hasRegion: false},
   {name: "itemstatus", actions: ["all"], hasRegion: false},
   {name: "region", actions: ["register_user"]},
   {name: "urole", actions: ["register_user"]}

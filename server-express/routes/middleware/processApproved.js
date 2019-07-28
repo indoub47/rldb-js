@@ -15,12 +15,13 @@ const modifyExistingRecord = (
   }
 
   item.journal = vResult.item.journal;
+  item.journal.jid = Date.now();
 
   // check if exists
   // check if the same version
   // attempt to insert journal and delete from supplied
   try {
-    const found = ifExists(item.main.id, regbit);
+    const found = ifExists.get(item.main.id, regbit);
     if (!found || found.v !== item.main.v) {
       return false;
     }
@@ -43,7 +44,7 @@ const createNewRecord = (
   itype,
   regbit,
   validate,
-  sammLocation,
+  sameLocation,
   createRecord
 ) => {
   const vResult = validate(item.main, item.journal, itype, true, "both");
@@ -52,12 +53,15 @@ const createNewRecord = (
   }
 
   item.main = vResult.item.main;
+  item.main.regbit = regbit;
   item.journal = vResult.item.journal;
+  item.journal.jid = Date.now();
+  
 
   // check for same location
   // if not same location - create record
   try {
-    if (sameLocation(item.main, regbit)) {
+    if (sameLocation.get(item.main, item.main.regbit)) {
       return false;
     }
     createRecord(item); // transaction

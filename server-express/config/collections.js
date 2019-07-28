@@ -31,7 +31,7 @@ module.exports = {
       main: {name: "weldings"}, 
       journal: {name: "weldingj"},
       viewAllFirstJ: {name: "weldings_all_firstj"},
-      viewAllLastJ: {name: "weldings_all_lastj"},
+      viewAllLastJ: {name: "weldings_all_lastjplan"},
     },
     itemNames: {
       item: "suvirinimas", 

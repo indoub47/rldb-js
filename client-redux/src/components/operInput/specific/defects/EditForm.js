@@ -14,7 +14,7 @@ const EditForm = ({ item, onChange, options, errors }) => {
       {errors.common && <Alert message={errors.common} type="error" />}
       <div className="form-group row main-data text-center">
         <SelectInputGroup
-          id="item-meistrija"
+          id="defect-meistrija"
           name="main.meistrija"
           label="Meistrija"
           divClassname="form-group col-4"
@@ -25,7 +25,7 @@ const EditForm = ({ item, onChange, options, errors }) => {
           error={errors.meistrija}
         />
         <SelectInputGroup
-          id="item-kkateg"
+          id="defect-kkateg"
           name="main.kkateg"
           label="Kelio kategorija"
           divClassname="form-group col-4"
@@ -38,7 +38,7 @@ const EditForm = ({ item, onChange, options, errors }) => {
       </div>
       <div className="form-group row begis text-center">
         <SelectInputGroup
-          id="item-btipas"
+          id="defect-btipas"
           divClassname="form-group col-4"
           name="main.btipas"
           label="Bėgio tipas"
@@ -49,7 +49,7 @@ const EditForm = ({ item, onChange, options, errors }) => {
           error={errors.btipas}
         />
         <SelectInputGroup
-          id="item-bgamykl"
+          id="defect-bgamykl"
           divClassname="form-group col-4"
           name="main.bgamykl"
           label="Bėgio gamykla"
@@ -62,7 +62,7 @@ const EditForm = ({ item, onChange, options, errors }) => {
         <TextFieldGroup
           divClassname="form-group col-4"
           label="Bėgio gam. metai"
-          id="item-bmetai"
+          id="defect-bmetai"
           name="main.bmetai"
           placeholder="Bėgio gam. metai"
           value={absent(item, "main", "bmetai")}
@@ -76,7 +76,7 @@ const EditForm = ({ item, onChange, options, errors }) => {
         <TextFieldGroup
           label="Linija"
           divClassname="form-group col-2"
-          id="item-linija"
+          id="defect-linija"
           name="main.linija"
           placeholder="Linija"
           value={absent(item, "main", "linija")}
@@ -87,7 +87,7 @@ const EditForm = ({ item, onChange, options, errors }) => {
         <TextFieldGroup
           label="Kelias"
           divClassname="form-group col-2"
-          id="item-kelias"
+          id="defect-kelias"
           name="main.kelias"
           placeholder="Kelio Nr."
           value={absent(item, "main", "kelias")}
@@ -98,7 +98,7 @@ const EditForm = ({ item, onChange, options, errors }) => {
         <TextFieldGroup
           label="km"
           divClassname="form-group col-2"
-          id="item-km"
+          id="defect-km"
           name="main.km"
           placeholder="km"
           value={absent(item, "main", "km")}
@@ -109,7 +109,7 @@ const EditForm = ({ item, onChange, options, errors }) => {
         <TextFieldGroup
           label="pk"
           divClassname="form-group col-2"
-          id="item-pk"
+          id="defect-pk"
           name="main.pk"
           placeholder="pk"
           value={absent(item, "main", "pk")}
@@ -120,7 +120,7 @@ const EditForm = ({ item, onChange, options, errors }) => {
         <TextFieldGroup
           label="m"
           divClassname="form-group col-2"
-          id="item-m"
+          id="defect-m"
           name="main.m"
           placeholder="m"
           value={absent(item, "main", "m")}
@@ -129,7 +129,7 @@ const EditForm = ({ item, onChange, options, errors }) => {
           error={errors.m}
         />
         <SelectInputGroup
-          id="item-siule"
+          id="defect-siule"
           divClassname="form-group col-2"
           name="main.siule"
           label="Siūlė"
@@ -145,14 +145,14 @@ const EditForm = ({ item, onChange, options, errors }) => {
           label="Data"
           divClassname="form-group col-4"
           type="date"
-          id="item-data"
+          id="defect-data"
           name="journal.data"
           value={absent(item, "journal", "data")}
           onChange={onChange}
           error={errors.data}
         />
         <SelectInputGroup
-          id="item-oper"
+          id="defect-oper"
           name="journal.oper"
           label="Operatorius"
           divClassname="form-group col-4"
@@ -162,7 +162,7 @@ const EditForm = ({ item, onChange, options, errors }) => {
           error={errors.oper}
         />
         <SelectInputGroup
-          id="item-apar"
+          id="defect-apar"
           name="journal.apar"
           label="Defektoskopas"
           divClassname="form-group col-4"
@@ -176,7 +176,7 @@ const EditForm = ({ item, onChange, options, errors }) => {
         <TextFieldGroup
           label="Kodas"
           divClassname="form-group col-3"
-          id="item-kodas"
+          id="defect-kodas"
           name="journal.kodas"
           placeholder="Kodas"
           value={absent(item, "journal", "kodas")}
@@ -186,7 +186,7 @@ const EditForm = ({ item, onChange, options, errors }) => {
         <TextFieldGroup
           label="L"
           divClassname="form-group col-3"
-          id="item-dl"
+          id="defect-dl"
           name="journal.dl"
           placeholder="L"
           value={absent(item, "journal", "dl")}
@@ -196,7 +196,7 @@ const EditForm = ({ item, onChange, options, errors }) => {
         <TextFieldGroup
           label="H"
           divClassname="form-group col-3"
-          id="item-dh"
+          id="defect-dh"
           name="journal.dh"
           placeholder="H"
           value={absent(item, "journal", "dh")}
@@ -204,7 +204,7 @@ const EditForm = ({ item, onChange, options, errors }) => {
           error={errors.dh}
         />
         <SelectInputGroup
-          id="item-pavoj"
+          id="defect-pavoj"
           name="journal.pavoj"
           label="Pavojingumas"
           divClassname="form-group col-3"
@@ -219,7 +219,7 @@ const EditForm = ({ item, onChange, options, errors }) => {
           label="Terminas"
           divClassname="form-group col-3"
           type="date"
-          id="item-dtermin"
+          id="defect-dtermin"
           name="journal.dtermin"
           value={absent(item, "journal", "dtermin")}
           onChange={onChange}
@@ -228,7 +228,7 @@ const EditForm = ({ item, onChange, options, errors }) => {
         <TextFieldGroup
           label="Pastaba"
           divClassname="form-group col-9"
-          id="item-note"
+          id="defect-note"
           name="journal.note"
           placeholder="Pastaba"
           value={absent(item, "journal", "note")}

@@ -8,7 +8,7 @@ const ModalFormPanel = ({body, title, submitHandler, cancelHandler, purpose, sho
       style={show ? {display: "block"} : {display: "none"}} 
       id="form-panel" tabIndex="-1">
         <div className="modal-content">
-          <div className="modal-header">
+          <div className="modal-header"> 
             <h5 className="modal-title" id="modal-title">{title}</h5>
             <button type="button" className="reject-button" onClick={cancelHandler}>
               &times;

@@ -33,8 +33,9 @@ export const fetchSuppliedOperInput = itype => dispatch => {
   axios
     .get("/api/operinput/supplied", { params: { itype } })
     .then(res => {
-      console.log("supplied", res.data);
+      console.log("got supplied: ", res.data);
       //const parsed = unpack(res.data, "supplied");
+      console.log("dispatching fetchIApproveSuccess")
       dispatch(fetchIApproveSuccess(res.data));
     })
     .catch(err => {
@@ -47,9 +48,9 @@ const iApproveProcessBegin = () => ({
   type: IAPPROVE_PROCESS_BEGIN
 });
 
-const iApproveProcessSuccess = info => ({
+const iApproveProcessSuccess = items => ({
   type: IAPPROVE_PROCESS_SUCCESS,
-  payload: { info }
+  payload: { items }
 });
 
 const iApproveProcessFailure = errormsg => ({
@@ -73,9 +74,10 @@ export const submitIApprove = (input, itype) => dispatch => {
       console.error(err);
       dispatch(iApproveProcessFailure(err.message));
     })
-    .finally(() => {
-      fetchSuppliedOperInput(itype);
-    });
+    // .finally(() => {
+    //   console.log("dispatching fetchSupplied");
+    //   fetchSuppliedOperInput(itype);
+    // });
 };
 
 export const setItems = items => dispatch => {

@@ -1,7 +1,7 @@
 function checkIfVMatch(foundV, mainV, res, ref) {
 // check if versions match
   ref.result = true;
-  if (found.v !== main.v) {
+  if (foundV !== mainV) {
     ref.result = false;
     return res.status(409).send({
       ok: 0,

@@ -5,6 +5,9 @@ import SelectInputGroup from "../../../common/SelectInputGroup";
 import absent from "../../../../utils/absent-props";
 
 const JournalEditForm = ({ jItem, onChange, options, submitJItem, cancelJItem, alert }) => {
+
+  console.log("jItem", jItem);
+  console.log("absent(jItem.oper), absent(jItem.apar)", absent(jItem.oper), absent(jItem.apar));
   
   return (
     <div className="container journal-info border border-primary text-center">
@@ -18,7 +21,7 @@ const JournalEditForm = ({ jItem, onChange, options, submitJItem, cancelJItem, a
       <div className="form-group row text-center">
         <TextFieldGroup
           label="Data"
-          divClassname="form-group col-4"
+          divClassname="form-group col-3"
           type="date"
           id="jitem-data"
           name="data"
@@ -29,7 +32,7 @@ const JournalEditForm = ({ jItem, onChange, options, submitJItem, cancelJItem, a
           id="jitem-oper"
           name="oper"
           label="Operatorius"
-          divClassname="form-group col-4"
+          divClassname="form-group col-3"
           value={absent(jItem.oper)}
           options={options.oper}
           onChange={onChange}
@@ -38,20 +41,20 @@ const JournalEditForm = ({ jItem, onChange, options, submitJItem, cancelJItem, a
           id="jitem-apar"
           name="apar"
           label="Defektoskopas"
-          divClassname="form-group col-4"
+          divClassname="form-group col-3"
           value={absent(jItem.apar)}
           options={options.apar}
           onChange={onChange}
         />
       </div>
       <div className="form-group row text-center">
-        <TextFieldGroup
-          label="Pavadinimas"
-          divClassname="form-group col-3"
+        <SelectInputGroup
           id="jitem-pvd"
           name="pvd"
-          placeholder="Pavadinimas"
+          label="Pavadinimas"
+          divClassname="form-group col-3"
           value={absent(jItem.pvd)}
+          options={options.vpvd}
           onChange={onChange}
         />
         <TextFieldGroup

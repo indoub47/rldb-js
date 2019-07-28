@@ -7,8 +7,6 @@ module.exports = (input, model) => {
   Object.keys(model.journal).forEach(key => journal[key] = input[key]);
   journal.note = "";
 
-  delete journal.id; // nes perkopijuoja iš input.id
-
   if (input.id > 0) {
     journal.mainid = input.id;
   }

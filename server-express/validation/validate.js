@@ -104,6 +104,14 @@ const validators = {
       );
     },
     msg: () => "must be valid short date (yyyy-mm-dd) or empty"
+  },
+
+  isNotInSet: {
+    func: (value, set) => {
+      console.log("value, set:", value, set);
+      return !set.includes(value);
+    },
+    msg: (set) => "out of allowed values set: " + set
   }
 };
 
@@ -302,6 +310,6 @@ module.exports.validators = validators;
 module.exports.hasDateOverflow = hasDateOverflow;
 module.exports.emptyValue = emptyValue;
 
-module.exports.validate = validateItem;
+module.exports.validateItem = validateItem;
 module.exports.validateItemPart = validateItemPart;
 module.exports.validateItemPair = validateItemPair;

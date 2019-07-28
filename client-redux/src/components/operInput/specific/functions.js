@@ -40,7 +40,6 @@ const splitMainJournalClear = (input, model) => {
   let journal = {};
   Object.keys(model.journal).forEach(key => (journal[key] = null));
 
-  delete journal.id;
   journal.mainid = input.id;
 
   return { main, journal };

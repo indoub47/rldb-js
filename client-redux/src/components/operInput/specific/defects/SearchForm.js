@@ -10,7 +10,7 @@ const SearchForm = ({onChange, searchInput, options, errors }) => {
       <div className="form-group row">
         <TextFieldGroup
           label="Linija"
-          id="search-linija"
+          id="defect-search-linija"
           name="linija"
           placeholder="Linija"
           classname="form-group col-12"
@@ -22,7 +22,7 @@ const SearchForm = ({onChange, searchInput, options, errors }) => {
       <div className="form-group row">      
         <TextFieldGroup
           label="Kelias"
-          id="search-kelias"
+          id="defect-search-kelias"
           name="kelias"
           placeholder="kelias"
           classname="form-group col-12"
@@ -34,7 +34,7 @@ const SearchForm = ({onChange, searchInput, options, errors }) => {
       <div className="form-group row">      
         <TextFieldGroup
           label="km"
-          id="search-km"
+          id="defect-search-km"
           name="km"
           placeholder="km"
           classname="form-group col-12"
@@ -46,7 +46,7 @@ const SearchForm = ({onChange, searchInput, options, errors }) => {
       <div className="form-group row">      
         <TextFieldGroup
           label="pk"
-          id="search-pk"
+          id="defect-search-pk"
           name="pk"
           placeholder="pk"
           classname="form-group col-12"
@@ -58,7 +58,7 @@ const SearchForm = ({onChange, searchInput, options, errors }) => {
       <div className="form-group row">      
         <TextFieldGroup
           label="m"
-          id="search-m"
+          id="defect-search-m"
           name="m"
           placeholder="m"
           classname="form-group col-12"
@@ -69,7 +69,7 @@ const SearchForm = ({onChange, searchInput, options, errors }) => {
       </div>
       <div className="form-group row">      
         <SelectInputGroup
-          id="search-siule"
+          id="defect-search-siule"
           name="siule"
           label="Siūlė"
           classname="form-group col-12"

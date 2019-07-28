@@ -28,20 +28,23 @@ export default function(state = initialState, action) {
         isLoading: true
       };
 
+    case IAPPROVE_PROCESS_SUCCESS:
     case IAPPROVE_FETCH_SUCCESS:
+      console.log("action.payload.items", action.payload.items);
       const items = action.payload.items.map(i => ({ ...i, action: "none" }));
+      console.log("items to set store", items);
       return {
         ...state,
         items,
         isLoading: false
       };
 
-    case IAPPROVE_PROCESS_SUCCESS:
-      return {
-        ...state,
-        isLoading: false,
-        info: { message: action.payload.info, type: "info" }
-      };
+    // case IAPPROVE_PROCESS_SUCCESS:
+    //   return {
+    //     ...state,
+    //     isLoading: false,
+    //     info: { message: action.payload.info.toString(), type: "info" }
+    //   };
 
     case IAPPROVE_FETCH_FAILURE:
     case IAPPROVE_PROCESS_FAILURE:

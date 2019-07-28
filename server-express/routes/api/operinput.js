@@ -60,10 +60,15 @@ router.get("/supplied", getCollection, (req, res) => {
     return res.status(500).send(error);
   }
 
+  console.log("fetched", fetched);
+  
+
   if (fetched.length < 1) return res.status(200).send([]);
 
   // json to object
   fetched.forEach(item => parseMainJournal(item));
+
+  console.log("parsed", fetched);
 
   // Visus įrašus padalinti į kuriamus naujus ir modifikuojamus.
   // Modifikuojamų id teigiamas, kuriamų naujų id neigiamas.
@@ -233,7 +238,44 @@ router.post("/process-approved", getCollection, (req, res) => {
       }
     });
 
-  res.status(200).send(result);
+  //res.status(200).send(result);
+  const stmtText = `SELECT * FROM supplied WHERE itype = ? AND regbit = ?`;
+  let fetched = null;
+
+  try {
+    fetched = db.prepare(stmtText).all(itype, regbit);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send(error);
+  }
+
+  //console.log("fetched", fetched);
+  
+
+  if (fetched.length < 1) return res.status(200).send([]);
+
+  // json to object
+  fetched.forEach(item => parseMainJournal(item));
+
+  //console.log("parsed", fetched);
+
+  // Visus įrašus padalinti į kuriamus naujus ir modifikuojamus.
+  // Modifikuojamų id teigiamas, kuriamų naujų id neigiamas.
+  let toCreate = fetched.filter(i => i.main.id < 0);
+  let toModify = fetched.filter(i => i.main.id > 0);
+
+  // validate drafts
+  validateSupplied.toCreate(toCreate, coll, regbit, itype, db);
+  validateSupplied.toModify(toModify, coll, regbit, itype, db);
+  // Each invalid item has gotten .validation prop:
+  // {reason: "string", (optional) errors: []}
+
+  // merge back into single array
+  const merged = toCreate.concat(toModify);
+
+  return res.status(200).send(merged);
+
+
 });
 
 

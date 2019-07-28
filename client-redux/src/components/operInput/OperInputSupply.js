@@ -55,12 +55,18 @@ class OperInputSupply extends Component {
     this.props.fetchUnapprovedOperInput(this.props.itype);
   }
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.itype !== this.props.itype) {
+      this.#options = itemSpecific[this.props.itype].options(this.props.things);
+    }
+  }
+
   hideInfo() {
-    this.props.dispatchRemoveInfo();
+    this.props.removeInfo();
   }
 
   hideSearchInfo() {
-    this.props.dispatchRemoveSearchInfo();
+    this.props.removeSearchInfo();
   }
 
   componentWillUnmount() {

@@ -18,7 +18,7 @@ module.exports.main = {
 };
 
 module.exports.journal = {
-  id: {type: 'integer', label: "id"},
+  jid: {type: 'integer', label: "id"},
   data: {type: 'string', required: true, validator: "isNotShortDate", label: "įrašo data"},
   kodas: {type: 'string', required: true, validator: "isEmptyString", label: "defekto kodas"},
   dl: {type: 'number', validator: "isNegative", label: "defekto dydis L"},
